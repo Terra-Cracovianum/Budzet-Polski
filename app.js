@@ -1301,13 +1301,40 @@
   function drawTax1000() { taxBarList("tax-1000", function (s) { return s * 1000; }, function (v) { return Math.round(v) + " zł"; }); }
   function drawTaxSplit() { taxBarList("tax-split", function (s) { return s * taxAmount; }, function (v) { return zlFull(v); }); }
 
-  // ================= PLAN VS WYKONANIE (test — na razie tylko 2025) =================
-  var WYK_FILES = { 2025: "wykonanie-2025.json", 2024: "wykonanie-2024.json", 2023: "wykonanie-2023.json", 2022: "wykonanie-2022.json", 2021: "wykonanie-2021.json", 2020: "wykonanie-2020.json", 2019: "wykonanie-2019.json", 2018: "wykonanie-2018.json", 2017: "wykonanie-2017.json", 2016: "wykonanie-2016.json", 2015: "wykonanie-2015.json", 2014: "wykonanie-2014.json", 2013: "wykonanie-2013.json", 2012: "wykonanie-2012.json", 2011: "wykonanie-2011.json" };
+  // ================= PLAN VS WYKONANIE =================
+  // 2026 is year-to-date (sprawozdanie operatywne), not a closed year.
+  var WYK_FILES = { 2026: "wykonanie-2026.json", 2025: "wykonanie-2025.json", 2024: "wykonanie-2024.json", 2023: "wykonanie-2023.json", 2022: "wykonanie-2022.json", 2021: "wykonanie-2021.json", 2020: "wykonanie-2020.json", 2019: "wykonanie-2019.json", 2018: "wykonanie-2018.json", 2017: "wykonanie-2017.json", 2016: "wykonanie-2016.json", 2015: "wykonanie-2015.json", 2014: "wykonanie-2014.json", 2013: "wykonanie-2013.json", 2012: "wykonanie-2012.json", 2011: "wykonanie-2011.json" };
+  var EXEC_PO = { 1: "po styczniu", 2: "po lutym", 3: "po marcu", 4: "po kwietniu", 5: "po maju", 6: "po czerwcu", 7: "po lipcu", 8: "po sierpniu", 9: "po wrześniu", 10: "po październiku", 11: "po listopadzie" };
+  var EXEC_KONIEC = { 1: "stycznia", 2: "lutego", 3: "marca", 4: "kwietnia", 5: "maja", 6: "czerwca", 7: "lipca", 8: "sierpnia", 9: "września", 10: "października", 11: "listopada" };
+  var EXEC_CLOSED_LEAD = "Ile z zaplanowanego budżetu faktycznie wydano. Porównanie planu z ustawy budżetowej z wykonaniem (sprawozdanie Ministerstwa Finansów). Wersja testowa: na razie lata 2011–2025.";
+  var EXEC_CLOSED_HINT = "„% planu” = wykonanie ÷ plan z ustawy. MF liczy wykonanie względem planu po zmianach (po rezerwach), więc względem pierwotnej ustawy bywa ponad 100% tam, gdzie uruchomiono rezerwy celowe (np. rolnictwo, zdrowie). Ok. 1,6 mld zł trafiło do działów spoza pierwotnego planu.";
+  var EXEC_TAB_CLOSED = "Plan vs wykonanie";
+  var EXEC_TAB_OPEN = "Wykonanie w toku";
   var WYK_CACHE = {};
   // the "Plan vs wykonanie" tab only exists for years that have execution data
   function updateExecTab() {
     var btn = document.getElementById("tab-exec");
     if (btn) btn.style.display = WYK_FILES[YEAR] ? "" : "none";
+    refreshExecTabLabel();
+  }
+  function setExecTabLabel(partial) {
+    setExecText("tab-exec-label", partial ? EXEC_TAB_OPEN : EXEC_TAB_CLOSED);
+  }
+  function setExecStatus(text) {
+    var el = document.getElementById("exec-status");
+    if (!el) return;
+    if (!text) { el.hidden = true; return; }
+    setExecText("exec-status-text", text);
+    el.hidden = false;
+  }
+  // tab label follows the year even when the panel is closed
+  function refreshExecTabLabel() {
+    if (!WYK_FILES[YEAR]) { setExecTabLabel(false); return; }
+    var yr = YEAR;
+    loadExec(function (W) {
+      if (yr !== YEAR) return;
+      setExecTabLabel(!!execMonths(W));
+    });
   }
   function loadExec(cb) {
     var file = WYK_FILES[YEAR];
@@ -1318,6 +1345,41 @@
       .catch(function (err) { console.error(err); cb(null); });
   }
   function execPct(wyk, plan) { return plan > 0 ? wyk / plan * 100 : null; }
+  // partial year: meta.miesiace is 1–11. A closed year has no such field.
+  function execMonths(W) {
+    var n = W && W.meta && W.meta.miesiace;
+    return (typeof n === "number" && n > 0 && n < 12) ? n : 0;
+  }
+  function setExecText(id, text) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = text;
+  }
+  function applyExecChrome(W) {
+    var n = execMonths(W);
+    if (!n) {
+      setExecTabLabel(false);
+      setExecStatus("");
+      setExecText("exec-lead", EXEC_CLOSED_LEAD);
+      setExecText("exec-hint-text", EXEC_CLOSED_HINT);
+      setExecText("exec-h-bars", "Plan obok wykonania");
+      setExecText("exec-h-doch", "Dochody wg źródła: plan vs wykonanie");
+      setExecText("exec-h-list", "Stopień wykonania wg działów");
+      setExecText("exec-h-odch", "Największe odchylenia działów");
+      return;
+    }
+    var po = EXEC_PO[n] || "narastająco";
+    var rok = (W.meta && W.meta.rok) || YEAR;
+    var okres = (W.meta && W.meta.okres) ? " (" + W.meta.okres + ")" : "";
+    var koniec = EXEC_KONIEC[n] || po;
+    setExecTabLabel(true);
+    setExecStatus("Stan na koniec " + koniec + " " + rok + ", " + n + " z 12 miesięcy. Poniższe kwoty to wykonanie narastająco, nie wynik za cały rok.");
+    setExecText("exec-lead", "Stan na koniec " + koniec + " " + rok + okres + ". Porównanie planu z ustawy na cały rok z wykonaniem narastająco. To nie jest zamknięcie roku.");
+    setExecText("exec-hint-text", (W.meta && W.meta.uwaga) || "");
+    setExecText("exec-h-bars", "Plan roczny obok wykonania " + po);
+    setExecText("exec-h-doch", "Dochody wg źródła: plan roczny i stan " + po);
+    setExecText("exec-h-list", "Udział planu rocznego wg działów");
+    setExecText("exec-h-odch", "Tempo wobec " + n + "/12 roku");
+  }
   function drawExec() {
     var st = document.getElementById("exec-state"), body = document.getElementById("exec-body"), notice = document.getElementById("exec-notice");
     if (st) st.style.display = "none";
@@ -1326,6 +1388,7 @@
     loadExec(function (W) {
       if (!W) { if (notice) { notice.hidden = false; notice.textContent = "Nie udało się wczytać danych o wykonaniu."; } if (body) body.hidden = true; return; }
       if (body) body.hidden = false;
+      applyExecChrome(W);
       drawExecSummary(W); drawExecKPIs(W); drawExecBars(W); drawExecDochody(W); drawExecList(W); drawExecOdchylenia(W);
     });
   }
@@ -1336,6 +1399,17 @@
   function drawExecSummary(W) {
     var el = document.getElementById("exec-summary"); if (!el) return;
     var m = DATA.meta, w = W.wykonanie;
+    var n = execMonths(W);
+    if (n) {
+      var spend = execPct(w.wydatki, m.wydatki), inc = execPct(w.dochody, m.dochody), def = execPct(w.deficyt, m.deficyt);
+      var elapsed = Math.round(n / 12 * 100);
+      var okres = (W.meta && W.meta.okres) ? " (" + escapeHtml(W.meta.okres) + ")" : "";
+      var defClause = (def == null)
+        ? " Deficyt wykonania to " + money(w.deficyt) + "."
+        : " Deficyt sięgnął " + money(w.deficyt) + ", czyli " + absPct(def) + "% deficytu założonego w ustawie.";
+      el.innerHTML = "Po " + n + " miesiącach" + okres + " wydano <strong>" + money(w.wydatki) + "</strong>, czyli <strong>" + absPct(spend) + "%</strong> rocznego planu. Dochody wyniosły " + money(w.dochody) + " (" + absPct(inc) + "% planu)." + defClause + " Minęło " + elapsed + "% roku.";
+      return;
+    }
     var dd = execDev(m.dochody, w.dochody), dw = execDev(m.wydatki, w.wydatki), df = execDev(m.deficyt, w.deficyt);
     function mw(p) { return p < 0 ? "mniej" : "więcej"; }
     var defClause = (df.pct == null)
@@ -1352,12 +1426,17 @@
       { label: "Deficyt", plan: m.deficyt, wyk: W.wykonanie.deficyt, danger: true }
     ];
     var host = document.getElementById("exec-kpis"); if (!host) return;
+    var n = execMonths(W);
+    var po = n ? (EXEC_PO[n] || "narastająco") : "";
     host.innerHTML = cards.map(function (c, i) {
       var dv = execDev(c.plan, c.wyk);
-      // deficyt lower than plan = good news → green; revenue/spend deviations stay neutral
-      var dCls = (c.label === "Deficyt") ? (dv.diff < 0 ? " is-good" : " is-bad") : "";
-      var delta = signMoney(dv.diff) + " · " + (dv.pct == null ? "—" : (dv.pct >= 0 ? "+" : "−") + absPct(dv.pct) + "%") + " vs plan";
-      return '<div class="stat anim-in" style="--anim-delay:' + (i * 50) + 'ms"><p class="stat-label">' + c.label + ' (wykonanie)</p>' +
+      var share = execPct(c.wyk, c.plan);
+      // closed year: deficyt lower than plan = good news. A partial year is not finished, so no good/bad.
+      var dCls = (!n && c.label === "Deficyt") ? (dv.diff < 0 ? " is-good" : " is-bad") : "";
+      var delta = n
+        ? ((share == null ? "—" : absPct(share) + "% planu rocznego"))
+        : (signMoney(dv.diff) + " · " + (dv.pct == null ? "—" : (dv.pct >= 0 ? "+" : "−") + absPct(dv.pct) + "%") + " vs plan");
+      return '<div class="stat anim-in" style="--anim-delay:' + (i * 50) + 'ms"><p class="stat-label">' + c.label + (n ? " (" + po + ")" : " (wykonanie)") + '</p>' +
         '<p class="stat-value' + (c.danger ? " is-danger" : "") + '" data-ek="' + i + '"></p>' +
         '<p class="stat-foot">plan ' + money(c.plan) + '</p>' +
         '<p class="exec-delta' + dCls + '">' + delta + "</p></div>";
@@ -1372,12 +1451,14 @@
   }
   function drawExecList(W) {
     var host = document.getElementById("exec-list"); if (!host) return;
+    var partial = !!execMonths(W);
     var dz = DATA.dzialy.slice().filter(function (d) { return W.dzialy[d.code] != null; }).sort(function (a, b) { return b.plan - a.plan; });
     host.innerHTML = dz.map(function (d) {
       var wyk = W.dzialy[d.code], pct = execPct(wyk, d.plan);
       var w = Math.max(2, Math.min(pct == null ? 0 : pct, 100));
       var c = CMAP[colorKey(d.name)];
-      var cls = pct == null ? "" : (pct >= 99 ? "is-over" : (pct < 85 ? "is-low" : ""));
+      // <85% / ≥99% coloring is for a finished year. Mid-year almost every dział would look "low".
+      var cls = (!partial && pct != null) ? (pct >= 99 ? "is-over" : (pct < 85 ? "is-low" : "")) : "";
       return '<div class="taxbar" title="' + escapeHtml(d.name) + ": plan " + money(d.plan) + " → wykonanie " + money(wyk) + '">' +
         '<span class="taxbar-name">' + escapeHtml(d.name) + "</span>" +
         '<span class="taxbar-track"><span class="taxbar-fill grow-in" style="width:' + w.toFixed(1) + "%;background:" + c.fill + ";border:1px solid " + c.line + '"></span></span>' +
@@ -1394,6 +1475,9 @@
       { label: "Deficyt", plan: m.deficyt, wyk: w.deficyt, col: cssVar("var(--danger)") }
     ];
     var max = d3.max(rows, function (r) { return Math.max(r.plan, r.wyk); }) || 1;
+    var n = execMonths(W);
+    var planLab = n ? "plan roczny" : "plan";
+    var wykLab = n ? (EXEC_PO[n] || "wykonanie") : "wyk";
     host.innerHTML = rows.map(function (r) {
       function bar(val, cls, lab) {
         var pw = Math.max(1, val / max * 100);
@@ -1401,7 +1485,7 @@
           '<span class="planbar-val">' + lab + " " + moneyShort(val) + "</span></div>";
       }
       return '<div class="planbar-group"><div class="planbar-label">' + r.label + "</div>" +
-        bar(r.plan, "is-plan", "plan") + bar(r.wyk, "is-wyk", "wyk") + "</div>";
+        bar(r.plan, "is-plan", planLab) + bar(r.wyk, "is-wyk", wykLab) + "</div>";
     }).join("");
   }
   // module 2 — dochody by source: plan vs wykonanie
@@ -1410,12 +1494,20 @@
     var inneName = "Inne dochody podatkowe i niepodatkowe";
     var known = W.dochody.VAT + W.dochody.Akcyza + W.dochody.CIT + W.dochody.PIT;
     var wykOf = function (name) { return name === inneName ? (W.wykonanie.dochody - known) : W.dochody[name]; };
+    var partial = !!execMonths(W);
     var rows = DATA.dochody.slice().filter(function (d) { return wykOf(d.name) != null; }).sort(function (a, b) { return b.plan - a.plan; });
     host.innerHTML = rows.map(function (d) {
       var wyk = wykOf(d.name), pct = execPct(wyk, d.plan);
-      var w = Math.max(2, Math.min(pct == null ? 0 : pct, 100));
       var c = CMAP[colorKey(d.name)];
-      var cls = pct == null ? "" : (pct >= 99 ? "is-over" : (pct < 85 ? "is-low" : ""));
+      // negative execution (PIT mid-year: shares sent to local governments exceed collections) is an amount, not a % bar
+      if (wyk < 0) {
+        return '<div class="taxbar" title="' + escapeHtml(d.name) + ": plan " + money(d.plan) + " → wykonanie " + signMoney(wyk) + '">' +
+          '<span class="taxbar-name">' + escapeHtml(d.name) + "</span>" +
+          '<span class="taxbar-track"><span class="taxbar-fill" style="width:0"></span></span>' +
+          '<span class="taxbar-amt">' + signMoney(wyk) + "</span></div>";
+      }
+      var w = Math.max(2, Math.min(pct == null ? 0 : pct, 100));
+      var cls = (!partial && pct != null) ? (pct >= 99 ? "is-over" : (pct < 85 ? "is-low" : "")) : "";
       return '<div class="taxbar" title="' + escapeHtml(d.name) + ": plan " + money(d.plan) + " → wykonanie " + money(wyk) + '">' +
         '<span class="taxbar-name">' + escapeHtml(d.name) + "</span>" +
         '<span class="taxbar-track"><span class="taxbar-fill grow-in" style="width:' + w.toFixed(1) + "%;background:" + c.fill + ";border:1px solid " + c.line + '"></span></span>' +
@@ -1425,6 +1517,8 @@
   // module 3 — biggest dział deviations (wykonanie − plan)
   function drawExecOdchylenia(W) {
     var host = document.getElementById("exec-odchylenia"); if (!host) return;
+    var n = execMonths(W);
+    if (n) { drawExecPace(host, W, n); return; }
     var rows = DATA.dzialy.filter(function (d) { return W.dzialy[d.code] != null; }).map(function (d) {
       var wyk = W.dzialy[d.code];
       return { name: d.name, diff: wyk - d.plan, pct: d.plan ? wyk / d.plan * 100 : null };
@@ -1444,6 +1538,30 @@
         }).join("") + "</div>";
     }
     host.innerHTML = list("Najbardziej powyżej planu", above, true) + list("Najbardziej poniżej planu", below, false);
+  }
+  // partial year: distance from a flat pace (miesiące/12), not distance from the full-year plan
+  function drawExecPace(host, W, n) {
+    var pace = n / 12;
+    var rows = DATA.dzialy.filter(function (d) { return W.dzialy[d.code] != null && d.plan > 0; }).map(function (d) {
+      var share = W.dzialy[d.code] / d.plan;
+      return { name: d.name, share: share, gap: share - pace };
+    });
+    var ahead = rows.filter(function (r) { return r.gap > 0; }).sort(function (a, b) { return b.gap - a.gap; }).slice(0, 5);
+    var behind = rows.filter(function (r) { return r.gap < 0; }).sort(function (a, b) { return a.gap - b.gap; }).slice(0, 5);
+    var maxAbs = d3.max(rows, function (r) { return Math.abs(r.gap); }) || 1;
+    function list(title, arr, up) {
+      return '<div class="movers-col"><h4 class="movers-h ' + (up ? "is-up" : "is-down") + '">' + title + "</h4>" +
+        arr.map(function (r) {
+          var w = Math.max(3, Math.abs(r.gap) / maxAbs * 100);
+          var c = CMAP[colorKey(r.name)];
+          var pkt = r.gap * 100;
+          var sign = pkt >= 0 ? "+" : "−";
+          return '<div class="mv-row"><span class="mv-name">' + escapeHtml(r.name) + "</span>" +
+            '<span class="mv-track"><span class="mv-fill" style="width:' + w.toFixed(1) + "%;background:" + c.fill + ";border:1px solid " + c.line + '"></span></span>' +
+            '<span class="mv-amt">' + Math.round(r.share * 100) + "% planu · " + sign + Math.abs(pkt).toFixed(0) + " pkt</span></div>";
+        }).join("") + "</div>";
+    }
+    host.innerHTML = list("Najdalej przed równym tempem", ahead, true) + list("Najdalej za równym tempem", behind, false);
   }
 
   // ---------- tabs & axis ----------
@@ -1506,6 +1624,8 @@
     // show/hide the Plan vs wykonanie tab for the new year; leave it if it vanishes
     var execBtn = document.getElementById("tab-exec");
     if (execBtn) execBtn.style.display = WYK_FILES[yr] ? "" : "none";
+    setExecTabLabel(false);
+    setExecStatus("");
     if (view === "exec" && !WYK_FILES[yr]) switchView("tree");
     path = [];
     restExpanded = false;
@@ -1513,6 +1633,7 @@
     function apply(json) {
       DATA = json;
       YEAR = yr;
+      refreshExecTabLabel();
       renderStats();
       // dział detail stays open across a year change — re-render it for the new year's data,
       // or close it if this dział doesn't exist in the new year's classification

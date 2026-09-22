@@ -378,6 +378,11 @@ button.mbar:active { border-color: var(--line-strong); background: var(--bg); tr
 .exec-pct.is-over { color: var(--c-edu-ink); }
 .exec-pct.is-low { color: var(--danger); }
 
+.exec-status {
+  margin: 0 0 16px; padding: 16px 18px; font-size: 15px; line-height: 1.6; color: var(--ink);
+  background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: var(--radius);
+}
+.exec-status strong { font-weight: 600; }
 .exec-summary {
   margin: 6px 0 26px; padding: 16px 18px; font-size: 15px; line-height: 1.6; color: var(--ink);
   background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: var(--radius);
