@@ -621,3 +621,23 @@ body.is-loaded .anim-in {
   .tut-dialog[open] .tut-panel, .tut-dialog[open]::backdrop { animation: none !important; }
   .tut-btn:active { transform: none !important; }
 }
+
+/* ---------- Budżet 2027 story link (masthead) ---------- */
+.b27-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 8px 6px 12px; border-radius: 999px; text-decoration: none;
+  font-size: 14px; font-weight: 600; color: #F3EEE6; background: #1A1714;
+  border: 1px solid #1A1714;
+  box-shadow: 0 6px 18px -10px rgba(26, 23, 20, 0.6);
+  transition: transform var(--dur-press) var(--ease-out), background var(--dur-ui) var(--ease-out), box-shadow var(--dur-ui) var(--ease-out);
+}
+.b27-btn:active { transform: scale(0.97); }
+@media (hover: hover) and (pointer: fine) {
+  .b27-btn:hover { background: #2A251F; box-shadow: 0 10px 24px -10px rgba(26, 23, 20, 0.7); }
+}
+.b27-dot { position: relative; width: 7px; height: 7px; border-radius: 50%; background: #E8B04B; flex: none; }
+.b27-dot::after { content: ""; position: absolute; inset: -4px; border-radius: 50%; border: 2px solid #E8B04B; animation: b27pulse 2s var(--ease-out) infinite; }
+@keyframes b27pulse { from { transform: scale(.6); opacity: .9; } to { transform: scale(1.7); opacity: 0; } }
+.b27-tag { font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #1A1408; background: #E8B04B; padding: 3px 7px; border-radius: 999px; }
+@media (max-width: 560px) { .b27-tag { display: none; } .b27-btn { padding: 6px 12px; } }
+@media (prefers-reduced-motion: reduce) { .b27-dot::after { animation: none; } .b27-btn:active { transform: none; } }

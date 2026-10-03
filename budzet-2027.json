@@ -1,0 +1,1117 @@
+{
+ "_instrukcja": "Jedyny plik do aktualizacji historii budżetu 2027 (budzet-2027.html). Kwoty w mld zł. Gdy Sejm/Senat/Prezydent coś zmieni: (1) uzupełnij kolejną pozycję w 'wersje', (2) przestaw statusy w 'kalendarz' (done / current / planned) i daty, (3) dopisz wpis do 'dziennik', (4) zmień 'meta.aktualizacja' i 'meta.etap'. Strona przeliczy resztę sama.",
+ "meta": {
+  "rok": 2027,
+  "aktualizacja": "2026-10-03",
+  "etap": "sejm",
+  "etap_krotko": "Projekt w Sejmie",
+  "etap_opis": "Rada Ministrów przyjęła projekt 29 września 2026 r. i przekazała go Sejmowi. Przed nami pierwsze czytanie.",
+  "druk_sejmowy": "3150",
+  "ludnosc": 37333000,
+  "cpi_2027": 102.8
+ },
+ "wersje": [
+  {
+   "id": "wstepny",
+   "nazwa": "Wstępny projekt",
+   "kiedy": "sierpień 2026",
+   "kto": "Rada Ministrów",
+   "dochody": 695.0,
+   "wydatki": 977.6,
+   "deficyt": 282.6,
+   "zrodlo": "Wstępny projekt ustawy budżetowej na 2027 r., przekazany Radzie Dialogu Społecznego i Radzie Fiskalnej"
+  },
+  {
+   "id": "rm",
+   "nazwa": "Projekt rządowy",
+   "kiedy": "29 września 2026",
+   "kto": "Rada Ministrów",
+   "dochody": 696.4,
+   "wydatki": 977.6,
+   "deficyt": 281.2,
+   "zrodlo": "Komunikat KPRM po posiedzeniu Rady Ministrów, 29.09.2026"
+  },
+  {
+   "id": "sejm",
+   "nazwa": "Po uchwaleniu w Sejmie",
+   "kiedy": "planowo 4 grudnia 2026",
+   "kto": "Sejm",
+   "dochody": null,
+   "wydatki": null,
+   "deficyt": null
+  },
+  {
+   "id": "senat",
+   "nazwa": "Po Senacie",
+   "kiedy": "planowo do 28 grudnia 2026",
+   "kto": "Senat",
+   "dochody": null,
+   "wydatki": null,
+   "deficyt": null
+  },
+  {
+   "id": "ustawa",
+   "nazwa": "Ustawa budżetowa",
+   "kiedy": "planowo styczeń 2027",
+   "kto": "Prezydent",
+   "dochody": null,
+   "wydatki": null,
+   "deficyt": null
+  }
+ ],
+ "dochody": {
+  "uwaga": "Źródło: druk sejmowy nr 3150, załącznik nr 1 (dochody budżetu państwa w 2027 r.). „Pozostałe” to inne podatki (32,0 mld zł), dochody niepodatkowe (69,3 mld zł) i środki z UE (3,3 mld zł).",
+  "podatkowe_razem": 623.8,
+  "pozycje": [
+   {
+    "id": "vat",
+    "name": "VAT",
+    "v": 363.7,
+    "plan2026": 341.5,
+    "opis": "Podatek od towarów i usług. Płacisz go przy każdym zakupie. Ponad połowa wszystkich dochodów państwa."
+   },
+   {
+    "id": "akcyza",
+    "name": "Akcyza",
+    "v": 100.1,
+    "plan2026": 103.3,
+    "opis": "Paliwa, alkohol, papierosy, energia. Rząd planuje 100,1 mld zł, o 5,6 mld zł więcej niż szacowane wykonanie z 2026 r., choć mniej niż zapisano w planie na 2026 r."
+   },
+   {
+    "id": "cit",
+    "name": "CIT",
+    "v": 94.6,
+    "plan2026": 80.4,
+    "opis": "Podatek od zysków firm. Najszybciej rosnące źródło: prawie +18% wobec planu na 2026 r."
+   },
+   {
+    "id": "pit",
+    "name": "PIT",
+    "v": 33.4,
+    "plan2026": 32.0,
+    "opis": "Podatek od dochodów osób. Do budżetu państwa trafia tylko część, większość dostają samorządy. Dlatego PIT jest tu tak mały."
+   },
+   {
+    "id": "inne",
+    "name": "Pozostałe",
+    "v": 104.6,
+    "plan2026": 90.0,
+    "opis": "Inne podatki: od instytucji finansowych, gier, kopalin, sprzedaży detalicznej. Do tego dochody niepodatkowe: dywidendy, cło, opłaty, a także środki z UE."
+   }
+  ]
+ },
+ "filary": {
+  "uwaga": "Kwoty filarów to łączne wydatki publiczne na dany cel, a nie tylko pozycje budżetu państwa. Obronność obejmuje Fundusz Wsparcia Sił Zbrojnych, a zdrowie m.in. NFZ. Nie sumuj ich z 977,6 mld zł.",
+  "pozycje": [
+   {
+    "id": "zdrowie",
+    "name": "Ochrona zdrowia",
+    "v": 274.1,
+    "delta": 26.3,
+    "kicker": "+26,3 mld zł wobec 2026 r.",
+    "fakty": [
+     "Dotacja z budżetu dla NFZ: 41,5 mld zł, o 15,5 mld zł więcej niż w 2026 r.",
+     "Powyżej ustawowego minimum 7% PKB na zdrowie."
+    ]
+   },
+   {
+    "id": "obrona",
+    "name": "Obronność",
+    "v": 198.1,
+    "delta": null,
+    "kicker": "ponad 4,5% PKB",
+    "fakty": [
+     "Część 29 budżetu (Obrona narodowa): 125,2 mld zł.",
+     "Fundusz Wsparcia Sił Zbrojnych: 66,3 mld zł m.in. na Tarczę Wschód.",
+     "Jeden z najwyższych wskaźników w NATO."
+    ]
+   },
+   {
+    "id": "infra",
+    "name": "Drogi i kolej",
+    "v": 62.4,
+    "delta": null,
+    "kicker": "inwestycje transportowe",
+    "fakty": [
+     "Budowa i modernizacja dróg oraz linii kolejowych."
+    ]
+   },
+   {
+    "id": "nauka",
+    "name": "Nauka i szkolnictwo wyższe",
+    "v": 46.2,
+    "delta": null,
+    "kicker": "uczelnie i badania",
+    "fakty": [
+     "Uczelnie, badania i granty naukowe."
+    ]
+   },
+   {
+    "id": "sluzby",
+    "name": "Służby mundurowe",
+    "v": 36.5,
+    "delta": null,
+    "kicker": "57,7 mld zł z emeryturami",
+    "fakty": [
+     "Policja, Straż Graniczna, PSP, SOP i służby specjalne.",
+     "Razem ze świadczeniami dla emerytów mundurowych: 57,7 mld zł."
+    ]
+   }
+  ]
+ },
+ "dlug": {
+  "uwaga": "Państwowy dług publiczny w relacji do PKB (definicja krajowa). 2026: wg uzasadnienia do ustawy na 2026 r.; 2027–2029: prognoza rządu z września 2026 r.",
+  "pkb": [
+   {
+    "rok": 2026,
+    "v": 53.8
+   },
+   {
+    "rok": 2027,
+    "v": 55.09
+   },
+   {
+    "rok": 2028,
+    "v": 58.6
+   },
+   {
+    "rok": 2029,
+    "v": 59.2
+   }
+  ],
+  "prog_ostroznosciowy": 55,
+  "prog_konstytucyjny": 60,
+  "obsluga_2027": 107.0
+ },
+ "makro": [
+  {
+   "id": "pkb",
+   "name": "Wzrost PKB",
+   "v": 3.0,
+   "przed": 3.1,
+   "unit": "%",
+   "opis": "realnie, rok do roku"
+  },
+  {
+   "id": "cpi",
+   "name": "Inflacja",
+   "v": 2.8,
+   "przed": 2.5,
+   "unit": "%",
+   "opis": "średnioroczna CPI"
+  },
+  {
+   "id": "place",
+   "name": "Przeciętna płaca",
+   "v": 5.9,
+   "przed": null,
+   "unit": "%",
+   "opis": "wzrost nominalny (realnie +3%)"
+  },
+  {
+   "id": "bezr",
+   "name": "Bezrobocie",
+   "v": 6.0,
+   "przed": null,
+   "unit": "%",
+   "opis": "rejestrowane, koniec roku"
+  },
+  {
+   "id": "gg",
+   "name": "Deficyt sektora",
+   "v": 7.1,
+   "przed": null,
+   "unit": "% PKB",
+   "opis": "cały sektor finansów publicznych (metodologia UE), tyle co w 2026 r."
+  }
+ ],
+ "portfel": [
+  {
+   "id": "800",
+   "v": 60.8,
+   "name": "Rodzina 800+",
+   "opis": "Świadczenie wychowawcze na każde dziecko."
+  },
+  {
+   "id": "1314",
+   "v": 32.1,
+   "name": "13. i 14. emerytura",
+   "opis": "Dodatkowe roczne świadczenia dla emerytów i rencistów."
+  },
+  {
+   "id": "walor",
+   "v": 19.0,
+   "name": "Waloryzacja emerytur i rent",
+   "opis": "Od 1 marca 2027 r., wskaźnik co najmniej 3,48% (propozycja rządu dla RDS)."
+  },
+  {
+   "id": "sfera",
+   "v": 7.8,
+   "name": "Podwyżki w budżetówce",
+   "opis": "+3% dla państwowej sfery budżetowej i nauczycieli (z pochodnymi)."
+  }
+ ],
+ "pit": {
+  "uwaga": "Zmiana skali PIT to osobny rządowy projekt nowelizacji ustaw podatkowych, procedowany równolegle z budżetem. Liczymy wyłącznie efekt progów na skali podatkowej (bez ulg, składek i daniny solidarnościowej).",
+  "teraz": [
+   {
+    "od": 30000,
+    "do": 120000,
+    "stawka": 12
+   },
+   {
+    "od": 120000,
+    "do": null,
+    "stawka": 32
+   }
+  ],
+  "projekt": [
+   {
+    "od": 30000,
+    "do": 130000,
+    "stawka": 12
+   },
+   {
+    "od": 130000,
+    "do": 150000,
+    "stawka": 24
+   },
+   {
+    "od": 150000,
+    "do": null,
+    "stawka": 32
+   }
+  ],
+  "podatnicy_mln": 3.5,
+  "max_zysk": 3600
+ },
+ "termin": {
+  "wplyniecie": "2026-09-30",
+  "termin_sejm_senat": "2027-01-30",
+  "opis": "Art. 225 Konstytucji: jeśli w ciągu 4 miesięcy od przedłożenia projektu ustawa budżetowa nie trafi do podpisu Prezydenta, Prezydent może w ciągu 14 dni skrócić kadencję Sejmu."
+ },
+ "kalendarz": [
+  {
+   "id": "wstepny",
+   "status": "done",
+   "kiedy": "sierpień 2026",
+   "kto": "Rada Ministrów",
+   "nazwa": "Wstępny projekt",
+   "opis": "Ministerstwo Finansów i Gospodarki przygotowuje pierwszą wersję. Deficyt: maksymalnie 282,6 mld zł."
+  },
+  {
+   "id": "opinie",
+   "status": "done",
+   "kiedy": "sierpień–wrzesień 2026",
+   "kto": "RDS · Rada Fiskalna",
+   "nazwa": "Opinie",
+   "opis": "Projekt opiniuje Rada Dialogu Społecznego (związki i pracodawcy). Po raz pierwszy w historii opiniuje go też Rada Fiskalna."
+  },
+  {
+   "id": "rm",
+   "status": "done",
+   "kiedy": "29 września 2026",
+   "kto": "Rada Ministrów",
+   "nazwa": "Projekt przyjęty przez rząd",
+   "opis": "Ostateczna wersja rządowa. Dochody rosną do 696,4 mld zł, a deficyt spada do 281,2 mld zł."
+  },
+  {
+   "id": "laska",
+   "status": "done",
+   "kiedy": "29 września 2026 · druk nr 3150",
+   "kto": "Marszałek Sejmu",
+   "nazwa": "Projekt trafia do Sejmu",
+   "opis": "Konstytucja wymaga, by rząd przedłożył projekt najpóźniej 3 miesiące przed początkiem roku budżetowego. Od tego dnia biegną 4 miesiące."
+  },
+  {
+   "id": "czyt1",
+   "status": "current",
+   "kiedy": "planowo 6–9 października 2026",
+   "kto": "Sejm",
+   "nazwa": "Pierwsze czytanie",
+   "opis": "Minister finansów przedstawia projekt na sali plenarnej. Opozycja zwykle składa wniosek o odrzucenie w całości."
+  },
+  {
+   "id": "komisja",
+   "status": "planned",
+   "kiedy": "planowo do 20 listopada 2026",
+   "kto": "Komisja Finansów Publicznych",
+   "nazwa": "Prace w komisjach",
+   "opis": "Komisje sejmowe przechodzą przez każdą część budżetu: od Kancelarii Prezydenta po rezerwy celowe."
+  },
+  {
+   "id": "czyt2",
+   "status": "planned",
+   "kiedy": "planowo 2 grudnia 2026",
+   "kto": "Sejm",
+   "nazwa": "Drugie czytanie",
+   "opis": "Posłowie zgłaszają poprawki. Każda poprawka zwiększająca wydatki musi wskazać, skąd wziąć pieniądze."
+  },
+  {
+   "id": "czyt3",
+   "status": "planned",
+   "kiedy": "planowo 4 grudnia 2026",
+   "kto": "Sejm",
+   "nazwa": "Trzecie czytanie i głosowanie",
+   "opis": "Sejm głosuje poprawki i całą ustawę. Sejm nie może zwiększyć deficytu ponad kwotę z projektu rządu (art. 220 Konstytucji)."
+  },
+  {
+   "id": "senat",
+   "status": "planned",
+   "kiedy": "planowo do 28 grudnia 2026",
+   "kto": "Senat",
+   "nazwa": "Senat",
+   "opis": "Senat ma 20 dni na ustawę budżetową. Może przyjąć ją bez zmian albo wnieść poprawki."
+  },
+  {
+   "id": "poprawki",
+   "status": "planned",
+   "kiedy": "planowo 15 stycznia 2027",
+   "kto": "Sejm",
+   "nazwa": "Sejm o poprawkach Senatu",
+   "opis": "Sejm przyjmuje albo odrzuca poprawki Senatu bezwzględną większością głosów."
+  },
+  {
+   "id": "prezydent",
+   "status": "planned",
+   "kiedy": "planowo od 20 stycznia 2027",
+   "kto": "Prezydent RP",
+   "nazwa": "Podpis Prezydenta",
+   "opis": "Prezydent ma 7 dni. Nie może zawetować budżetu, ale może skierować go do Trybunału Konstytucyjnego."
+  },
+  {
+   "id": "dzu",
+   "status": "planned",
+   "kiedy": "2027",
+   "kto": "Dziennik Ustaw",
+   "nazwa": "Ustawa budżetowa obowiązuje",
+   "opis": "Publikacja w Dzienniku Ustaw. Do tego czasu państwo działa na podstawie projektu."
+  }
+ ],
+ "dziennik": [
+  {
+   "data": "2026-10-03",
+   "tekst": "Sprawdziliśmy liczby z oficjalnym drukiem sejmowym nr 3150 (projekt ustawy i załączniki). Zgadzają się dochody, wydatki, deficyt, wpływy z VAT, akcyzy, CIT i PIT, obsługa długu, część 29 Obrona narodowa, dotacja dla NFZ i 800+."
+  },
+  {
+   "data": "2026-10-03",
+   "tekst": "Uruchamiamy historię budżetu 2027. Stan: projekt rządowy z 29 września 2026 r., przed pierwszym czytaniem w Sejmie."
+  },
+  {
+   "data": "2026-09-29",
+   "tekst": "Rada Ministrów przyjęła projekt: 696,4 mld zł dochodów, 977,6 mld zł wydatków, 281,2 mld zł deficytu. Prognozę PKB obniżono z 3,1% do 3,0%, a inflacji podniesiono z 2,5% do 2,8%."
+  },
+  {
+   "data": "2026-08",
+   "tekst": "Wstępny projekt: dochody 695 mld zł, wydatki 977,6 mld zł, deficyt najwyżej 282,6 mld zł."
+  }
+ ],
+ "zrodla": [
+  {
+   "t": "PAP Biznes: Rząd przyjął projekt budżetu na '27 r. z deficytem na poziomie 281,2 mld zł",
+   "url": "https://biznes.pap.pl/wiadomosci/gospodarka/rzad-przyjal-projekt-budzetu-na-27-r-z-deficytem-na-poziomie-2812-mld-zl-opis"
+  },
+  {
+   "t": "Sejm RP: druk nr 3150, projekt ustawy budżetowej na rok 2027 wraz z załącznikami",
+   "url": "https://api.sejm.gov.pl/sejm/term10/prints/3150/3150-ustawa%20i%20za%C5%82%C4%85czniki%20do%20ustawy.pdf"
+  },
+  {
+   "t": "KPRM: Projekt ustawy budżetowej na rok 2027",
+   "url": "https://www.gov.pl/web/premier/projekt-ustawy-budzetowej-na-rok-20225"
+  },
+  {
+   "t": "Prawo.pl: Rząd przyjął projekt budżetu na 2027 rok",
+   "url": "https://www.prawo.pl/podatki/rzad-przyjal-projekt-budzetu-na-2027-rok,1551753.html"
+  },
+  {
+   "t": "Forsal: 36,5 mld zł na służby mundurowe i służby specjalne",
+   "url": "https://forsal.pl/gospodarka/aktualnosci/artykuly/11295998,projekt-budzetu-na-2027-rok-przyjety-przez-rzad-365-mld-zl-na-sluzby-mundurowe-i-sluzby-specjalne.html"
+  },
+  {
+   "t": "Rynek Zdrowia: 274 mld zł na zdrowie i 41,5 mld zł dotacji dla NFZ",
+   "url": "https://www.rynekzdrowia.pl/Finanse-i-zarzadzanie/Rzad-przyjal-projekt-budzetu-na-2027-rok-Wzmocnienie-finansow-NFZ-bedzie-zalezalo-od-podpisu-prezydenta,289399,1.html"
+  },
+  {
+   "t": "WNP: Koszty obsługi długu w 2027 r. wyniosą 107 mld zł",
+   "url": "https://www.wnp.pl/rynki/domanski-koszty-obslugi-dlugu-w-2027-r-wyniosa-107-mld-zl-o-17-mld-zl-wiecej-niz-w-br,1093868.html"
+  },
+  {
+   "t": "WNP: Komisja finansów przewiduje, że 4 grudnia Sejm uchwali budżet na 2027 r.",
+   "url": "https://www.wnp.pl/rynki/sejm-komisja-finansow-przewiduje-ze-4-grudnia-br-sejm-uchwali-budzet-na-2027-r,1099955.html"
+  },
+  {
+   "t": "Portal Spożywczy: Rząd chce pozyskać ponad 100 mld zł z akcyzy w 2027",
+   "url": "https://www.portalspozywczy.pl/finanse/wiadomosci/rzad-chce-pozyskac-ponad-100-mld-zl-z-akcyzy-w-2027,292408.html"
+  },
+  {
+   "t": "Głos Nauczycielski: budżetówka z 3 proc. waloryzacją, prognoza makro",
+   "url": "https://glos.pl/rzad-przyjal-projekt-budzetu-na-2027-roku-a-takze-zaktualizowana-prognoze-wskaznikow-makroekonomicznych-nauczyciele-i-tzw-budzetowka-z-3-proc-waloryzacja"
+  },
+  {
+   "t": "GazetaPrawna: nowy próg PIT 130–150 tys. zł od 2027 r.",
+   "url": "https://www.gazetaprawna.pl/podatki/artykuly/11321581,nowy-prog-pit-130-150-tys-2027.html"
+  },
+  {
+   "t": "PKB24: Deficyt 281,2 mld zł i dług tuż pod konstytucyjnym sufitem",
+   "url": "https://pkb24.pl/deficyt-2812-mld-zl-i-dlug-tuz-pod-konstytucyjnym-sufitem-rzad-przyjal-projekt-budzetu-na-2027-rok/"
+  },
+  {
+   "t": "Infor: Co z 800+, rentą wdowią i in vitro w budżecie 2027",
+   "url": "https://ksiegowosc-budzetowa.infor.pl/wiadomosci/7670786,rzad-przyjal-projekt-budzetu-na-2027-r-co-z-800-renta-wdowia-i-in-v.html"
+  },
+  {
+   "t": "Dane historyczne 2011–2026: ustawy budżetowe (Dziennik Ustaw), jak w głównym eksploratorze tej strony",
+   "url": "index.html"
+  }
+ ],
+ "ustawa": {
+  "_zrodlo": "Druk sejmowy nr 3150 (Sejm X kadencji), projekt ustawy budżetowej na rok 2027 z załącznikami, 29.09.2026. Kwoty w mld zł, przeliczone z tys. zł.",
+  "druk": "3150",
+  "data_pisma": "2026-09-29",
+  "strony": 856,
+  "zalaczniki": 18,
+  "art": {
+   "dochody": 696.4,
+   "wydatki": 977.6,
+   "deficyt": 281.2,
+   "wydatki_sektora": 2155.330796,
+   "limit_wydatkow": 1793.357952,
+   "bse_dochody": 87.27065,
+   "bse_wydatki": 106.611475,
+   "bse_wynik": -19.340825,
+   "przychody": 1115.47032,
+   "rozchody": 814.929495,
+   "saldo": 300.540825,
+   "limit_zadluzenia": 470.0,
+   "poreczenia": 200.0,
+   "kuke": 100.0
+  },
+  "cytaty": {
+   "art1_1": "Art. 1. 1. Ustala się, zgodnie z załącznikiem nr 1, łączną kwotę podatkowych i niepodatkowych dochodów budżetu państwa w wysokości 696 400 000 tys. zł.",
+   "art1_2": "2. Ustala się, zgodnie z załącznikiem nr 2, łączną kwotę wydatków budżetu państwa w wysokości 977 600 000 tys. zł.",
+   "art1_5": "5. Deficyt budżetu państwa ustala się na dzień 31 grudnia 2027 r. na kwotę nie większą niż 281 200 000 tys. zł.",
+   "art1_3": "3. Ustala się kwotę planowanych wydatków organów i jednostek (…), państwowych osób prawnych (…), a także funduszy utworzonych, powierzonych lub przekazanych Bankowi Gospodarstwa Krajowego (…) w wysokości 2 155 330 796 tys. zł.",
+   "art3": "Art. 3. 1. Ustala się łączną kwotę planowanych przychodów budżetu państwa w wysokości 1 115 470 320 tys. zł oraz łączną kwotę planowanych rozchodów budżetu państwa w wysokości 814 929 495 tys. zł.",
+   "art5": "Art. 5. 1. Przyrost zadłużenia na dzień 31 grudnia 2027 r. (…) nie może przekroczyć kwoty 470 000 000 tys. zł.",
+   "art6": "Art. 6. Poręczenia i gwarancje mogą być udzielane przez Skarb Państwa do łącznej kwoty 200 000 000 tys. zł."
+  },
+  "dochody_pelne": [
+   {
+    "g": "podatkowe",
+    "name": "Podatek od towarów i usług (VAT)",
+    "v": 363.7
+   },
+   {
+    "g": "podatkowe",
+    "name": "Podatek akcyzowy",
+    "v": 100.1005
+   },
+   {
+    "g": "podatkowe",
+    "name": "Podatek dochodowy od osób prawnych (CIT)",
+    "v": 94.641448
+   },
+   {
+    "g": "podatkowe",
+    "name": "Podatek dochodowy od osób fizycznych (PIT)",
+    "v": 33.389424
+   },
+   {
+    "g": "podatkowe",
+    "name": "Podatek od niektórych instytucji finansowych",
+    "v": 7.39
+   },
+   {
+    "g": "podatkowe",
+    "name": "Podatek od gier",
+    "v": 7.3
+   },
+   {
+    "g": "podatkowe",
+    "name": "Podatek od wydobycia niektórych kopalin",
+    "v": 6.6
+   },
+   {
+    "g": "podatkowe",
+    "name": "Podatek od sprzedaży detalicznej",
+    "v": 5.18469
+   },
+   {
+    "g": "podatkowe",
+    "name": "Podatek rekompensujący i od nadzwyczajnych zysków ze zbycia paliw",
+    "v": 3.116
+   },
+   {
+    "g": "podatkowe",
+    "name": "Podatki wyrównawcze",
+    "v": 2.415
+   },
+   {
+    "g": "niepodatkowe",
+    "name": "Dochody jednostek budżetowych i inne niepodatkowe",
+    "v": 45.969862
+   },
+   {
+    "g": "niepodatkowe",
+    "name": "Dywidendy i wpłaty z zysku",
+    "v": 13.900409
+   },
+   {
+    "g": "niepodatkowe",
+    "name": "Cło",
+    "v": 9.425
+   },
+   {
+    "g": "ue",
+    "name": "Środki z UE i innych źródeł (bezzwrotne)",
+    "v": 3.267667
+   }
+  ],
+  "dochody_podatkowe": 623.837062,
+  "dochody_niepodatkowe": 69.295271,
+  "dzialy": [
+   {
+    "code": "010",
+    "name": "Rolnictwo i łowiectwo",
+    "v": 10.265,
+    "v2026": 9.575,
+    "tb": 7.283,
+    "sw": 0.005,
+    "wb": 2.56,
+    "wm": 0.04,
+    "tm": 0.377
+   },
+   {
+    "code": "020",
+    "name": "Leśnictwo",
+    "v": 0.009,
+    "v2026": 0.008,
+    "tb": 0.007,
+    "sw": 0.0,
+    "wb": 0.002,
+    "wm": 0.0,
+    "tm": 0.0
+   },
+   {
+    "code": "050",
+    "name": "Rybołówstwo i rybactwo",
+    "v": 0.246,
+    "v2026": 0.243,
+    "tb": 0.173,
+    "sw": 0.002,
+    "wb": 0.068,
+    "wm": 0.003,
+    "tm": 0.001
+   },
+   {
+    "code": "100",
+    "name": "Górnictwo i kopalnictwo",
+    "v": 6.136,
+    "v2026": 5.634,
+    "tb": 6.136,
+    "sw": 0.0,
+    "wb": 0.0,
+    "wm": 0.0,
+    "tm": 0.0
+   },
+   {
+    "code": "150",
+    "name": "Przetwórstwo przemysłowe",
+    "v": 2.02,
+    "v2026": 2.224,
+    "tb": 0.561,
+    "sw": 0.0,
+    "wb": 0.82,
+    "wm": 0.009,
+    "tm": 0.63
+   },
+   {
+    "code": "500",
+    "name": "Handel",
+    "v": 1.328,
+    "v2026": 1.324,
+    "tb": 1.093,
+    "sw": 0.0,
+    "wb": 0.163,
+    "wm": 0.005,
+    "tm": 0.067
+   },
+   {
+    "code": "550",
+    "name": "Hotele i restauracje",
+    "v": 0.095,
+    "v2026": 0.071,
+    "tb": 0.095,
+    "sw": 0.0,
+    "wb": 0.0,
+    "wm": 0.0,
+    "tm": 0.0
+   },
+   {
+    "code": "600",
+    "name": "Transport i łączność",
+    "v": 27.722,
+    "v2026": 21.821,
+    "tb": 14.944,
+    "sw": 0.02,
+    "wb": 5.305,
+    "wm": 0.961,
+    "tm": 6.492
+   },
+   {
+    "code": "630",
+    "name": "Turystyka",
+    "v": 0.118,
+    "v2026": 0.132,
+    "tb": 0.112,
+    "sw": 0.0,
+    "wb": 0.005,
+    "wm": 0.0,
+    "tm": 0.001
+   },
+   {
+    "code": "700",
+    "name": "Gospodarka mieszkaniowa",
+    "v": 6.122,
+    "v2026": 7.034,
+    "tb": 2.382,
+    "sw": 0.0,
+    "wb": 0.027,
+    "wm": 0.0,
+    "tm": 3.713
+   },
+   {
+    "code": "710",
+    "name": "Działalność usługowa",
+    "v": 1.163,
+    "v2026": 1.03,
+    "tb": 0.823,
+    "sw": 0.0,
+    "wb": 0.294,
+    "wm": 0.023,
+    "tm": 0.022
+   },
+   {
+    "code": "720",
+    "name": "Informatyka",
+    "v": 0.352,
+    "v2026": 0.298,
+    "tb": 0.352,
+    "sw": 0.0,
+    "wb": 0.0,
+    "wm": 0.0,
+    "tm": 0.0
+   },
+   {
+    "code": "730",
+    "name": "Szkolnictwo wyższe i nauka",
+    "v": 43.269,
+    "v2026": 41.241,
+    "tb": 40.338,
+    "sw": 0.0,
+    "wb": 1.02,
+    "wm": 0.001,
+    "tm": 1.91
+   },
+   {
+    "code": "750",
+    "name": "Administracja publiczna",
+    "v": 31.609,
+    "v2026": 30.208,
+    "tb": 3.621,
+    "sw": 0.449,
+    "wb": 26.206,
+    "wm": 1.098,
+    "tm": 0.235
+   },
+   {
+    "code": "751",
+    "name": "Urzędy naczelnych organów władzy państwowej, kontroli i ochrony prawa oraz sądownictwa",
+    "v": 5.419,
+    "v2026": 4.69,
+    "tb": 0.112,
+    "sw": 0.019,
+    "wb": 4.831,
+    "wm": 0.458,
+    "tm": 0.0
+   },
+   {
+    "code": "752",
+    "name": "Obrona narodowa",
+    "v": 115.695,
+    "v2026": 109.231,
+    "tb": 7.125,
+    "sw": 5.108,
+    "wb": 54.088,
+    "wm": 38.201,
+    "tm": 11.172
+   },
+   {
+    "code": "753",
+    "name": "Obowiązkowe ubezpieczenia społeczne",
+    "v": 201.394,
+    "v2026": 195.971,
+    "tb": 124.544,
+    "sw": 76.231,
+    "wb": 0.618,
+    "wm": 0.001,
+    "tm": 0.0
+   },
+   {
+    "code": "754",
+    "name": "Bezpieczeństwo publiczne i ochrona przeciwpożarowa",
+    "v": 36.516,
+    "v2026": 31.139,
+    "tb": 5.455,
+    "sw": 0.521,
+    "wb": 27.621,
+    "wm": 2.445,
+    "tm": 0.475
+   },
+   {
+    "code": "755",
+    "name": "Wymiar sprawiedliwości",
+    "v": 30.531,
+    "v2026": 28.682,
+    "tb": 0.594,
+    "sw": 0.388,
+    "wb": 27.643,
+    "wm": 1.898,
+    "tm": 0.009
+   },
+   {
+    "code": "757",
+    "name": "Obsługa długu publicznego",
+    "v": 107.0,
+    "v2026": 90.388,
+    "tb": 0.0,
+    "sw": 0.0,
+    "wb": 107.0,
+    "wm": 0.0,
+    "tm": 0.0
+   },
+   {
+    "code": "758",
+    "name": "Różne rozliczenia",
+    "v": 151.254,
+    "v2026": 162.528,
+    "tb": 129.602,
+    "sw": 2.704,
+    "wb": 7.947,
+    "wm": 3.883,
+    "tm": 7.119
+   },
+   {
+    "code": "801",
+    "name": "Oświata i wychowanie",
+    "v": 5.435,
+    "v2026": 4.7,
+    "tb": 1.161,
+    "sw": 0.04,
+    "wb": 4.062,
+    "wm": 0.171,
+    "tm": 0.0
+   },
+   {
+    "code": "851",
+    "name": "Ochrona zdrowia",
+    "v": 68.906,
+    "v2026": 54.243,
+    "tb": 51.381,
+    "sw": 0.036,
+    "wb": 13.513,
+    "wm": 0.729,
+    "tm": 3.246
+   },
+   {
+    "code": "852",
+    "name": "Pomoc społeczna",
+    "v": 6.914,
+    "v2026": 6.912,
+    "tb": 6.729,
+    "sw": 0.062,
+    "wb": 0.122,
+    "wm": 0.0,
+    "tm": 0.0
+   },
+   {
+    "code": "853",
+    "name": "Pozostałe zadania w zakresie polityki społecznej",
+    "v": 1.935,
+    "v2026": 2.213,
+    "tb": 0.638,
+    "sw": 0.502,
+    "wb": 0.785,
+    "wm": 0.008,
+    "tm": 0.002
+   },
+   {
+    "code": "854",
+    "name": "Edukacyjna opieka wychowawcza",
+    "v": 0.306,
+    "v2026": 0.291,
+    "tb": 0.027,
+    "sw": 0.005,
+    "wb": 0.258,
+    "wm": 0.016,
+    "tm": 0.0
+   },
+   {
+    "code": "855",
+    "name": "Rodzina",
+    "v": 106.583,
+    "v2026": 97.922,
+    "tb": 20.061,
+    "sw": 86.415,
+    "wb": 0.107,
+    "wm": 0.0,
+    "tm": 0.0
+   },
+   {
+    "code": "900",
+    "name": "Gospodarka komunalna i ochrona środowiska",
+    "v": 2.491,
+    "v2026": 2.692,
+    "tb": 1.172,
+    "sw": 0.001,
+    "wb": 0.844,
+    "wm": 0.029,
+    "tm": 0.446
+   },
+   {
+    "code": "921",
+    "name": "Kultura i ochrona dziedzictwa narodowego",
+    "v": 5.696,
+    "v2026": 5.488,
+    "tb": 3.522,
+    "sw": 0.001,
+    "wb": 0.845,
+    "wm": 0.123,
+    "tm": 1.204
+   },
+   {
+    "code": "925",
+    "name": "Ogrody botaniczne i zoologiczne oraz naturalne obszary i obiekty chronionej przyrody",
+    "v": 0.241,
+    "v2026": 0.233,
+    "tb": 0.209,
+    "sw": 0.0,
+    "wb": 0.004,
+    "wm": 0.002,
+    "tm": 0.026
+   },
+   {
+    "code": "926",
+    "name": "Kultura fizyczna",
+    "v": 0.829,
+    "v2026": 0.773,
+    "tb": 0.763,
+    "sw": 0.042,
+    "wb": 0.025,
+    "wm": 0.0,
+    "tm": 0.0
+   }
+  ],
+  "rodzaje": [
+   {
+    "id": "tb",
+    "name": "Transfery bieżące",
+    "v": 431.016732,
+    "opis": "Pieniądze, które budżet przekazuje dalej: do ZUS i KRUS, samorządów, NFZ, uczelni, agencji."
+   },
+   {
+    "id": "wb",
+    "name": "Wydatki bieżące",
+    "v": 286.782535,
+    "opis": "Codzienne działanie państwa: pensje, utrzymanie urzędów, wojska i sądów. W tym 107 mld zł odsetek od długu."
+   },
+   {
+    "id": "sw",
+    "name": "Świadczenia na rzecz osób",
+    "v": 172.549009,
+    "opis": "Pieniądze prosto do ludzi: 800+, świadczenia, emerytury mundurowe."
+   },
+   {
+    "id": "wm",
+    "name": "Wydatki majątkowe",
+    "v": 50.104628,
+    "opis": "Inwestycje samego państwa: sprzęt, budynki, infrastruktura."
+   },
+   {
+    "id": "tm",
+    "name": "Transfery majątkowe",
+    "v": 37.147096,
+    "opis": "Pieniądze na inwestycje innych: samorządów, kolei, mieszkalnictwa."
+   }
+  ],
+  "dysponenci": [
+   {
+    "name": "Minister Finansów i Gospodarki",
+    "v": 231.641718,
+    "sub": [
+     [
+      "Obsługa długu Skarbu Państwa",
+      107.0
+     ],
+     [
+      "Subwencje dla samorządów",
+      55.492428
+     ],
+     [
+      "Składka do budżetu UE",
+      45.572445
+     ],
+     [
+      "Budżet i finanse publiczne",
+      16.291973
+     ],
+     [
+      "Pozostałe",
+      7.284872
+     ]
+    ]
+   },
+   {
+    "name": "Zakład Ubezpieczeń Społecznych",
+    "v": 212.477784
+   },
+   {
+    "name": "Minister Obrony Narodowej",
+    "v": 125.232789
+   },
+   {
+    "name": "Minister Zdrowia",
+    "v": 63.714349
+   },
+   {
+    "name": "Wojewodowie (16 województw)",
+    "v": 54.478056
+   },
+   {
+    "name": "Minister Spraw Wewnętrznych i Administracji",
+    "v": 53.822339
+   },
+   {
+    "name": "Rezerwy celowe",
+    "v": 50.074552
+   },
+   {
+    "name": "Minister Nauki i Szkolnictwa Wyższego",
+    "v": 36.384054
+   },
+   {
+    "name": "Kasa Rolniczego Ubezpieczenia Społecznego",
+    "v": 34.026902
+   },
+   {
+    "name": "Minister Infrastruktury",
+    "v": 27.82692
+   },
+   {
+    "name": "Sądy, Sejm, Prezydent i inne organy niezależne",
+    "v": 25.868591
+   },
+   {
+    "name": "Minister Sprawiedliwości",
+    "v": 10.712094
+   },
+   {
+    "name": "Minister Rolnictwa i Rozwoju Wsi",
+    "v": 9.264453
+   }
+  ],
+  "rezerwy": {
+   "razem": 50.074552,
+   "pozycje": [
+    {
+     "poz": 8,
+     "name": "Projekty z udziałem środków UE i rozliczenia z UE",
+     "v": 8.470991
+    },
+    {
+     "poz": 49,
+     "name": "Utrzymanie rezultatów projektów unijnych",
+     "v": 4.965918
+    },
+    {
+     "poz": 44,
+     "name": "Dofinansowanie zadań kontynuowanych",
+     "v": 4.879304
+    },
+    {
+     "poz": 56,
+     "name": "Zmiany systemowe i nowe zadania",
+     "v": 4.319847
+    },
+    {
+     "poz": 65,
+     "name": "Zadania w obszarze zdrowia",
+     "v": 3.431019
+    },
+    {
+     "poz": 35,
+     "name": "Wypłata i waloryzacja świadczeń",
+     "v": 3.292216
+    },
+    {
+     "poz": 18,
+     "name": "Rolnictwo i skutki złej pogody",
+     "v": 2.384947
+    },
+    {
+     "poz": 7,
+     "name": "Dopłaty do paliwa rolniczego",
+     "v": 2.013
+    },
+    {
+     "poz": 5,
+     "name": "Fundusze dróg i przewozów autobusowych",
+     "v": 1.315
+    },
+    {
+     "poz": 4,
+     "name": "Klęski żywiołowe",
+     "v": 1.033524
+    },
+    {
+     "poz": 53,
+     "name": "Wpłata do Funduszu Pomocy",
+     "v": 1.0
+    },
+    {
+     "poz": 17,
+     "name": "Wybory i referenda",
+     "v": 0.894722
+    },
+    {
+     "poz": 51,
+     "name": "Współpraca z Europejską Agencją Kosmiczną",
+     "v": 0.7272
+    },
+    {
+     "poz": 27,
+     "name": "Program „Posiłek w szkole i w domu”",
+     "v": 0.2
+    },
+    {
+     "poz": 39,
+     "name": "Mistrzostwa Świata w siatkówce mężczyzn 2027",
+     "v": 0.154784
+    }
+   ]
+  },
+  "pozyczki": {
+   "potrzeby_netto": 315.962354,
+   "deficyt": 281.2,
+   "deficyt_bse": 19.340825,
+   "inne_netto": 15.421529,
+   "finansowanie_krajowe": 197.15184,
+   "finansowanie_zagraniczne": 118.810514,
+   "spw_krajowe_przychody": 406.13529,
+   "obligacje_rynkowe": 306.436519,
+   "obligacje_oszczednosciowe": 84.317124,
+   "bony": 15.381647,
+   "przychody_zagraniczne": 240.453396
+  }
+ }
+}

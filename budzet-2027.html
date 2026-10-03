@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0B0A09">
+<title>Budżet 2027: historia w toku | Terra Cracovianum</title>
+<meta name="description" content="Projekt ustawy budżetowej na 2027 rok (druk nr 3150) opowiedziany jego własnymi liczbami: skąd pieniądze, dokąd płyną, ile pożyczamy i jak projekt idzie przez Sejm.">
+<meta property="og:title" content="Budżet 2027. Historia jednej ustawy">
+<meta property="og:description" content="977,6 mld zł wydatków, 281,2 mld zł deficytu, 1,1 bln zł pożyczek. Projekt budżetu na 2027 rok, krok po kroku.">
+<meta property="og:type" content="article">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=1">
+<link rel="apple-touch-icon" href="favicon.svg?v=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.7.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="story-2027.css?v=2">
+</head>
+<body>
+<a class="skip" href="#act">Przejdź do treści</a>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <a class="tb-brand" href="index.html" aria-label="Wróć do eksploratora budżetu">
+      <i class="ti ti-arrow-left" aria-hidden="true"></i>
+      <img src="logo.svg?v=16" alt="Terra Cracovianum" width="1757" height="586">
+    </a>
+    <nav class="tb-chapters" id="tb-chapters" aria-label="Rozdziały"></nav>
+    <span class="tb-label" id="tb-label" aria-hidden="true"></span>
+    <a class="tb-status" href="#rozdzial-11"><span class="pulse" aria-hidden="true"></span><span class="tb-status-t" id="tb-status">Projekt w Sejmie</span></a>
+  </div>
+  <div class="tb-progress" aria-hidden="true"><span id="tb-progress"></span></div>
+</header>
+
+<main>
+  <!-- ===================== PROLOG ===================== -->
+  <section class="prolog" id="prolog" aria-labelledby="prolog-title">
+    <div class="prolog-in">
+      <div>
+        <p class="kicker rv"><span>Druk nr 3150</span><span class="dot"></span><span>Sejm X kadencji</span><span class="dot"></span><span class="live"><span class="pulse" aria-hidden="true"></span>historia w toku</span></p>
+        <h1 class="display rv" style="--d:80ms" id="prolog-title">Budżet, który dopiero <em>powstaje</em>.</h1>
+        <p class="prolog-lead rv" style="--d:180ms">29 września 2026 r. premier wysłał do Marszałka Sejmu projekt ustawy budżetowej na 2027 rok. <strong>856 stron, 18 załączników.</strong> Opowiadamy go jego własnymi liczbami: skąd państwo weźmie pieniądze, na co je wyda i ile musi pożyczyć.</p>
+        <div class="trio rv" style="--d:280ms" id="trio"></div>
+      </div>
+      <div class="doc-stage rv" style="--d:120ms">
+        <article class="doc" id="doc" aria-label="Pierwsza strona projektu ustawy budżetowej na rok 2027">
+          <div class="doc-top"><div class="doc-seal">SEJM<br>RZECZYPOSPOLITEJ POLSKIEJ<span>X kadencja</span></div><div style="text-align:right"><b>Druk nr 3150</b>Warszawa, 29 września 2026 r.</div></div>
+          <div class="doc-proj">Projekt</div>
+          <div class="doc-title">USTAWA BUDŻETOWA</div>
+          <div class="doc-sub">NA ROK 2027</div>
+          <p><b>Art. 1.</b> 1. Ustala się, zgodnie z załącznikiem nr 1, łączną kwotę podatkowych i niepodatkowych dochodów budżetu państwa w wysokości <mark class="m1">696 400 000 tys. zł</mark>.</p>
+          <p>2. Ustala się, zgodnie z załącznikiem nr 2, łączną kwotę wydatków budżetu państwa w wysokości <mark class="m2">977 600 000 tys. zł</mark>.</p>
+          <p>5. Deficyt budżetu państwa ustala się na dzień 31 grudnia 2027 r. na kwotę nie większą niż <mark class="m3">281 200 000 tys. zł</mark>.</p>
+          <div class="doc-lines" aria-hidden="true"><span style="width:96%"></span><span style="width:88%"></span><span style="width:93%"></span><span style="width:61%"></span></div>
+          <div class="doc-foot">– 1 –</div>
+        </article>
+        <span class="doc-tag t1"><i>ART. 1</i> trzy liczby</span>
+        <span class="doc-tag t2"><i>ART. 3</i> 1,1 bln zł pożyczek</span>
+        <span class="doc-tag t3"><i>ZAŁ. 2</i> 31 działów</span>
+      </div>
+    </div>
+    <a class="scroll-cue" href="#act"><span>Przewiń</span><span class="line"></span></a>
+  </section>
+
+  <!-- ===================== ACT: 978 DOTS (chapters I–IV) ===================== -->
+  <section class="act" id="act" aria-label="Rozdziały I–IV: budżet w kropkach">
+    <div class="act-stage" aria-hidden="true">
+      <canvas id="dots"></canvas>
+      <div class="act-legend"><i></i>1 kropka = 1 mld zł</div>
+    </div>
+    <div class="act-steps" id="act-steps">
+
+      <!-- I -->
+      <div class="astep astep-head" data-state="cloud" data-chapter="1" data-label="Trzy liczby" id="rozdzial-1">
+        <div class="chead"><p class="chead-num">Rozdział I · Art. 1</p><h2 class="chead-title" data-split>Trzy <em>liczby</em></h2><p class="chead-deck">Cała ustawa zaczyna się od trzech kwot. Reszta to szczegóły.</p></div>
+      </div>
+      <div class="astep" data-state="grid"><div class="acard">
+        <p class="acard-k">Wydatki</p>
+        <span class="acard-big">977,6<small>mld zł</small></span>
+        <p>Każda kropka to <strong>1 mld zł</strong>. Jest ich 978. Tyle państwo chce wydać w 2027 roku, najwięcej w historii.</p>
+        <span class="cite">Art. 1 ust. 2 · załącznik nr 2</span>
+      </div></div>
+      <div class="astep" data-state="split"><div class="acard">
+        <p class="acard-k">Dochody i deficyt</p>
+        <p><span class="sw" style="background:#3E8EE0"></span><strong>Dochody: 696,4 mld zł.</strong> Głównie podatki.</p>
+        <p><span class="sw" style="background:#EF5A4C"></span><strong>Deficyt: 281,2 mld zł.</strong> Różnica, której nie pokrywają dochody.</p>
+        <span class="cite">Art. 1 ust. 1 i ust. 5</span>
+      </div></div>
+      <div class="astep" data-state="split" data-hl="deficyt"><div class="acard">
+        <p class="acard-k">Co trzecia złotówka</p>
+        <span class="acard-big hl-red">28,8<small>zł ze 100 zł</small></span>
+        <p>Prawie co trzecia złotówka wydatków będzie pożyczona. To ok. <strong>770 mln zł nowego długu dziennie</strong>, prawie 8 917 zł na sekundę.</p>
+      </div></div>
+
+      <!-- II -->
+      <div class="astep astep-head" data-state="cloud" data-chapter="2" data-label="Skąd pieniądze" id="rozdzial-2">
+        <div class="chead"><p class="chead-num">Rozdział II · Załącznik nr 1</p><h2 class="chead-title" data-split>Skąd <em>pieniądze</em></h2><p class="chead-deck">Państwo żyje z Twoich codziennych zakupów. I z pożyczek.</p></div>
+      </div>
+      <div class="astep" data-state="revenue"><div class="acard">
+        <p class="acard-k">Źródła dochodów</p>
+        <p>Te same kropki, ułożone według źródeł. <strong>Sam VAT daje więcej niż wszystkie pozostałe podatki razem.</strong></p>
+        <p>Najedź na pasek, żeby zobaczyć dokładną kwotę.</p>
+        <span class="cite">Załącznik nr 1 · dochody budżetu państwa</span>
+      </div></div>
+      <div class="astep" data-state="revenue" data-hl="vat"><div class="acard">
+        <p class="acard-k"><span class="sw" style="background:#3E8EE0"></span>VAT</p>
+        <span class="acard-big">363,7<small>mld zł</small></span>
+        <p>Płacisz go przy każdym zakupie: w sklepie, na stacji, w internecie. To 52 zł z każdych 100 zł dochodów.</p>
+        <span class="chip up"><i class="ti ti-arrow-up-right" aria-hidden="true"></i>+6,5% wobec planu na 2026 r.</span>
+      </div></div>
+      <div class="astep" data-state="revenue" data-hl="cit"><div class="acard">
+        <p class="acard-k"><span class="sw" style="background:#22A57E"></span>CIT</p>
+        <span class="acard-big">94,6<small>mld zł</small></span>
+        <p>Podatek od zysków firm rośnie najszybciej ze wszystkich dużych źródeł. Rząd liczy na lepsze wyniki spółek i szczelniejszy pobór.</p>
+        <span class="chip up"><i class="ti ti-arrow-up-right" aria-hidden="true"></i>+17,7% wobec planu na 2026 r.</span>
+      </div></div>
+      <div class="astep" data-state="revenue" data-hl="pit"><div class="acard">
+        <p class="acard-k"><span class="sw" style="background:#8F7BEA"></span>PIT</p>
+        <span class="acard-big">33,4<small>mld zł</small></span>
+        <p>Dlaczego tak mało? Większość podatku od Twojej pensji trafia do gminy, powiatu i województwa, a nie do budżetu państwa.</p>
+      </div></div>
+      <div class="astep" data-state="revenue" data-hl="pozyczone"><div class="acard">
+        <p class="acard-k"><span class="sw" style="background:#EF5A4C"></span>Pożyczone</p>
+        <span class="acard-big">281,2<small>mld zł</small></span>
+        <p>Gdyby deficyt był podatkiem, byłby <strong>drugim największym źródłem</strong> pieniędzy państwa. Większym niż akcyza, CIT i PIT razem.</p>
+      </div></div>
+
+      <!-- III -->
+      <div class="astep astep-head" data-state="cloud" data-chapter="3" data-label="Dokąd płyną" id="rozdzial-3">
+        <div class="chead"><p class="chead-num">Rozdział III · Załącznik nr 2</p><h2 class="chead-title" data-split>Dokąd <em>płyną</em></h2><p class="chead-deck">31 działów klasyfikacji budżetowej. Zobacz, kto dostaje najwięcej.</p></div>
+      </div>
+      <div class="astep" data-state="dzialy"><div class="acard">
+        <p class="acard-k">Wydatki według działów</p>
+        <p>Teraz kropki ułożyły się według działów. Każdy pasek to jedna dziedzina życia państwa. Jedenaście największych to <strong>94%</strong> całych wydatków.</p>
+        <span class="cite">Załącznik nr 2 · zestawienie według działów</span>
+      </div></div>
+      <div class="astep" data-state="dzialy" data-hl="753,855"><div class="acard">
+        <p class="acard-k">Emeryci i rodziny</p>
+        <span class="acard-big">308,0<small>mld zł</small></span>
+        <p>Ubezpieczenia społeczne (dotacje do ZUS i KRUS) i dział Rodzina, w tym <strong>800+ za 60,8 mld zł</strong>. Prawie co trzecia złotówka budżetu.</p>
+      </div></div>
+      <div class="astep" data-state="dzialy" data-hl="752,754"><div class="acard">
+        <p class="acard-k">Bezpieczeństwo</p>
+        <span class="acard-big">152,2<small>mld zł</small></span>
+        <p>Obrona narodowa (115,7 mld zł) i bezpieczeństwo publiczne (36,5 mld zł). Do tego dochodzą miliardy z Funduszu Wsparcia Sił Zbrojnych, który działa poza budżetem.</p>
+      </div></div>
+      <div class="astep" data-state="dzialy" data-hl="757"><div class="acard">
+        <p class="acard-k">Odsetki</p>
+        <span class="acard-big hl-red">107,0<small>mld zł</small></span>
+        <p>Obsługa długu kosztuje więcej niż <strong>cały dział Rodzina z programem 800+</strong> (106,6 mld zł). I rośnie szybciej niż jakikolwiek inny dział.</p>
+      </div></div>
+      <div class="astep" data-state="dzialy" data-hl="758"><div class="acard">
+        <p class="acard-k">Różne rozliczenia</p>
+        <span class="acard-big">151,3<small>mld zł</small></span>
+        <p>Tajemniczo brzmiący dział to m.in. <strong>subwencje dla gmin i powiatów</strong> (55,5 mld zł), <strong>składka do budżetu UE</strong> (45,6 mld zł) i rezerwy celowe.</p>
+      </div></div>
+
+      <!-- IV -->
+      <div class="astep astep-head" data-state="cloud" data-chapter="4" data-label="Na co" id="rozdzial-4">
+        <div class="chead"><p class="chead-num">Rozdział IV · Rodzaje wydatków</p><h2 class="chead-title" data-split>Na co, <em>dosłownie</em></h2><p class="chead-deck">Ta sama kwota, inny podział: przelewy, pensje czy inwestycje?</p></div>
+      </div>
+      <div class="astep" data-state="types"><div class="acard">
+        <p class="acard-k">Pięć rodzajów wydatków</p>
+        <p>Ustawa dzieli każdą złotówkę także według tego, <strong>czym jest</strong>: przelewem dalej, świadczeniem dla ludzi, kosztem działania państwa albo inwestycją.</p>
+        <span class="cite">Załącznik nr 2 · kolumny zestawienia</span>
+      </div></div>
+      <div class="astep" data-state="types" data-hl="tb"><div class="acard">
+        <p class="acard-k"><span class="sw" style="background:#8F7BEA"></span>Transfery bieżące</p>
+        <span class="acard-big">431,0<small>mld zł</small></span>
+        <p>44 zł ze 100 zł budżet tylko przekazuje dalej: do ZUS i KRUS, samorządów, NFZ, uczelni i agencji. To one wydają te pieniądze.</p>
+      </div></div>
+      <div class="astep" data-state="types" data-hl="wm,tm"><div class="acard">
+        <p class="acard-k"><span class="sw" style="background:#22A57E"></span>Inwestycje</p>
+        <span class="acard-big hl-green">8,9<small>zł ze 100 zł</small></span>
+        <p>Wydatki i transfery majątkowe to razem <strong>87,3 mld zł</strong>. Reszta to wydatki bieżące, które znikają w tym samym roku.</p>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- ===================== V. WINNERS & LOSERS ===================== -->
+  <section class="chapter" id="rozdzial-5" data-chapter="5" data-label="Wygrani i przegrani">
+    <div class="chead-block" style="--wash: rgba(34,165,126,.12)">
+      <div class="chead"><p class="chead-num">Rozdział V · 2026 → 2027</p><h2 class="chead-title" data-split>Wygrani i <em>przegrani</em></h2><p class="chead-deck">Co zyskuje, a co traci w porównaniu z ustawą na 2026 rok.</p></div>
+    </div>
+    <div class="sec">
+      <div class="sec-head">
+        <div><p class="sec-k">Zmiana wydatków według działów</p><h3 class="sec-h">Najwięcej zyskują <em>odsetki</em>.</h3></div>
+        <p class="sec-lead">Na pierwszym miejscu nie ma zdrowia ani wojska. Najszybciej rośnie koszt długu: <strong>+16,6 mld zł</strong> w jeden rok. Zaraz za nim ochrona zdrowia i rodzina.</p>
+      </div>
+      <div class="panel">
+        <div class="toolbar">
+          <span class="toolbar-t">Projekt 2027 vs ustawa 2026 · mld zł</span>
+          <span class="seg" role="group" aria-label="Jednostka zmiany"><button type="button" id="dv-abs" aria-pressed="true">mld zł</button><button type="button" id="dv-pct" aria-pressed="false">procent</button></span>
+        </div>
+        <div class="dv-axis" aria-hidden="true"><span></span><div><span>← mniej</span><span>więcej →</span></div><span></span></div>
+        <div class="diverge" id="diverge"></div>
+      </div>
+      <p class="note">Porównanie planu z druku nr 3150 z ustawą budżetową na 2026 r. (Dz.U. 2026 poz. 62). Pokazujemy 16 działów o największej zmianie kwotowej.</p>
+    </div>
+
+    <div class="sec">
+      <div class="sec-head">
+        <div><p class="sec-k">Całe załączniki, wiersz po wierszu</p><h3 class="sec-h">Księgi <em>ustawy</em></h3></div>
+        <p class="sec-lead">Wszystkie źródła dochodów z załącznika nr 1 i wszystkie działy z załącznika nr 2. Obok kwoty widać zmianę wobec 2026 roku.</p>
+      </div>
+      <div class="ledgers">
+        <div class="ledger" id="ledger-in"></div>
+        <div class="ledger" id="ledger-out"></div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-head">
+        <div><p class="sec-k">Zestawienie według dysponentów</p><h3 class="sec-h">Kto trzyma <em>portfel</em></h3></div>
+        <p class="sec-lead">Najwięcej pieniędzy ma w rękach minister finansów. Ale prawie połowa jego części to <strong>odsetki od długu</strong>, a reszta to głównie pieniądze dla samorządów i składka do Unii.</p>
+      </div>
+      <div class="panel">
+        <div class="sp-legend" id="sp-legend"></div>
+        <div class="spenders" id="spenders"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== VI. DEBT ===================== -->
+  <section class="chapter" id="rozdzial-6" data-chapter="6" data-label="Pieniądz pożyczony">
+    <div class="chead-block" style="--wash: rgba(239,90,76,.13)">
+      <div class="chead"><p class="chead-num">Rozdział VI · Art. 3, 4 i 5</p><h2 class="chead-title" data-split>Pieniądz <em>pożyczony</em></h2><p class="chead-deck">Deficyt to dopiero początek. Państwo musi w 2027 r. pozyskać ponad bilion złotych.</p></div>
+    </div>
+    <div class="lex-wrap">
+      <blockquote class="lex" id="lex-art3">
+        <div class="lex-src"><span>Druk nr 3150 · Art. 3 i Art. 5</span><span>projekt ustawy budżetowej na rok 2027</span></div>
+        <p><b>Art. 3.</b> 1. Ustala się łączną kwotę planowanych przychodów budżetu państwa w wysokości <mark>1 115 470 320 tys. zł</mark> oraz łączną kwotę planowanych rozchodów budżetu państwa w wysokości <mark>814 929 495 tys. zł</mark>.</p>
+        <p><b>Art. 5.</b> 1. Przyrost zadłużenia na dzień 31 grudnia 2027 r. (…) nie może przekroczyć kwoty <mark>470 000 000 tys. zł</mark>.</p>
+      </blockquote>
+    </div>
+    <div class="scrolly" data-chart="debt">
+      <figure class="sfig">
+        <figcaption class="fig-cap"><span class="fig-title" id="debt-title">Ile państwo musi pożyczyć w 2027 r.</span><span class="fig-sub" id="debt-sub">mld zł · załącznik nr 5</span></figcaption>
+        <div class="fig-body" id="chart-debt" role="img" aria-label="Potrzeby pożyczkowe, koszt odsetek i dług publiczny"></div>
+      </figure>
+      <div class="ssteps">
+        <div class="sstep" data-step="0"><div class="scard">
+          <p class="acard-k">Krok 1 · deficyt</p>
+          <span class="acard-big hl-red">281,2<small>mld zł</small></span>
+          <p>Zaczyna się od deficytu budżetu państwa z art. 1.</p>
+        </div></div>
+        <div class="sstep" data-step="1"><div class="scard">
+          <p class="acard-k">Krok 2 · saldo z art. 3</p>
+          <span class="acard-big">300,5<small>mld zł</small></span>
+          <p>Do deficytu dochodzi deficyt budżetu środków europejskich: 19,3 mld zł. Razem to saldo przychodów i rozchodów z art. 3 ust. 2, co do tysiąca złotych.</p>
+        </div></div>
+        <div class="sstep" data-step="2"><div class="scard">
+          <p class="acard-k">Krok 3 · stare długi</p>
+          <span class="acard-big">1 115,5<small>mld zł</small></span>
+          <p>Państwo musi też <strong>spłacić stare długi</strong>, które zapadają w 2027 r. Dlatego łączne przychody z art. 3 przekraczają <strong>bilion złotych</strong>.</p>
+          <p>Polacy mają kupić obligacji oszczędnościowych za 84,3 mld zł.</p>
+        </div></div>
+        <div class="sstep" data-step="3"><div class="scard">
+          <p class="acard-k">Cena pieniądza</p>
+          <span class="acard-big hl-red">107<small>mld zł</small></span>
+          <p>Za ten dług trzeba płacić odsetki. W 2022 r. kosztowały w planie <strong>26 mld zł</strong>. W 2027 r. ponad cztery razy więcej.</p>
+          <span class="cite">Część 79 · obsługa długu Skarbu Państwa</span>
+        </div></div>
+        <div class="sstep" data-step="4"><div class="scard">
+          <p class="acard-k">Sufit z Konstytucji</p>
+          <span class="acard-big">59,2<small>% PKB w 2029 r.</small></span>
+          <p>Rząd prognozuje, że dług wzrośnie z 53,8% do 59,2% PKB. Konstytucja zakazuje przekroczenia <strong class="hl-red">60%</strong>. Zostaje 0,8 punktu procentowego zapasu.</p>
+          <span class="cite">Prognoza rządu z uzasadnienia, wrzesień 2026</span>
+        </div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== VII. BEYOND THE BUDGET ===================== -->
+  <section class="chapter" id="rozdzial-7" data-chapter="7" data-label="Poza budżetem">
+    <div class="chead-block" style="--wash: rgba(143,123,234,.13)">
+      <div class="chead"><p class="chead-num">Rozdział VII · Art. 1 ust. 3 i 4, Art. 2</p><h2 class="chead-title" data-split>Państwo <em>większe</em> niż budżet</h2><p class="chead-deck">977,6 mld zł to tylko część pieniędzy, którymi zarządza państwo.</p></div>
+    </div>
+    <div class="lex-wrap">
+      <blockquote class="lex" id="lex-art13">
+        <div class="lex-src"><span>Druk nr 3150 · Art. 1 ust. 3</span><span>projekt ustawy budżetowej na rok 2027</span></div>
+        <p>3. Ustala się kwotę planowanych wydatków organów i jednostek (…), państwowych osób prawnych (…), a także funduszy utworzonych, powierzonych lub przekazanych Bankowi Gospodarstwa Krajowego (…) w wysokości <mark>2 155 330 796 tys. zł</mark>.</p>
+      </blockquote>
+    </div>
+    <div class="scrolly" data-chart="orbit">
+      <figure class="sfig">
+        <figcaption class="fig-cap"><span class="fig-title">Pieniądze państwa w 2027 r.</span><span class="fig-sub">mld zł · pole koła = kwota</span></figcaption>
+        <div class="fig-body" id="chart-orbit" role="img" aria-label="Porównanie budżetu państwa z wydatkami całego sektora i budżetem środków europejskich"></div>
+      </figure>
+      <div class="ssteps">
+        <div class="sstep" data-step="0"><div class="scard">
+          <p class="acard-k">Budżet państwa</p>
+          <span class="acard-big">977,6<small>mld zł</small></span>
+          <p>To kwota, o której mówi się najczęściej. Ale to nie wszystko.</p>
+        </div></div>
+        <div class="sstep" data-step="1"><div class="scard">
+          <p class="acard-k">Całe państwo</p>
+          <span class="acard-big hl-gold">2 155,3<small>mld zł</small></span>
+          <p>Art. 1 ust. 3 sumuje plany wydatków wszystkich państwowych jednostek, agencji i <strong>funduszy w BGK</strong>, np. Funduszu Wsparcia Sił Zbrojnych. To ponad <strong>dwa biliony złotych</strong>.</p>
+          <p>Kwoty częściowo się nakładają: część pieniędzy przepływa między budżetem a funduszami.</p>
+        </div></div>
+        <div class="sstep" data-step="2"><div class="scard">
+          <p class="acard-k">Hamulec</p>
+          <span class="acard-big">1 793,4<small>mld zł</small></span>
+          <p>Art. 1 ust. 4 to limit z <strong>reguły wydatkowej</strong>. Ogranicza, ile może wydać ta szeroka grupa państwowych jednostek i funduszy.</p>
+        </div></div>
+        <div class="sstep" data-step="3"><div class="scard">
+          <p class="acard-k">Osobny budżet na pieniądze z UE</p>
+          <span class="acard-big">106,6<small>mld zł</small></span>
+          <p>Budżet środków europejskich ma własne dochody (87,3 mld zł) i wydatki (106,6 mld zł). W tym samym czasie Polska wpłaca do budżetu UE <strong>45,6 mld zł składki</strong>.</p>
+          <span class="cite">Art. 2 · część 84</span>
+        </div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== VIII. RESERVES ===================== -->
+  <section class="chapter" id="rozdzial-8" data-chapter="8" data-label="Rezerwy">
+    <div class="chead-block" style="--wash: rgba(201,131,31,.14)">
+      <div class="chead"><p class="chead-num">Rozdział VIII · Część 83</p><h2 class="chead-title" data-split>Ukryte <em>miliardy</em></h2><p class="chead-deck">50 mld zł czeka w rezerwach celowych. Rozdzieli je rząd już w trakcie roku.</p></div>
+    </div>
+    <div class="sec">
+      <div class="sec-head">
+        <div><p class="sec-k">Rezerwy celowe · 50,1 mld zł</p><h3 class="sec-h">Od klęsk żywiołowych po <em>mistrzostwa świata</em></h3></div>
+        <p class="sec-lead">Rezerwy to pieniądze zapisane na cel, ale bez wskazanego od razu ministra. Największe dotyczą projektów unijnych. Najmniejsze potrafią zaskoczyć.</p>
+      </div>
+      <div class="panel"><div class="tiles" id="tiles"></div><p class="note" id="tiles-small" style="margin-top:18px"></p></div>
+      <p class="note">15 wybranych pozycji spośród ponad 60 w części 83, według numerów pozycji z załącznika nr 2. Pole prostokąta odpowiada kwocie. „Pozostałe” to suma reszty pozycji.</p>
+    </div>
+  </section>
+
+  <!-- ===================== IX. PRIORITIES ===================== -->
+  <section class="chapter" id="rozdzial-9" data-chapter="9" data-label="Priorytety">
+    <div class="chead-block" style="--wash: rgba(217,86,127,.12)">
+      <div class="chead"><p class="chead-num">Rozdział IX · Priorytety rządu</p><h2 class="chead-title" data-split>Co rząd <em>obiecuje</em></h2><p class="chead-deck">Bezpieczeństwo, zdrowie i rozwój. Sprawdzamy, ile z tego jest w samej ustawie.</p></div>
+    </div>
+    <div class="sec">
+      <div class="sec-head">
+        <div><p class="sec-k">Ustawa vs komunikat</p><h3 class="sec-h">Dwie liczby przy każdym <em>priorytecie</em></h3></div>
+        <p class="sec-lead">Rząd podaje kwoty łączne, razem z NFZ i funduszami. Ustawa pokazuje tylko budżet państwa. <strong>Pełne koło</strong> to kwota z druku, <strong>przerywane</strong> to kwota łączna według rządu.</p>
+      </div>
+      <div class="prio" id="prio"></div>
+      <p class="note">Kwoty łączne: komunikat KPRM z 29.09.2026 r. Kwoty z ustawy: druk nr 3150 (dział 851, część 29, dział 730, rozdział 85501).</p>
+    </div>
+  </section>
+
+  <!-- ===================== X. RECEIPT ===================== -->
+  <section class="chapter" id="rozdzial-10" data-chapter="10" data-label="Twój paragon">
+    <div class="chead-block" style="--wash: rgba(34,165,126,.12)">
+      <div class="chead"><p class="chead-num">Rozdział X · Na jednego mieszkańca</p><h2 class="chead-title" data-split>Twój <em>paragon</em></h2><p class="chead-deck">Miliardy trudno sobie wyobrazić. Tak wygląda budżet w przeliczeniu na jedną osobę.</p></div>
+    </div>
+    <div class="sec">
+      <div class="receipt-wrap">
+        <div class="receipt" id="receipt" aria-label="Budżet na jednego mieszkańca w formie paragonu"></div>
+        <div class="rc-side">
+          <p class="sec-k">Wydatki na mieszkańca w 2027 r.</p>
+          <div class="rc-big" id="rc-big"></div>
+          <p>Tyle budżet państwa wyda na każdą osobę w Polsce, od niemowlęcia po seniora. <strong id="rc-def"></strong></p>
+          <p>Paragon pokazuje największe działy. Kwoty wyliczamy z załącznika nr 2, dzieląc je przez liczbę mieszkańców (GUS).</p>
+        </div>
+      </div>
+      <div class="calc" id="calc">
+        <div>
+          <p class="calc-k"><i class="ti ti-calculator" aria-hidden="true"></i> Kalkulator</p>
+          <h3 class="calc-title">Ile dałby Ci nowy próg PIT?</h3>
+          <p class="calc-lead">Równolegle z budżetem rząd proponuje podnieść próg ze 120 do 130 tys. zł i dodać stawkę 24% dla dochodów 130–150 tys. zł.</p>
+        </div>
+        <div class="calc-body">
+          <label class="calc-label" for="calc-range">Twój roczny dochód do opodatkowania</label>
+          <div class="calc-input-row">
+            <input type="range" id="calc-range" min="0" max="250000" step="1000" value="140000">
+            <span class="calc-input-wrap"><input type="number" id="calc-num" min="0" max="10000000" step="1000" value="140000" inputmode="numeric" aria-label="Dochód w złotych"><span>zł</span></span>
+          </div>
+          <div class="calc-scales" id="calc-scales" aria-hidden="true"></div>
+          <div class="calc-out" id="calc-out" aria-live="polite"></div>
+        </div>
+        <p class="calc-note" id="calc-note"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== XI. PARLIAMENT ===================== -->
+  <section class="chapter" id="rozdzial-11" data-chapter="11" data-label="Droga przez Sejm">
+    <div class="chead-block" style="--wash: rgba(232,176,75,.14)">
+      <div class="chead"><p class="chead-num">Rozdział XI · Aktualizowany na bieżąco</p><h2 class="chead-title" data-split>Droga przez <em>parlament</em></h2><p class="chead-deck">Projekt to dopiero początek. Tu śledzimy każdy krok, od rządu do Dziennika Ustaw.</p></div>
+    </div>
+    <div class="sec">
+      <div class="clock" id="clock"></div>
+      <ol class="journey" id="journey"></ol>
+      <h3 class="sub-h">Jak zmienia się projekt</h3>
+      <p class="sub-lead">Każda wersja budżetu ma swoje liczby. Kolejne kolumny uzupełnimy, gdy Sejm, Senat i Prezydent podejmą decyzje.</p>
+      <div class="versions" id="versions"></div>
+      <h3 class="sub-h">Dziennik zmian</h3>
+      <ul class="log" id="log"></ul>
+    </div>
+  </section>
+
+  <!-- ===================== XII. BALANCE ===================== -->
+  <section class="chapter" id="rozdzial-12" data-chapter="12" data-label="Bilans">
+    <div class="chead-block">
+      <div class="chead"><p class="chead-num">Rozdział XII · Bilans</p><h2 class="chead-title" data-split>2026 → <em>2027</em></h2><p class="chead-deck">Obecny budżet obok nowego projektu. I założenia, na których stoi cały plan.</p></div>
+    </div>
+    <div class="sec">
+      <div class="tape" id="tape"></div>
+      <h3 class="sub-h">Na czym stoi ten plan</h3>
+      <p class="sub-lead">Budżet to prognoza. Między czerwcem a wrześniem rząd obniżył prognozę wzrostu PKB i podniósł prognozę inflacji. Gdy gospodarka rośnie wolniej, wpływa mniej podatków.</p>
+      <div class="macro" id="macro"></div>
+    </div>
+  </section>
+
+  <!-- ===================== OUTRO ===================== -->
+  <section class="outro" aria-labelledby="outro-title">
+    <div class="outro-in">
+      <p class="kicker" style="justify-content:center"><span class="live"><span class="pulse" aria-hidden="true"></span>ciąg dalszy nastąpi</span></p>
+      <h2 class="outro-title" id="outro-title">Ta historia jeszcze <em>się pisze</em>.</h2>
+      <p class="outro-lead">Wrócimy po każdym głosowaniu w Sejmie i Senacie. Liczby z projektu zamienimy na liczby z ustawy, gdy tylko trafi do Dziennika Ustaw.</p>
+      <div class="outro-cta">
+        <a class="btn btn-primary" href="index.html"><i class="ti ti-layout-grid" aria-hidden="true"></i> Otwórz eksplorator budżetu</a>
+        <a class="btn" href="ustawa.pdf" target="_blank" rel="noopener"><i class="ti ti-file-text" aria-hidden="true"></i> Druk nr 3150 (PDF)</a>
+      </div>
+    </div>
+    <div class="sources">
+      <div>
+        <h3>Źródła i metoda</h3>
+        <p>Podstawą historii jest projekt ustawy budżetowej na rok 2027 z załącznikami (druk sejmowy nr 3150). Kwoty w ustawie podane są w tysiącach złotych, my przeliczamy je na miliardy.</p>
+        <p>Porównania z 2026 r. opieramy na ustawie budżetowej na 2026 r. Prognozy makroekonomiczne, dług do PKB i łączne kwoty priorytetów pochodzą z komunikatów rządu i uzasadnienia projektu.</p>
+      </div>
+      <ol class="src-list" id="sources"></ol>
+    </div>
+  </section>
+</main>
+
+<footer class="foot"><span id="foot-upd"></span><span>© 2026 Stowarzyszenie <a href="https://terracracovianum.org" rel="noopener">Terra Cracovianum</a></span></footer>
+<div class="tt" id="tt" role="status" aria-live="polite"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+<script src="story-2027.js?v=2"></script>
+</body>
+</html>
