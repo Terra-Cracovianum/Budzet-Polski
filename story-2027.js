@@ -867,7 +867,7 @@
      ===================================================================== */
   var stepper = null;
   function goToEl(el) {
-    if (stepper) stepper.goToEl(el);
+    if (stepper && stepper.on()) stepper.goToEl(el);
     else el.scrollIntoView({ behavior: REDUCED ? "auto" : "smooth" });
   }
 
@@ -875,9 +875,20 @@
     if (REDUCED || window.innerHeight < 460) return;
     var root = document.documentElement, topH = 58, segs = [], cur = 0;
     var locked = false, animating = false, lockTimer = 0, raf = 0;
-    var lastWheel = 0, lastAbs = 0, hint = $("step-hint"), hintCount = $("step-hint-n");
-    root.style.scrollBehavior = "auto";
-    root.classList.add("stepper");
+    var lastWheel = 0, lastAbs = 0, hint = $("step-hint"), hintCount = $("step-hint-n"), hintText = $("step-hint-t");
+    var dock = $("dock"), modeBtn = $("dock-mode"), PREF = "b27-stepper", enabled = true, toastTimer = 0;
+    try { enabled = localStorage.getItem(PREF) !== "off"; } catch (e) { /* storage blocked: default on */ }
+    if (dock) dock.hidden = false;
+    function applyMode() {
+      root.style.scrollBehavior = enabled ? "auto" : "";
+      root.classList.toggle("stepper", enabled);
+      if (modeBtn) {
+        modeBtn.setAttribute("aria-checked", enabled ? "true" : "false");
+        modeBtn.querySelector(".dock-mode-i").className = "dock-mode-i ti " + (enabled ? "ti-lock" : "ti-lock-open");
+        modeBtn.title = enabled ? "Wyłącz przewijanie krok po kroku" : "Włącz przewijanie krok po kroku";
+      }
+    }
+    applyMode();
 
     var HOLD = { prolog: 500, astep: 1250, ahead: 900, chead: 750, lex: 900, sstep: 1000, sec: 450, free: 350 };
 
@@ -969,11 +980,30 @@
       locked = false;
       animateTo(s.type === "stop" ? s.y : s.y0, s.type === "stop" ? s.hold : HOLD.free, j);
     }
-    stepper = { goToEl: goToEl };
+    stepper = { goToEl: goToEl, on: function () { return enabled; } };
+    if (modeBtn) modeBtn.addEventListener("click", function () {
+      enabled = !enabled;
+      try { localStorage.setItem(PREF, enabled ? "on" : "off"); } catch (e) { /* ignore */ }
+      cancelAnimationFrame(raf); clearTimeout(lockTimer); animating = false; locked = false;
+      applyMode();
+      if (enabled) {
+        toast("Krok po kroku");
+        var i = locate(window.scrollY), s = segs[i];
+        if (s && s.type === "stop" && Math.abs(s.y - window.scrollY) > 6) setTimeout(function () { animateTo(s.y, 300, i); }, 120);
+      } else toast("Przewijanie swobodne");
+    });
 
     // --- hint pill
     function setHint(on) { if (hint) hint.classList.toggle("is-on", on); }
+    function toast(msg) {
+      clearTimeout(toastTimer);
+      if (!hint) return;
+      hint.classList.add("is-toast"); hintText.textContent = msg; setHint(true);
+      toastTimer = setTimeout(function () { hint.classList.remove("is-toast"); restoreHintText(); setHint(false); if (enabled) updateHint(); }, 1700);
+    }
+    function restoreHintText() { hintText.innerHTML = '<span class="sh-desk">Przewiń dalej</span><span class="sh-touch">Przesuń w górę</span>'; }
     function updateHint() {
+      if (!enabled || hint.classList.contains("is-toast")) { if (!enabled) setHint(false); return; }
       var y = window.scrollY, i = locate(y), s = segs[i];
       var show = !locked && i > 0 && i < segs.length - 1 && s.type === "stop" && Math.abs(s.y - y) < 30;
       if (hintCount) hintCount.textContent = (i + 1) + " / " + stopCount();
@@ -983,7 +1013,7 @@
     // --- wheel (mouse + trackpad, with inertia absorption)
     function interactive(t) { return t && t.closest && t.closest("input, textarea, select, [contenteditable], .versions, .tt"); }
     window.addEventListener("wheel", function (e) {
-      if (e.ctrlKey || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+      if (!enabled || e.ctrlKey || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
       var dy = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? window.innerHeight : 1), dir = dy > 0 ? 1 : -1, abs = Math.abs(dy);
       var now = performance.now(), gap = now - lastWheel;
       var fresh = gap > 140 || abs > lastAbs * 1.7 + 6;
@@ -1006,7 +1036,7 @@
 
     // --- keyboard
     window.addEventListener("keydown", function (e) {
-      if (e.altKey || e.ctrlKey || e.metaKey || interactive(e.target) || (e.target && e.target.closest && e.target.closest("button, a") && (e.key === " " || e.key === "Enter"))) return;
+      if (!enabled || e.altKey || e.ctrlKey || e.metaKey || interactive(e.target) || (e.target && e.target.closest && e.target.closest("button, a") && (e.key === " " || e.key === "Enter"))) return;
       var down = ["ArrowDown", "PageDown"].indexOf(e.key) >= 0 || (e.key === " " && !e.shiftKey);
       var up = ["ArrowUp", "PageUp"].indexOf(e.key) >= 0 || (e.key === " " && e.shiftKey);
       if (!down && !up) return;
@@ -1019,7 +1049,7 @@
     // --- touch
     var ts = null;
     window.addEventListener("touchstart", function (e) {
-      if (e.touches.length !== 1) { ts = null; return; }
+      if (!enabled || e.touches.length !== 1) { ts = null; return; }
       ts = { x: e.touches[0].clientX, y: e.touches[0].clientY, mode: interactive(e.target) ? "native" : null };
     }, { passive: true });
     window.addEventListener("touchmove", function (e) {
@@ -1043,7 +1073,7 @@
     // --- anchors inside the story
     document.addEventListener("click", function (e) {
       var a = e.target.closest && e.target.closest('a[href^="#"]');
-      if (!a) return;
+      if (!a || !enabled) return;
       var el = document.querySelector(a.getAttribute("href"));
       if (!el) return;
       e.preventDefault(); goToEl(el);
@@ -1052,7 +1082,7 @@
     // --- settle: anything that moved the page without us (scrollbar drag, find, focus, momentum out of a long section)
     var idle = 0;
     window.addEventListener("scroll", function () {
-      if (animating) return;
+      if (animating || !enabled) return;
       setHint(false);
       clearTimeout(idle);
       idle = setTimeout(function () {
