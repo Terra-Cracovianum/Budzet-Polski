@@ -92,6 +92,7 @@
     buildSources(D);
     $("foot-upd").textContent = "Ostatnia aktualizacja: " + fmtDate(D.meta.aktualizacja) + " · druk nr " + (U.druk || "—");
     setupReveal();
+    setupStepper();
 
     var lastW = window.innerWidth, rt;
     window.addEventListener("resize", function () {
@@ -135,7 +136,7 @@
       b.type = "button"; b.className = "tb-ch";
       b.innerHTML = ROMAN[i] + '<span class="tb-tip">' + ROMAN[i] + " · " + esc(s.dataset.label) + "</span>";
       b.setAttribute("aria-label", "Rozdział " + ROMAN[i] + ": " + s.dataset.label);
-      b.addEventListener("click", function () { s.scrollIntoView({ behavior: REDUCED ? "auto" : "smooth" }); });
+      b.addEventListener("click", function () { goToEl(s); });
       nav.appendChild(b);
     });
     $("tb-status").textContent = D.meta.etap_krotko;
@@ -850,6 +851,218 @@
       var ext = /^https?:/.test(z.url);
       return '<li><a href="' + esc(z.url) + '"' + (ext ? ' target="_blank" rel="noopener"' : "") + ">" + esc(z.t) + "</a></li>";
     }).join("");
+  }
+
+  /* =====================================================================
+     STEPPER — one gesture, one frame. Wheel, trackpad, keys and touch move the
+     story to the next stop; the page holds still until that frame has settled.
+     Sections taller than the screen scroll natively inside, and step at their edges.
+     ===================================================================== */
+  var stepper = null;
+  function goToEl(el) {
+    if (stepper) stepper.goToEl(el);
+    else el.scrollIntoView({ behavior: REDUCED ? "auto" : "smooth" });
+  }
+
+  function setupStepper() {
+    if (REDUCED || window.innerHeight < 460) return;
+    var root = document.documentElement, topH = 58, segs = [], cur = 0;
+    var locked = false, animating = false, lockTimer = 0, raf = 0;
+    var lastWheel = 0, lastAbs = 0, hint = $("step-hint"), hintCount = $("step-hint-n");
+    root.style.scrollBehavior = "auto";
+    root.classList.add("stepper");
+
+    var HOLD = { prolog: 500, astep: 1250, ahead: 900, chead: 750, lex: 900, sstep: 1000, sec: 450, free: 350 };
+
+    function docTop(el) { var r = el.getBoundingClientRect(); return r.top + window.scrollY; }
+    function maxY() { return root.scrollHeight - window.innerHeight; }
+    function clampY(y) { return Math.max(0, Math.min(maxY(), Math.round(y))); }
+
+    function build() {
+      var vh = window.innerHeight, list = [];
+      topH = $("tb-chapters") ? document.querySelector(".topbar").offsetHeight : 58;
+      list.push({ type: "stop", y: 0, hold: HOLD.prolog, el: $("prolog") });
+      document.querySelectorAll(".astep, .chead-block, .lex-wrap, .sstep, .sec, .outro").forEach(function (el) {
+        var t = docTop(el), h = el.offsetHeight, kind;
+        if (el.classList.contains("astep")) kind = el.classList.contains("astep-head") ? "ahead" : "astep";
+        else if (el.classList.contains("chead-block")) kind = "chead";
+        else if (el.classList.contains("lex-wrap")) kind = "lex";
+        else if (el.classList.contains("sstep")) kind = "sstep";
+        else kind = "sec";
+        if (kind === "sec") {
+          if (h + topH + 24 <= vh) list.push({ type: "stop", y: clampY(t + h / 2 - (vh + topH) / 2), hold: HOLD.sec, el: el });
+          else list.push({ type: "free", y0: clampY(t - topH - 18), y1: clampY(t + h - vh + 28), el: el });
+        } else {
+          list.push({ type: "stop", y: clampY(t + h / 2 - vh / 2), hold: HOLD[kind], el: el });
+        }
+      });
+      list.sort(function (a, b) { return (a.type === "stop" ? a.y : a.y0) - (b.type === "stop" ? b.y : b.y0); });
+      segs = [];
+      list.forEach(function (s) {
+        var p = segs[segs.length - 1], sy = s.type === "stop" ? s.y : s.y0;
+        if (p) {
+          var py = p.type === "stop" ? p.y : p.y1;
+          if (s.type === "stop" && Math.abs(sy - py) < 40) return;
+          if (p.type === "free" && s.type === "free" && s.y0 <= p.y1 + 40) { p.y1 = Math.max(p.y1, s.y1); return; }
+        }
+        segs.push(s);
+      });
+      cur = locate(window.scrollY);
+    }
+
+    function inFree(s, y) { return s.type === "free" && y >= s.y0 - 2 && y <= s.y1 + 2; }
+    function locate(y) {
+      var best = 0, bd = Infinity;
+      segs.forEach(function (s, i) {
+        var d = s.type === "stop" ? Math.abs(s.y - y) : (y < s.y0 ? s.y0 - y : y > s.y1 ? y - s.y1 : 0);
+        if (d < bd) { bd = d; best = i; }
+      });
+      return best;
+    }
+    function stopCount() { return segs.length; }
+
+    // --- motion
+    function ease(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+    function animateTo(y, hold, idx) {
+      y = clampY(y);
+      cancelAnimationFrame(raf); clearTimeout(lockTimer);
+      locked = true; animating = true; setHint(false);
+      var from = window.scrollY, dist = y - from, T = Math.max(560, Math.min(1150, 420 + Math.abs(dist) * 0.32)), t0 = performance.now();
+      if (Math.abs(dist) < 2) T = 1;
+      (function f(now) {
+        var k = Math.min(1, (now - t0) / T);
+        window.scrollTo(0, from + dist * ease(k));
+        if (k < 1) raf = requestAnimationFrame(f);
+        else {
+          animating = false; cur = idx != null ? idx : locate(y);
+          lockTimer = setTimeout(release, hold);
+        }
+      })(t0);
+    }
+    function release() { locked = false; updateHint(); }
+    function go(dir) {
+      if (locked || !segs.length) return;
+      var y = window.scrollY, i = locate(y), s = segs[i], j;
+      if (s.type === "stop" && ((dir > 0 && s.y > y + 24) || (dir < 0 && s.y < y - 24))) j = i;
+      else j = i + dir;
+      if (j < 0) return;
+      if (j >= segs.length) { if (dir > 0 && y < maxY() - 2) animateTo(maxY(), HOLD.free); return; }
+      var t = segs[j];
+      if (t.type === "free") animateTo(dir > 0 ? t.y0 : t.y1, HOLD.free, j);
+      else animateTo(t.y, t.hold, j);
+    }
+    function goToEl(el) {
+      var y = docTop(el), j = 0, bd = Infinity;
+      segs.forEach(function (s, i) {
+        var sy = s.type === "stop" ? s.y : s.y0, d = Math.abs(sy - (y - topH));
+        if (s.el === el || (el.contains && s.el && el.contains(s.el))) d -= 100000;
+        if (d < bd) { bd = d; j = i; }
+      });
+      var s = segs[j];
+      locked = false;
+      animateTo(s.type === "stop" ? s.y : s.y0, s.type === "stop" ? s.hold : HOLD.free, j);
+    }
+    stepper = { goToEl: goToEl };
+
+    // --- hint pill
+    function setHint(on) { if (hint) hint.classList.toggle("is-on", on); }
+    function updateHint() {
+      var y = window.scrollY, i = locate(y), s = segs[i];
+      var show = !locked && i > 0 && i < segs.length - 1 && s.type === "stop" && Math.abs(s.y - y) < 30;
+      if (hintCount) hintCount.textContent = (i + 1) + " / " + stopCount();
+      setHint(show);
+    }
+
+    // --- wheel (mouse + trackpad, with inertia absorption)
+    function interactive(t) { return t && t.closest && t.closest("input, textarea, select, [contenteditable], .versions, .tt"); }
+    window.addEventListener("wheel", function (e) {
+      if (e.ctrlKey || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+      var dy = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? window.innerHeight : 1), dir = dy > 0 ? 1 : -1, abs = Math.abs(dy);
+      var now = performance.now(), gap = now - lastWheel;
+      var fresh = gap > 140 || abs > lastAbs * 1.7 + 6;
+      lastWheel = now; lastAbs = abs;
+      var y = window.scrollY, s = segs[locate(y)];
+      // native scrolling inside tall sections, clamped to their edges
+      if (!locked && s && inFree(s, y)) {
+        var target = y + dy;
+        if ((dir > 0 && y < s.y1 - 1) || (dir < 0 && y > s.y0 + 1)) {
+          if (target > s.y1 && dir > 0) { e.preventDefault(); window.scrollTo(0, s.y1); hold(); }
+          else if (target < s.y0 && dir < 0) { e.preventDefault(); window.scrollTo(0, s.y0); hold(); }
+          return;
+        }
+      }
+      e.preventDefault();
+      if (locked || !fresh || abs < 3) return;
+      go(dir);
+    }, { passive: false });
+    function hold() { locked = true; clearTimeout(lockTimer); lockTimer = setTimeout(release, HOLD.free); }
+
+    // --- keyboard
+    window.addEventListener("keydown", function (e) {
+      if (e.altKey || e.ctrlKey || e.metaKey || interactive(e.target) || (e.target && e.target.closest && e.target.closest("button, a") && (e.key === " " || e.key === "Enter"))) return;
+      var down = ["ArrowDown", "PageDown"].indexOf(e.key) >= 0 || (e.key === " " && !e.shiftKey);
+      var up = ["ArrowUp", "PageUp"].indexOf(e.key) >= 0 || (e.key === " " && e.shiftKey);
+      if (!down && !up) return;
+      var y = window.scrollY, s = segs[locate(y)];
+      if (s && inFree(s, y) && ((down && y < s.y1 - 1) || (up && y > s.y0 + 1))) return;
+      e.preventDefault();
+      go(down ? 1 : -1);
+    });
+
+    // --- touch
+    var ts = null;
+    window.addEventListener("touchstart", function (e) {
+      if (e.touches.length !== 1) { ts = null; return; }
+      ts = { x: e.touches[0].clientX, y: e.touches[0].clientY, mode: interactive(e.target) ? "native" : null };
+    }, { passive: true });
+    window.addEventListener("touchmove", function (e) {
+      if (!ts) return;
+      var dx = ts.x - e.touches[0].clientX, dy = ts.y - e.touches[0].clientY;
+      if (!ts.mode) {
+        if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+        if (Math.abs(dx) > Math.abs(dy)) ts.mode = "native";
+        else {
+          var y = window.scrollY, s = segs[locate(y)], dir = dy > 0 ? 1 : -1;
+          ts.mode = (!locked && s && inFree(s, y) && ((dir > 0 && y < s.y1 - 1) || (dir < 0 && y > s.y0 + 1))) ? "native" : "step";
+        }
+      }
+      if (ts.mode === "step") { e.preventDefault(); ts.dy = dy; }
+    }, { passive: false });
+    window.addEventListener("touchend", function () {
+      if (ts && ts.mode === "step" && Math.abs(ts.dy || 0) > 28) go(ts.dy > 0 ? 1 : -1);
+      ts = null;
+    }, { passive: true });
+
+    // --- anchors inside the story
+    document.addEventListener("click", function (e) {
+      var a = e.target.closest && e.target.closest('a[href^="#"]');
+      if (!a) return;
+      var el = document.querySelector(a.getAttribute("href"));
+      if (!el) return;
+      e.preventDefault(); goToEl(el);
+    });
+
+    // --- settle: anything that moved the page without us (scrollbar drag, find, focus, momentum out of a long section)
+    var idle = 0;
+    window.addEventListener("scroll", function () {
+      if (animating) return;
+      setHint(false);
+      clearTimeout(idle);
+      idle = setTimeout(function () {
+        if (ts || animating) return;
+        var y = window.scrollY, i = locate(y), s = segs[i];
+        if (s && s.type === "stop" && Math.abs(s.y - y) > 6) { locked = false; animateTo(s.y, 250, i); }
+        else updateHint();
+      }, 180);
+    }, { passive: true });
+
+    var rt;
+    function rebuild() { clearTimeout(rt); rt = setTimeout(function () { build(); updateHint(); }, 200); }
+    window.addEventListener("resize", rebuild);
+    if (window.ResizeObserver) new ResizeObserver(rebuild).observe(document.body);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(rebuild);
+    build();
+    setTimeout(updateHint, 900);
   }
 
   /* ---------------- reveal ---------------- */
