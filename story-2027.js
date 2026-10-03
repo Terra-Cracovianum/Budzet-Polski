@@ -139,7 +139,14 @@
       b.addEventListener("click", function () { goToEl(s); });
       nav.appendChild(b);
     });
-    $("tb-status").textContent = D.meta.etap_krotko;
+    var K = D.kalendarz, ci = -1;
+    K.forEach(function (k, i) { if (k.status === "current") ci = i; });
+    if (ci < 0) K.forEach(function (k, i) { if (k.status === "done") ci = i; });
+    var stage = K[ci] || { nazwa: D.meta.etap_krotko };
+    $("tb-status").textContent = stage.nazwa;
+    $("tb-status-k").textContent = "Etap " + (ci + 1) + " z " + K.length;
+    $("tb-status-bar").innerHTML = K.map(function (k) { return '<i class="' + k.status + '"></i>'; }).join("");
+    $("tb-status-link").setAttribute("aria-label", "Etap " + (ci + 1) + " z " + K.length + ": " + stage.nazwa + ". Przejdź do drogi przez parlament");
     var btns = nav.querySelectorAll(".tb-ch"), bar = $("tb-progress"), ticking = false, last = -2;
     function onScroll() {
       ticking = false;

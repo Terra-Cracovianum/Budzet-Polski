@@ -16,7 +16,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.7.0/dist/tabler-icons.min.css">
-<link rel="stylesheet" href="story-2027.css?v=3">
+<link rel="stylesheet" href="story-2027.css?v=4">
 </head>
 <body>
 <a class="skip" href="#act">Przejdź do treści</a>
@@ -24,12 +24,16 @@
 <header class="topbar">
   <div class="topbar-in">
     <a class="tb-brand" href="index.html" aria-label="Wróć do eksploratora budżetu">
-      <i class="ti ti-arrow-left" aria-hidden="true"></i>
+      <span class="tb-back" aria-hidden="true"><i class="ti ti-arrow-left"></i></span>
       <img src="logo.svg?v=16" alt="Terra Cracovianum" width="1757" height="586">
     </a>
     <nav class="tb-chapters" id="tb-chapters" aria-label="Rozdziały"></nav>
     <span class="tb-label" id="tb-label" aria-hidden="true"></span>
-    <a class="tb-status" href="#rozdzial-11"><span class="pulse" aria-hidden="true"></span><span class="tb-status-t" id="tb-status">Projekt w Sejmie</span></a>
+    <a class="tb-status" href="#rozdzial-11" id="tb-status-link" aria-label="Etap prac nad budżetem">
+      <span class="live-dot" aria-hidden="true"></span>
+      <span class="tb-status-body"><span class="tb-status-k" id="tb-status-k">Etap</span><span class="tb-status-t" id="tb-status">Projekt w Sejmie</span></span>
+      <span class="tb-status-bar" id="tb-status-bar" aria-hidden="true"></span>
+    </a>
   </div>
   <div class="tb-progress" aria-hidden="true"><span id="tb-progress"></span></div>
 </header>
@@ -437,6 +441,6 @@
 <div class="tt" id="tt" role="status" aria-live="polite"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
-<script src="story-2027.js?v=3"></script>
+<script src="story-2027.js?v=4"></script>
 </body>
 </html>
