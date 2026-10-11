@@ -2,288 +2,361 @@
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#F4F2ED" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0B0B0C" media="(prefers-color-scheme: dark)">
 <title>Budżet Polski 2026: na co państwo wydaje pieniądze | Terra Cracovianum</title>
-<meta name="description" content="Interaktywna wizualizacja budżetu państwa polskiego na 2026 rok. Pełne dane z ustawy budżetowej (Dz.U. poz. 62): wydatki według działów i części, z możliwością wejścia w szczegóły.">
+<meta name="description" content="Interaktywny budżet państwa polskiego 2011–2026. Pełne dane z ustaw budżetowych i sprawozdań Ministerstwa Finansów: wydatki, dochody, deficyt, wykonanie, w prostym widoku dla każdego i szczegółowym dla ekspertów.">
 <meta property="og:title" content="Budżet Polski 2026: na co państwo wydaje pieniądze">
-<meta property="og:description" content="Interaktywna wizualizacja wydatków budżetu państwa na 2026 r. Dane prosto z ustawy budżetowej.">
+<meta property="og:description" content="918,9 mld zł wydatków, rozłożone na czynniki pierwsze. Dane prosto z ustawy budżetowej.">
 <meta property="og:type" content="website">
 <link rel="icon" type="image/svg+xml" href="favicon.svg?v=1">
 <link rel="apple-touch-icon" href="favicon.svg?v=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.7.0/dist/tabler-icons.min.css">
-<link rel="stylesheet" href="style.css?v=38">
+<link rel="stylesheet" href="style.css?v=40">
 </head>
 <body>
+<a class="skip" href="#main">Przejdź do treści</a>
 
-<header class="masthead">
-  <div class="wrap">
-    <div class="brand">
-      <img class="brand-logo" src="logo.svg?v=16" alt="Terra Cracovianum" width="1757" height="586">
-    </div>
-    <div class="masthead-actions">
-      <div class="masthead-meta" id="masthead-meta">Ustawa budżetowa · Dz.U. 2026 poz. 62</div>
-      <a class="b27-btn" href="budzet-2027.html" aria-label="Budżet 2027: historia projektu w toku">
-        <span class="b27-dot" aria-hidden="true"></span>
-        <span class="b27-label">Budżet 2027</span>
-        <span class="b27-tag" aria-hidden="true">nowe</span>
-        <span class="b27-go" aria-hidden="true"><i class="ti ti-arrow-right"></i></span>
-      </a>
-      <button type="button" class="tut-btn" id="tut-open"
-              aria-label="Otwórz samouczek wideo"
-              aria-haspopup="dialog" aria-controls="tutorial-dialog">
+<header class="hdr" id="hdr">
+  <div class="wrap hdr-in">
+    <a class="brand" href="./" aria-label="Terra Cracovianum: Budżet Polski, strona główna">
+      <img class="logo" src="logo.svg?v=16" alt="Terra Cracovianum" width="1757" height="586">
+    </a>
+    <nav class="nav" role="tablist" aria-label="Widoki budżetu" id="nav">
+      <button class="nav-i" role="tab" id="tab-overview" data-view="overview" aria-controls="panel-overview" aria-selected="true">Przegląd</button>
+      <button class="nav-i" role="tab" id="tab-tree" data-view="tree" aria-controls="panel-tree" aria-selected="false" tabindex="-1">Mapa wydatków</button>
+      <button class="nav-i" role="tab" id="tab-flow" data-view="flow" aria-controls="panel-flow" aria-selected="false" tabindex="-1">Przepływ</button>
+      <button class="nav-i" role="tab" id="tab-type" data-view="type" aria-controls="panel-type" aria-selected="false" tabindex="-1">Rodzaje</button>
+      <button class="nav-i" role="tab" id="tab-trends" data-view="trends" aria-controls="panel-trends" aria-selected="false" tabindex="-1">Trendy</button>
+      <button class="nav-i" role="tab" id="tab-taxes" data-view="taxes" aria-controls="panel-taxes" aria-selected="false" tabindex="-1">Twoje podatki</button>
+      <button class="nav-i" role="tab" id="tab-exec" data-view="exec" aria-controls="panel-exec" aria-selected="false" tabindex="-1"><span class="live-dot" aria-hidden="true"></span><span id="tab-exec-label">Wykonanie</span></button>
+    </nav>
+    <div class="hdr-r">
+      <div class="seg seg-sm mode" role="group" aria-label="Tryb widoku">
+        <button type="button" id="mode-simple" aria-pressed="true" title="Wnioski i kwoty na osobę">Prosty</button>
+        <button type="button" id="mode-expert" aria-pressed="false" title="Kody, dokładne kwoty, zmiany rok do roku">Ekspert</button>
+      </div>
+      <label class="ypick">
+        <span class="sr">Rok budżetu</span>
+        <select id="year-select" aria-label="Rok budżetu">
+          <option value="2026" selected>2026</option><option value="2025">2025</option><option value="2024">2024</option><option value="2023">2023</option>
+          <option value="2022">2022</option><option value="2021">2021</option><option value="2020">2020</option><option value="2019">2019</option>
+          <option value="2018">2018</option><option value="2017">2017</option><option value="2016">2016</option><option value="2015">2015</option>
+          <option value="2014">2014</option><option value="2013">2013</option><option value="2012">2012</option><option value="2011">2011</option>
+        </select>
+        <i class="ti ti-chevron-down" aria-hidden="true"></i>
+      </label>
+      <button type="button" class="icon-btn" id="tut-open" aria-label="Otwórz samouczek wideo" aria-haspopup="dialog" aria-controls="tutorial-dialog" title="Samouczek">
         <i class="ti ti-player-play" aria-hidden="true"></i>
-        <span class="tut-btn-label" aria-hidden="true">Samouczek</span>
       </button>
     </div>
   </div>
 </header>
 
-<main>
-  <section class="hero">
-    <div class="wrap">
-      <p class="eyebrow anim-in" style="--anim-delay:0ms">Budżet państwa · rok 2026</p>
-      <h1 class="anim-in" style="--anim-delay:60ms">Państwo polskie wyda <span class="amt">918,9&nbsp;mld&nbsp;zł</span>. Zobacz na co.</h1>
-      <p class="hero-lead anim-in" id="hero-lead" style="--anim-delay:120ms">Każda złotówka z ustawy budżetowej, rozłożona na czynniki pierwsze. Wielkość pola odpowiada kwocie. Kliknij, żeby wejść głębiej. Dane pochodzą wprost z ustawy budżetowej na rok 2026 i sumują się co do tysiąca złotych.</p>
+<main id="main" class="wrap">
+  <div class="state" id="boot-state"><div class="spinner"></div>Wczytuję dane budżetu…</div>
 
-      <div class="stats" id="stats" aria-label="Kluczowe wielkości budżetu">
-        <!-- filled by JS -->
+  <!-- ===================== PRZEGLĄD ===================== -->
+  <section class="view is-active" id="panel-overview" role="tabpanel" aria-labelledby="tab-overview">
+    <div class="hero">
+      <div class="hero-l rv">
+        <p class="eyebrow mono"><span class="dot" aria-hidden="true"></span><span id="hero-eyebrow">Budżet państwa 2026 · plan z ustawy</span></p>
+        <h1 class="hero-n"><span id="hero-amt">918,9</span><small id="hero-unit">mld zł</small></h1>
+        <p class="hero-t" id="hero-lead">Tyle państwo planuje wydać w 2026 roku.</p>
       </div>
-      <p class="stat-foot" style="margin-top:10px">Kwoty w tysiącach złotych przeliczane na mld dla czytelności. Relacja długu i wydatków na obronę do PKB wg uzasadnienia do ustawy.</p>
+      <div class="card yr rv" style="--d:1">
+        <div class="yr-h"><span class="yr-t">Wydatki budżetu, 2011–2027</span><span class="mono yr-m">mld zł · wybierz rok</span></div>
+        <svg id="year-chart" class="year-chart" role="group" aria-label="Wydatki budżetu w latach 2011–2027. Strzałkami wybierzesz rok." tabindex="0"></svg>
+      </div>
+    </div>
+
+    <section class="card ticker rv" style="--d:2" id="ticker" aria-label="Kluczowe wskaźniki"></section>
+
+    <div class="bento">
+      <article class="card s8 rv" style="--d:3">
+        <div class="k"><span class="mono" id="ov-map-k">Mapa wydatków</span><button type="button" class="open" data-go="tree">Otwórz <i class="ti ti-chevron-right" aria-hidden="true"></i></button></div>
+        <h2 class="h" id="ov-map-h"></h2>
+        <div class="tm-wrap"><svg id="ov-treemap" class="treemap" role="img" aria-label="Mapa wydatków budżetu, pola proporcjonalne do kwot"></svg></div>
+        <div class="legend" id="ov-legend"></div>
+      </article>
+
+      <article class="card s4 rv" style="--d:4">
+        <div class="k"><span class="mono">Skąd pieniądze</span><button type="button" class="open" data-go="flow">Przepływ <i class="ti ti-chevron-right" aria-hidden="true"></i></button></div>
+        <h2 class="h" id="ov-src-h"></h2>
+        <div class="src" id="ov-src"></div>
+      </article>
+
+      <article class="card s4 rv" style="--d:5">
+        <div class="k"><span class="mono" id="ov-exec-k">Wykonanie</span><button type="button" class="open" data-go="exec">Wykonanie <i class="ti ti-chevron-right" aria-hidden="true"></i></button></div>
+        <h2 class="h" id="ov-exec-h"></h2>
+        <div class="ringwrap">
+          <svg id="ov-rings" class="rings" viewBox="0 0 150 150" width="150" height="150" aria-hidden="true"></svg>
+          <div class="rl" id="ov-rings-leg"></div>
+        </div>
+      </article>
+
+      <article class="card s4 rv" style="--d:6">
+        <div class="k"><span class="mono" id="ov-gauge-k">Dług publiczny / PKB</span><button type="button" class="open" data-go="trends">Trendy <i class="ti ti-chevron-right" aria-hidden="true"></i></button></div>
+        <h2 class="h" id="ov-gauge-h"></h2>
+        <svg class="gauge" id="ov-gauge" viewBox="0 0 260 156" aria-hidden="true"></svg>
+        <div class="gauge-leg" id="ov-gauge-leg"></div>
+      </article>
+
+      <article class="card s4 rv" style="--d:7">
+        <div class="k"><span class="mono">Twoje podatki</span><button type="button" class="open" data-go="taxes">Policz <i class="ti ti-chevron-right" aria-hidden="true"></i></button></div>
+        <h2 class="h" id="ov-tax-h"></h2>
+        <label class="money-in">
+          <span class="sr">Twoja roczna kwota podatków w złotych</span>
+          <input id="ov-tax-input" type="number" inputmode="numeric" min="0" step="100" value="5000">
+          <span class="money-in-u">zł rocznie</span><i class="ti ti-pencil" aria-hidden="true"></i>
+        </label>
+        <div class="tx" id="ov-tax-list"></div>
+      </article>
+
+      <article class="card s8 rv" style="--d:8">
+        <div class="k"><span class="mono" id="ov-tbl-k">Największe działy</span><button type="button" class="open" data-go="tree">Wszystkie <i class="ti ti-chevron-right" aria-hidden="true"></i></button></div>
+        <h2 class="h" id="ov-tbl-h"></h2>
+        <div class="tbl-wrap"><table class="tbl" id="ov-table"></table></div>
+      </article>
+
+      <a class="card c27 s4 rv" style="--d:9" href="budzet-2027.html" id="ov-2027" aria-label="Budżet 2027: historia projektu ustawy krok po kroku">
+        <span class="go" aria-hidden="true"><i class="ti ti-arrow-up-right"></i></span>
+        <span class="stage" id="c27-stage">Projekt w Sejmie</span>
+        <h3>Budżet 2027 <em>powstaje.</em></h3>
+        <div class="steps" id="c27-steps" aria-hidden="true"></div>
+        <p class="c27-step mono" id="c27-step"></p>
+        <p class="c27-p">Śledź projekt ustawy krok po kroku, od rządu do Dziennika Ustaw.</p>
+        <div class="fig" id="c27-fig"></div>
+      </a>
     </div>
   </section>
 
-  <section class="year-bar-section">
-    <div class="wrap">
-      <div class="year-bar" id="year-bar" role="group" aria-label="Wybór roku budżetowego">
-        <span class="year-bar-label">Wybierz rok budżetu:</span>
-        <div class="year-bar-buttons" id="year-seg">
-          <button data-year="2011" aria-pressed="false">2011</button>
-          <button data-year="2012" aria-pressed="false">2012</button>
-          <button data-year="2013" aria-pressed="false">2013</button>
-          <button data-year="2014" aria-pressed="false">2014</button>
-          <button data-year="2015" aria-pressed="false">2015</button>
-          <button data-year="2016" aria-pressed="false">2016</button>
-          <button data-year="2017" aria-pressed="false">2017</button>
-          <button data-year="2018" aria-pressed="false">2018</button>
-          <button data-year="2019" aria-pressed="false">2019</button>
-          <button data-year="2020" aria-pressed="false">2020</button>
-          <button data-year="2021" aria-pressed="false">2021</button>
-          <button data-year="2022" aria-pressed="false">2022</button>
-          <button data-year="2023" aria-pressed="false">2023</button>
-          <button data-year="2024" aria-pressed="false">2024</button>
-          <button data-year="2025" aria-pressed="false">2025</button>
-          <button data-year="2026" aria-pressed="true">2026</button>
+  <!-- ===================== MAPA WYDATKÓW ===================== -->
+  <section class="view" id="panel-tree" role="tabpanel" aria-labelledby="tab-tree" hidden>
+    <header class="vhead">
+      <div class="vhead-l">
+        <p class="mono" id="tree-k">Mapa wydatków</p>
+        <h1 class="vh">Na co idą <em class="s">pieniądze</em>?</h1>
+        <p class="vsub" id="tree-sub">Każde pole to jeden obszar budżetu. Im większe pole, tym więcej pieniędzy. Kliknij, żeby zobaczyć szczegóły.</p>
+      </div>
+      <div class="vtools">
+        <div class="seg" role="group" aria-label="Podział wydatków" id="axis-toggle">
+          <button type="button" id="axis-dzialy" aria-pressed="true">Na co (działy)</button>
+          <button type="button" id="axis-czesci" aria-pressed="false">Kto wydaje (części)</button>
+        </div>
+        <div class="seg x-only" role="group" aria-label="Forma prezentacji">
+          <button type="button" id="tree-as-chart" aria-pressed="true" aria-label="Wykres"><i class="ti ti-layout-grid" aria-hidden="true"></i></button>
+          <button type="button" id="tree-as-table" aria-pressed="false" aria-label="Tabela"><i class="ti ti-table" aria-hidden="true"></i></button>
         </div>
       </div>
-    </div>
-  </section>
-
-  <section class="wrap">
-    <div class="controls">
-      <div class="tabs" role="tablist" aria-label="Widok danych">
-        <button class="tab" role="tab" id="tab-tree" aria-selected="true" aria-controls="panel-tree">
-          <i class="ti ti-layout-grid" aria-hidden="true"></i> Mapa wydatków
-        </button>
-        <button class="tab" role="tab" id="tab-flow" aria-selected="false" aria-controls="panel-flow">
-          <i class="ti ti-arrows-split" aria-hidden="true"></i> Przepływ
-        </button>
-        <button class="tab" role="tab" id="tab-type" aria-selected="false" aria-controls="panel-type">
-          <i class="ti ti-chart-bar" aria-hidden="true"></i> Rodzaj wydatku
-        </button>
-        <button class="tab" role="tab" id="tab-trends" aria-selected="false" aria-controls="panel-trends">
-          <i class="ti ti-trending-up" aria-hidden="true"></i> Trendy
-        </button>
-        <button class="tab" role="tab" id="tab-taxes" aria-selected="false" aria-controls="panel-taxes">
-          <i class="ti ti-user-dollar" aria-hidden="true"></i> Twoje podatki
-        </button>
-        <button class="tab" role="tab" id="tab-exec" aria-selected="false" aria-controls="panel-exec">
-          <i class="ti ti-checklist" aria-hidden="true"></i> <span id="tab-exec-label">Plan vs wykonanie</span>
-        </button>
-      </div>
-
-      <div class="control-right">
-        <span class="axis-toggle" id="axis-toggle">
-          <span>Podział wg:</span>
-          <span class="seg">
-            <button id="axis-dzialy" aria-pressed="true">na co (działy)</button>
-            <button id="axis-czesci" aria-pressed="false">kto wydaje (części)</button>
-          </span>
-        </span>
-      </div>
-    </div>
-
-    <!-- TREEMAP -->
-    <div class="panel is-active" id="panel-tree" role="tabpanel" aria-labelledby="tab-tree">
+    </header>
+    <div class="insights" id="ins-tree"></div>
+    <div class="card chart-card">
       <div class="crumbs" id="crumbs"></div>
-      <div id="treemap-wrap">
+      <div id="treemap-wrap" class="tm-wrap">
         <div class="state" id="tree-state"><div class="spinner"></div>Wczytuję dane budżetu…</div>
-        <svg id="treemap" role="img" aria-label="Mapa wydatków budżetu, pola proporcjonalne do kwot"></svg>
-        <div id="tree-rest" aria-label="Lista wydatków"></div>
+        <svg id="treemap" class="treemap" role="img" aria-label="Mapa wydatków budżetu, pola proporcjonalne do kwot"></svg>
+        <div id="tree-rest" class="mlist" aria-label="Lista wydatków"></div>
+        <div id="tree-table" class="tbl-wrap" hidden></div>
       </div>
       <div class="legend" id="legend"></div>
-      <p class="hint" id="tree-hint"><i class="ti ti-pointer" aria-hidden="true"></i> Kliknij pole, aby wejść w szczegóły. Kliknij ścieżkę powyżej, aby wrócić.</p>
-
-      <!-- DZIAŁ DETAIL — filled by JS -->
-      <section class="dzial-detail" id="dzial-detail" aria-label="Szczegóły działu" hidden></section>
     </div>
+    <p class="hint" id="tree-hint"><i class="ti ti-hand-click" aria-hidden="true"></i> <span id="tree-hint-t">Kliknij pole, aby zobaczyć, kto wydaje te pieniądze i na co dokładnie.</span></p>
+  </section>
 
-    <!-- SANKEY -->
-    <div class="panel" id="panel-flow" role="tabpanel" aria-labelledby="tab-flow" hidden>
-      <p style="color:var(--ink-soft); max-width:62ch; margin:0 0 8px;">Skąd pochodzą pieniądze i dokąd płyną. Źródła dochodów łączą się w budżet, z którego finansowane są największe obszary wydatków. Czerwony strumień to deficyt, czyli wydatki niepokryte dochodami.</p>
-      <div id="sankey-wrap">
-        <svg id="sankey" role="img" aria-label="Diagram przepływu: dochody budżetu do kategorii wydatków"></svg>
+  <!-- ===================== PRZEPŁYW ===================== -->
+  <section class="view" id="panel-flow" role="tabpanel" aria-labelledby="tab-flow" hidden>
+    <header class="vhead">
+      <div class="vhead-l">
+        <p class="mono" id="flow-k">Przepływ pieniędzy</p>
+        <h1 class="vh">Skąd przychodzą i dokąd <em class="s">płyną</em>?</h1>
+        <p class="vsub"><span class="on-wide">Po lewej źródła pieniędzy, po prawej największe wydatki.</span><span class="on-narrow">Na górze źródła pieniędzy, na dole największe wydatki.</span> Czerwony strumień to deficyt, czyli to, co państwo musi pożyczyć.</p>
       </div>
+    </header>
+    <div class="insights" id="ins-flow"></div>
+    <div class="card chart-card">
+      <div id="sankey-wrap"><svg id="sankey" role="img" aria-label="Diagram przepływu: dochody budżetu do kategorii wydatków"></svg></div>
+      <ol class="sk-legend" id="sankey-legend"></ol>
     </div>
+  </section>
 
-    <!-- TYPE BREAKDOWN -->
-    <div class="panel" id="panel-type" role="tabpanel" aria-labelledby="tab-type" hidden>
-      <p style="color:var(--ink-soft); max-width:62ch; margin:0 0 20px;">Te same pieniądze, ale wg <em>rodzaju</em> wydatku: ile trafia bezpośrednio do ludzi jako świadczenia, ile to inwestycje, ile bieżące utrzymanie państwa, a ile obsługa długu.</p>
+  <!-- ===================== RODZAJE ===================== -->
+  <section class="view" id="panel-type" role="tabpanel" aria-labelledby="tab-type" hidden>
+    <header class="vhead">
+      <div class="vhead-l">
+        <p class="mono" id="type-k">Rodzaje wydatków</p>
+        <h1 class="vh">Na co, <em class="s">dosłownie</em>?</h1>
+        <p class="vsub">Te same pieniądze, inny podział: ile trafia prosto do ludzi, ile to przelewy dla samorządów i instytucji, ile kosztuje państwo, a ile odsetki.</p>
+      </div>
+    </header>
+    <div class="insights" id="ins-type"></div>
+    <div class="card chart-card">
+      <div class="stack100" id="type-stack" role="img" aria-label="Udział rodzajów wydatków"></div>
       <div class="types" id="types"></div>
-      <p class="hint"><i class="ti ti-info-circle" aria-hidden="true"></i> Podział wg kolumn ustawy budżetowej (zestawienie zbiorcze według działów).</p>
     </div>
+    <p class="hint"><i class="ti ti-info-circle" aria-hidden="true"></i> Podział wg kolumn ustawy budżetowej (zestawienie zbiorcze według działów).</p>
+  </section>
 
-    <!-- TRENDS DASHBOARD -->
-    <div class="panel" id="panel-trends" role="tabpanel" aria-labelledby="tab-trends" hidden>
-      <p style="color:var(--ink-soft); max-width:64ch; margin:0 0 16px;">Jak budżet państwa zmieniał się przez lata 2011–2026. Wszystkie kwoty to plan z ustaw budżetowych, porównywalne metodologicznie przez cały okres.</p>
-
-      <div class="state" id="trends-state"><div class="spinner"></div>Wczytuję dane historyczne…</div>
-
-      <div id="trends-body" hidden>
-        <div class="trend-toolbar">
-          <span class="trend-toggle" id="trend-toggle" role="group" aria-label="Tryb wartości">
-            <span class="seg">
-              <button id="trend-zl" aria-pressed="true">kwoty (zł)</button>
-              <button id="trend-pct" aria-pressed="false">udział (%)</button>
-            </span>
-          </span>
-          <span class="trend-toggle" id="real-toggle" role="group" aria-label="Ceny">
-            <span class="seg">
-              <button id="trend-real-curr" aria-pressed="true">ceny bieżące</button>
-              <button id="trend-real-const" aria-pressed="false">ceny stałe (2026)</button>
-            </span>
-          </span>
+  <!-- ===================== TRENDY ===================== -->
+  <section class="view" id="panel-trends" role="tabpanel" aria-labelledby="tab-trends" hidden>
+    <header class="vhead">
+      <div class="vhead-l">
+        <p class="mono">Trendy 2011–2026</p>
+        <h1 class="vh">Jak zmieniał się <em class="s">budżet</em>?</h1>
+        <p class="vsub">Szesnaście ustaw budżetowych obok siebie. Wszystkie kwoty to plan z ustaw, porównywalny przez cały okres.</p>
+      </div>
+      <div class="vtools">
+        <div class="seg" role="group" aria-label="Tryb wartości" id="trend-toggle">
+          <button type="button" id="trend-zl" aria-pressed="true">zł</button>
+          <button type="button" id="trend-pct" aria-pressed="false">udział %</button>
         </div>
+        <div class="seg" role="group" aria-label="Ceny" id="real-toggle">
+          <button type="button" id="trend-real-curr" aria-pressed="true">ceny bieżące</button>
+          <button type="button" id="trend-real-const" aria-pressed="false">ceny 2026</button>
+        </div>
+      </div>
+    </header>
 
-        <div class="stats trend-kpis" id="trend-kpis" aria-label="Kluczowe wskaźniki w czasie"></div>
-
-        <!-- big three -->
-        <section class="trend-section">
-          <h3 class="trend-h">Wydatki, dochody i deficyt</h3>
-          <div class="trend-legend" id="legend-totals"></div>
+    <div class="state" id="trends-state"><div class="spinner"></div>Wczytuję dane historyczne…</div>
+    <div id="trends-body" hidden>
+      <div class="kpis" id="trend-kpis" aria-label="Kluczowe wskaźniki w czasie"></div>
+      <div class="bento">
+        <section class="card s12">
+          <div class="k"><span class="mono">Wydatki, dochody i deficyt</span></div>
+          <h2 class="h" id="trend-totals-h"></h2>
+          <div class="legend" id="legend-totals"></div>
           <div class="chart-wrap"><svg id="chart-totals" role="img" aria-label="Wydatki, dochody i deficyt w latach 2011–2026"></svg></div>
         </section>
-
-        <!-- type composition -->
-        <section class="trend-section">
-          <h3 class="trend-h">Struktura wydatków wg rodzaju</h3>
-          <div class="trend-legend" id="legend-types"></div>
+        <section class="card s6">
+          <div class="k"><span class="mono">Struktura wg rodzaju</span></div>
+          <h2 class="h" id="trend-types-h"></h2>
+          <div class="legend" id="legend-types"></div>
           <div class="chart-wrap"><svg id="chart-types" role="img" aria-label="Struktura wydatków wg rodzaju w czasie"></svg></div>
         </section>
-
-        <!-- category -->
-        <section class="trend-section">
-          <div class="trend-section-head">
-            <h3 class="trend-h">Wydatki wg działu</h3>
-            <label class="cat-pick">Dział:
-              <select id="trend-cat" aria-label="Wybór działu do porównania"></select>
-            </label>
+        <section class="card s6">
+          <div class="k"><span class="mono">Wybrany dział</span>
+            <label class="pick"><span class="sr">Dział</span><select id="trend-cat" aria-label="Wybór działu do porównania"></select><i class="ti ti-chevron-down" aria-hidden="true"></i></label>
           </div>
+          <h2 class="h" id="trend-cat-h"></h2>
           <div class="chart-wrap"><svg id="chart-cat" role="img" aria-label="Wydatki wybranego działu w czasie"></svg></div>
         </section>
-
-        <!-- biggest movers -->
-        <section class="trend-section">
-          <div class="trend-section-head">
-            <h3 class="trend-h">Największe zmiany</h3>
-            <span class="movers-pick">od
-              <select id="movers-from" aria-label="Rok początkowy"></select> do
-              <select id="movers-to" aria-label="Rok końcowy"></select>
+        <section class="card s12">
+          <div class="k"><span class="mono">Największe zmiany</span>
+            <span class="pick-row">
+              <label class="pick"><span class="sr">Rok początkowy</span><select id="movers-from" aria-label="Rok początkowy"></select><i class="ti ti-chevron-down" aria-hidden="true"></i></label>
+              <i class="ti ti-arrow-right" aria-hidden="true"></i>
+              <label class="pick"><span class="sr">Rok końcowy</span><select id="movers-to" aria-label="Rok końcowy"></select><i class="ti ti-chevron-down" aria-hidden="true"></i></label>
             </span>
           </div>
           <div class="movers" id="movers"></div>
         </section>
-
-        <p class="hint"><i class="ti ti-info-circle" aria-hidden="true"></i> Pionowa linia oznacza rok wybrany w pasku lat. „Ceny stałe" przeliczają dawne kwoty na siłę nabywczą z 2026 r. (CPI wg GUS; inflacja 2026 to prognoza rządowa). Część działów zmieniała przez lata nazwę lub klasyfikację, co w „największych zmianach" może wyglądać jak nagły wzrost albo spadek.</p>
       </div>
+      <p class="hint"><i class="ti ti-info-circle" aria-hidden="true"></i> Pionowa linia oznacza rok wybrany w nagłówku. „Ceny 2026” przeliczają dawne kwoty na siłę nabywczą z 2026 r. (CPI wg GUS; inflacja 2026 to prognoza rządowa). Część działów zmieniała przez lata nazwę lub klasyfikację, co w „największych zmianach” może wyglądać jak nagły wzrost albo spadek.</p>
     </div>
+  </section>
 
-    <!-- TWOJE PODATKI -->
-    <div class="panel" id="panel-taxes" role="tabpanel" aria-labelledby="tab-taxes" hidden>
-      <p style="color:var(--ink-soft); max-width:64ch; margin:0 0 16px;">Miliardy trudno sobie wyobrazić. Zobacz, ile budżet znaczy w przeliczeniu na jednego obywatela i na każde wydane 1000 zł. Dane dla roku wybranego w pasku powyżej.</p>
-
-      <div class="state" id="taxes-state"><div class="spinner"></div>Wczytuję dane…</div>
-
-      <div id="taxes-body" hidden>
-        <div class="stats trend-kpis" id="tax-kpis" aria-label="Budżet na obywatela"></div>
-
-        <section class="trend-section">
-          <h3 class="trend-h">Z każdych 1000 zł budżetu</h3>
-          <div class="bars" id="tax-1000"></div>
+  <!-- ===================== TWOJE PODATKI ===================== -->
+  <section class="view" id="panel-taxes" role="tabpanel" aria-labelledby="tab-taxes" hidden>
+    <header class="vhead">
+      <div class="vhead-l">
+        <p class="mono" id="taxes-k">Twoje podatki</p>
+        <h1 class="vh">Ile to znaczy <em class="s">dla mnie</em>?</h1>
+        <p class="vsub">Miliardy trudno sobie wyobrazić. Tak wygląda budżet w przeliczeniu na jedną osobę i na każde wydane 1000 zł.</p>
+      </div>
+    </header>
+    <div class="state" id="taxes-state"><div class="spinner"></div>Wczytuję dane…</div>
+    <div id="taxes-body" hidden>
+      <div class="kpis" id="tax-kpis" aria-label="Budżet na obywatela"></div>
+      <div class="bento">
+        <section class="card s6">
+          <div class="k"><span class="mono">Z każdych 1000 zł budżetu</span><span class="mono soft">1 kwadrat = 10 zł</span></div>
+          <h2 class="h" id="tax-1000-h"></h2>
+          <div class="waffle" id="tax-waffle" role="img"></div>
+          <div class="tx" id="tax-1000"></div>
         </section>
-
-        <section class="trend-section">
-          <div class="trend-section-head">
-            <h3 class="trend-h">Gdyby to był Twój podatek</h3>
-            <label class="cat-pick">Twoja kwota (zł / rok):
-              <input id="tax-input" type="number" inputmode="numeric" min="0" step="100" value="5000" aria-label="Twoja roczna kwota w złotych">
-            </label>
-          </div>
+        <section class="card s6">
+          <div class="k"><span class="mono">Gdyby to był Twój podatek</span></div>
+          <h2 class="h" id="tax-split-h"></h2>
+          <label class="money-in big">
+            <span class="sr">Twoja roczna kwota w złotych</span>
+            <input id="tax-input" type="number" inputmode="numeric" min="0" step="100" value="5000">
+            <span class="money-in-u">zł rocznie</span><i class="ti ti-pencil" aria-hidden="true"></i>
+          </label>
+          <input class="range" id="tax-range" type="range" min="0" max="50000" step="100" value="5000" aria-label="Twoja roczna kwota, suwak">
           <div class="bars" id="tax-split"></div>
         </section>
-
-        <p class="hint"><i class="ti ti-info-circle" aria-hidden="true"></i> Podział wg struktury wydatków budżetu (działy). „Na obywatela” = wydatki ÷ liczba ludności (GUS). To ilustracja proporcji, nie rzeczywista alokacja Twoich podatków.</p>
       </div>
+      <p class="hint"><i class="ti ti-info-circle" aria-hidden="true"></i> Podział wg struktury wydatków budżetu (działy). „Na osobę” = kwota ÷ liczba ludności (GUS). To ilustracja proporcji, nie rzeczywista alokacja Twoich podatków.</p>
     </div>
+  </section>
 
-    <!-- PLAN VS WYKONANIE (test, 2025) -->
-    <div class="panel" id="panel-exec" role="tabpanel" aria-labelledby="tab-exec" hidden>
-      <p class="exec-status" id="exec-status" hidden><strong>W toku.</strong> <span id="exec-status-text"></span></p>
-      <p id="exec-lead" style="color:var(--ink-soft); max-width:66ch; margin:0 0 16px;">Ile z zaplanowanego budżetu faktycznie wydano. Porównanie planu z ustawy budżetowej z wykonaniem (sprawozdanie Ministerstwa Finansów). Wersja testowa: na razie lata 2011–2025.</p>
+  <!-- ===================== WYKONANIE ===================== -->
+  <section class="view" id="panel-exec" role="tabpanel" aria-labelledby="tab-exec" hidden>
+    <header class="vhead">
+      <div class="vhead-l">
+        <p class="mono" id="exec-k">Plan i wykonanie</p>
+        <h1 class="vh">Ile naprawdę <em class="s">wydano</em>?</h1>
+        <p class="vsub" id="exec-lead">Ile z zaplanowanego budżetu faktycznie wydano. Porównanie planu z ustawy budżetowej z wykonaniem (sprawozdanie Ministerstwa Finansów).</p>
+      </div>
+    </header>
+    <p class="exec-status" id="exec-status" hidden><span class="live-dot" aria-hidden="true"></span><strong>W toku.</strong> <span id="exec-status-text"></span></p>
 
-      <div class="state" id="exec-state"><div class="spinner"></div>Wczytuję dane o wykonaniu…</div>
-      <p class="exec-notice" id="exec-notice" hidden>Dane o wykonaniu są na razie dostępne dla lat <strong>2011</strong>–<strong>2025</strong> (wersja testowa). Wybierz rok z przedziału 2011–2025 w pasku powyżej.</p>
+    <div class="state" id="exec-state"><div class="spinner"></div>Wczytuję dane o wykonaniu…</div>
+    <p class="notice" id="exec-notice" hidden>Dane o wykonaniu są dostępne dla lat 2011–2026. Wybierz rok z tego przedziału w nagłówku.</p>
 
-      <div id="exec-body" hidden>
-        <p class="exec-summary" id="exec-summary"></p>
-
-        <div class="stats trend-kpis" id="exec-kpis" aria-label="Plan vs wykonanie — ogółem"></div>
-
-        <section class="trend-section">
-          <h3 class="trend-h" id="exec-h-bars">Plan obok wykonania</h3>
+    <div id="exec-body" hidden>
+      <div class="bento">
+        <section class="card s5 exec-hero">
+          <div class="k"><span class="mono" id="exec-rings-k">Ogółem</span></div>
+          <h2 class="h" id="exec-rings-h"></h2>
+          <div class="ringwrap big">
+            <svg id="exec-rings" class="rings" viewBox="0 0 150 150" width="190" height="190" aria-hidden="true"></svg>
+            <div class="rl" id="exec-rings-leg"></div>
+          </div>
+          <p class="exec-summary" id="exec-summary"></p>
+        </section>
+        <section class="card s7">
+          <div class="k"><span class="mono" id="exec-h-bars">Plan obok wykonania</span></div>
+          <div class="kpis in-card" id="exec-kpis" aria-label="Plan i wykonanie ogółem"></div>
           <div class="planbars" id="exec-bars"></div>
         </section>
-
-        <section class="trend-section">
-          <h3 class="trend-h" id="exec-h-doch">Dochody wg źródła: plan vs wykonanie</h3>
+        <section class="card s6">
+          <div class="k"><span class="mono" id="exec-h-doch">Dochody wg źródła: plan i wykonanie</span></div>
           <div class="bars" id="exec-dochody"></div>
         </section>
-
-        <section class="trend-section">
-          <h3 class="trend-h" id="exec-h-list">Stopień wykonania wg działów</h3>
-          <div class="bars" id="exec-list"></div>
+        <section class="card s6">
+          <div class="k"><span class="mono" id="exec-h-odch">Największe odchylenia działów</span></div>
+          <div class="movers stacked" id="exec-odchylenia"></div>
         </section>
-
-        <section class="trend-section">
-          <h3 class="trend-h" id="exec-h-odch">Największe odchylenia działów</h3>
-          <div class="movers" id="exec-odchylenia"></div>
+        <section class="card s12">
+          <div class="k"><span class="mono" id="exec-h-list">Stopień wykonania wg działów</span><span class="mono soft" id="exec-list-note"></span></div>
+          <div class="bars cols" id="exec-list"></div>
         </section>
-
-        <p class="hint" id="exec-hint"><i class="ti ti-info-circle" aria-hidden="true"></i> <span id="exec-hint-text">„% planu” = wykonanie ÷ plan z ustawy. MF liczy wykonanie względem planu po zmianach (po rezerwach), więc względem pierwotnej ustawy bywa ponad 100% tam, gdzie uruchomiono rezerwy celowe (np. rolnictwo, zdrowie). Ok. 1,6 mld zł trafiło do działów spoza pierwotnego planu.</span></p>
       </div>
+      <p class="hint" id="exec-hint"><i class="ti ti-info-circle" aria-hidden="true"></i> <span id="exec-hint-text"></span></p>
     </div>
   </section>
 </main>
 
+<!-- DZIAŁ DETAIL (sheet) -->
+<div class="sheet-backdrop" id="sheet-backdrop" hidden></div>
+<aside class="sheet" id="dzial-detail" role="dialog" aria-modal="true" aria-label="Szczegóły działu" hidden tabindex="-1"></aside>
+
 <footer class="foot">
-  <div class="wrap">
-    <span id="foot-src">Źródło: ustawy budżetowe na lata 2011–2026 (Dziennik Ustaw). Wszystkie kwoty to plan z ustawy, nie wykonanie.</span>
-    <span class="foot-right">© 2026 Stowarzyszenie <a href="https://terracracovianum.org" rel="noopener">Terra Cracovianum</a> · <span style="color:var(--ink-faint)">wersja 0.15 Beta</span></span>
+  <div class="wrap foot-in">
+    <img class="logo" src="logo.svg?v=16" alt="Terra Cracovianum" width="1757" height="586">
+    <div class="foot-t">
+      <span id="foot-src">Źródło: ustawy budżetowe na lata 2011–2026 (Dziennik Ustaw) i sprawozdania Ministerstwa Finansów z wykonania budżetu.</span>
+      <span>© 2026 Stowarzyszenie <a href="https://terracracovianum.org" rel="noopener">Terra Cracovianum</a> · wersja 1.0</span>
+    </div>
   </div>
 </footer>
 
@@ -291,23 +364,13 @@
   <div class="tut-panel">
     <header class="tut-head">
       <h2 class="tut-title" id="tut-title">Nowy tutaj? Zobacz krótki samouczek</h2>
-      <button type="button" class="tut-close" id="tut-close" aria-label="Zamknij samouczek">
+      <button type="button" class="tut-close icon-btn" id="tut-close" aria-label="Zamknij samouczek">
         <i class="ti ti-x" aria-hidden="true"></i>
       </button>
     </header>
-
-    <p class="tut-lead">
-      Film pokazuje, jak czytać mapę wydatków, przełączać lata i wchodzić w szczegóły
-      budżetu państwa. Do samouczka wrócisz zawsze przyciskiem „Samouczek” u góry strony.
-    </p>
-
-    <div class="tut-video" id="tut-video"><!-- poster/iframe injected by JS --></div>
-
-    <p class="tut-foot">
-      Film nie działa?
-      <a class="tut-yt-link" href="https://www.youtube.com/watch?v=kYXm-8s79P0"
-         target="_blank" rel="noopener">Otwórz w YouTube <i class="ti ti-external-link" aria-hidden="true"></i></a>
-    </p>
+    <p class="tut-lead">Film pokazuje, jak czytać mapę wydatków, przełączać lata i wchodzić w szczegóły budżetu państwa. Do samouczka wrócisz zawsze przyciskiem ▶ w nagłówku.</p>
+    <div class="tut-video" id="tut-video"></div>
+    <p class="tut-foot">Film nie działa? <a class="tut-yt-link" href="https://www.youtube.com/watch?v=kYXm-8s79P0" target="_blank" rel="noopener">Otwórz w YouTube <i class="ti ti-external-link" aria-hidden="true"></i></a></p>
   </div>
 </dialog>
 
@@ -315,6 +378,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
-<script src="app.js?v=36"></script>
+<script src="app.js?v=40"></script>
 </body>
 </html>
