@@ -108,9 +108,6 @@ svg text { font-family: var(--sans); }
 .mono.soft { color: var(--ink-3); }
 em.s, .vh em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spacing: 0; }
 .on-narrow { display: none; }
-.x-only { display: none !important; }
-body.is-expert .x-only { display: revert !important; }
-body.is-expert .s-only { display: none !important; }
 
 /* ============ header ============ */
 .hdr {
@@ -590,7 +587,6 @@ body.is-loaded .rv { animation: viewIn .7s var(--ease) both; animation-delay: ca
   .wrap { padding: 0 16px; }
   .hdr-in { gap: 10px; }
   .logo { height: 28px; }
-  .mode { display: none; }
   .nav { width: calc(100% + 32px); margin: 0 -16px; padding: 0 16px 10px; }
   .nav-i { box-shadow: 0 0 0 1px var(--hair-2); background: var(--surface); }
   .nav-i[aria-selected="true"] { background: var(--ink); color: var(--bg); box-shadow: none; }

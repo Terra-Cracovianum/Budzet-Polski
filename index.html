@@ -20,7 +20,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.7.0/dist/tabler-icons.min.css">
-<link rel="stylesheet" href="style.css?v=40">
+<link rel="stylesheet" href="style.css?v=41">
 </head>
 <body>
 <a class="skip" href="#main">Przejdź do treści</a>
@@ -40,10 +40,6 @@
       <button class="nav-i" role="tab" id="tab-exec" data-view="exec" aria-controls="panel-exec" aria-selected="false" tabindex="-1"><span class="live-dot" aria-hidden="true"></span><span id="tab-exec-label">Wykonanie</span></button>
     </nav>
     <div class="hdr-r">
-      <div class="seg seg-sm mode" role="group" aria-label="Tryb widoku">
-        <button type="button" id="mode-simple" aria-pressed="true" title="Wnioski i kwoty na osobę">Prosty</button>
-        <button type="button" id="mode-expert" aria-pressed="false" title="Kody, dokładne kwoty, zmiany rok do roku">Ekspert</button>
-      </div>
       <label class="ypick">
         <span class="sr">Rok budżetu</span>
         <select id="year-select" aria-label="Rok budżetu">
@@ -152,7 +148,7 @@
           <button type="button" id="axis-dzialy" aria-pressed="true">Na co (działy)</button>
           <button type="button" id="axis-czesci" aria-pressed="false">Kto wydaje (części)</button>
         </div>
-        <div class="seg x-only" role="group" aria-label="Forma prezentacji">
+        <div class="seg" role="group" aria-label="Forma prezentacji">
           <button type="button" id="tree-as-chart" aria-pressed="true" aria-label="Wykres"><i class="ti ti-layout-grid" aria-hidden="true"></i></button>
           <button type="button" id="tree-as-table" aria-pressed="false" aria-label="Tabela"><i class="ti ti-table" aria-hidden="true"></i></button>
         </div>
@@ -378,6 +374,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
-<script src="app.js?v=40"></script>
+<script src="app.js?v=41"></script>
 </body>
 </html>

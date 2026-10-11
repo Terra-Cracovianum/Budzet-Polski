@@ -15,8 +15,7 @@
   var view = "overview";            // overview | tree | flow | type | trends | taxes | exec
   var path = [];                    // drill-down stack (części axis)
   var dzialDetail = null;           // open dział sheet (code) or null
-  var mode = "simple";              // "simple" | "expert"
-  var treeAsTable = false;          // expert: map as table
+  var treeAsTable = false;          // map shown as a table
   var taxAmount = 5000;             // shared by overview + taxes view
   var P27 = null;                   // budzet-2027.json (read only, for the overview card)
 
@@ -293,7 +292,6 @@
     TRENDS = r[1];
     CONTEXT = r[2]; if (CONTEXT) buildPriceLevels();
 
-    initMode();
     wireNav();
     wireAxis();
     wireYear();
@@ -331,27 +329,6 @@
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(go);
     setTimeout(go, 1800);
     if (!document.fonts) go();
-  }
-
-  // ================= MODE (Prosty / Ekspert) =================
-  function initMode() {
-    try { if (localStorage.getItem("bp-mode") === "expert") mode = "expert"; } catch (e) {}
-    applyMode();
-    document.getElementById("mode-simple").addEventListener("click", function () { setMode("simple"); });
-    document.getElementById("mode-expert").addEventListener("click", function () { setMode("expert"); });
-  }
-  function applyMode() {
-    document.body.classList.toggle("is-expert", mode === "expert");
-    document.getElementById("mode-simple").setAttribute("aria-pressed", mode === "simple" ? "true" : "false");
-    document.getElementById("mode-expert").setAttribute("aria-pressed", mode === "expert" ? "true" : "false");
-  }
-  function setMode(m) {
-    if (mode === m) return;
-    mode = m;
-    try { localStorage.setItem("bp-mode", m); } catch (e) {}
-    if (m === "simple" && treeAsTable) setTreeAsTable(false, true);
-    applyMode();
-    renderView(view);
   }
 
   // ================= NAVIGATION =================
@@ -885,12 +862,12 @@
     var P = prevData(), total = DATA.meta.wydatki;
     var rows = dzialyDesc().slice(0, 8);
     setText("ov-tbl-k", "Największe działy · " + YEAR + (P ? " vs " + (YEAR - 1) : ""));
-    var head = '<thead><tr><th class="l x-only">Kod</th><th class="l">Dział</th><th>mld zł</th><th class="x-only x-col">Udział</th><th>' + (P ? "r/r" : "") + '</th><th class="x-only x-col">' + trendRange() + "</th></tr></thead>";
+    var head = '<thead><tr><th class="l x-col">Kod</th><th class="l">Dział</th><th>mld zł</th><th class="x-only x-col">Udział</th><th>' + (P ? "r/r" : "") + '</th><th class="x-only x-col">' + trendRange() + "</th></tr></thead>";
     var body = rows.map(function (d, i) {
       var nm = fixName(d.name);
-      return '<tr class="is-link" data-code="' + d.code + '" tabindex="0"><td class="code l x-only">' + d.code + '</td><td class="nm l"><span class="dot" style="background:' + CMAP[colorKey(nm)].fill + '"></span>' + dzialShort(d.code, d.name) +
+      return '<tr class="is-link" data-code="' + d.code + '" tabindex="0"><td class="code l x-col">' + d.code + '</td><td class="nm l"><span class="dot" style="background:' + CMAP[colorKey(nm)].fill + '"></span>' + dzialShort(d.code, d.name) +
         '</td><td class="n">' + mldN(d.plan) + '</td><td class="x-only x-col">' + pct(d.plan / total * 100, 1) + "</td><td>" + (P ? deltaHtml(prevRR(d.code), null, "") : "") +
-        '</td><td class="sp x-only x-col"><svg width="110" height="24" data-spark="' + i + '"></svg></td></tr>';
+        '</td><td class="sp x-col"><svg width="110" height="24" data-spark="' + i + '"></svg></td></tr>';
     }).join("");
     var tbl = document.getElementById("ov-table");
     tbl.innerHTML = head + "<tbody>" + body + "</tbody>";
@@ -1045,7 +1022,7 @@
     var pc = perCap(n.value);
     var h = '<div class="tt-k">' + kind + '</div><div class="tt-t">' + escapeHtml(n.name) + '</div><div class="tt-v">' + money(n.value) + "</div>" +
       '<div class="tt-s">' + pct(n.value / total * 100, 1) + (n.kind === "rozdzial" ? " działu" : " budżetu") + (pc ? " · " + zl(pc) + " na osobę" : "") + "</div>";
-    if (mode === "expert") {
+    {
       var x = exactTys(n.value);
       if (n.kind === "dzial" && prevData()) { var r = prevRR(n.code); if (r != null) x += " · r/r " + (r > 0 ? "▲ " : "▼ ") + pl(Math.abs(r), 1) + "%"; }
       h += '<div class="tt-x">' + x + "</div>";
@@ -1132,7 +1109,7 @@
     setText("tree-hint-t", axis === "dzialy" && !path.length ? "Kliknij pole, aby zobaczyć, kto wydaje te pieniądze i na co dokładnie." :
       path.length < 2 ? "Kliknij pole, aby wejść głębiej. Ścieżka nad mapą prowadzi z powrotem." : "To najniższy poziom: rozdziały klasyfikacji budżetowej.");
 
-    if (treeAsTable && mode === "expert") {
+    if (treeAsTable) {
       svgEl.style.display = "none"; list.style.display = "none"; tbl.hidden = false;
       drawTreeTable(tbl, nodes, total);
       return;
@@ -1372,7 +1349,7 @@
       '<h3 class="dd-h">Kto wydaje te pieniądze</h3>' +
       '<p class="dd-sub">' + agg.rows.length + " " + plural(agg.rows.length, "część", "części", "części") + " budżetu (instytucje) · " + nRoz + " " + plural(nRoz, "rozdział", "rozdziały", "rozdziałów") + ". Rozwiń, aby zobaczyć rozdziały.</p>" +
       '<div class="dd-parts">' + parts + "</div>" +
-      (mode === "expert" || Math.abs(agg.aggTotal - dz.plan) > 1 ? '<p class="hint dd-note"><i class="ti ti-info-circle" aria-hidden="true"></i> Suma rozbicia wg części (' + exactTys(agg.aggTotal) + ") może nieznacznie różnić się od kwoty działu w zestawieniu zbiorczym (" + exactTys(dz.plan) + "). To różnice klasyfikacyjne w ustawie, nie błąd.</p>" : "");
+      (Math.abs(agg.aggTotal - dz.plan) > 1 ? '<p class="hint dd-note"><i class="ti ti-info-circle" aria-hidden="true"></i> Suma rozbicia wg części (' + exactTys(agg.aggTotal) + ") może nieznacznie różnić się od kwoty działu w zestawieniu zbiorczym (" + exactTys(dz.plan) + "). To różnice klasyfikacyjne w ustawie, nie błąd.</p>" : "");
 
     document.getElementById("dd-close").addEventListener("click", function () { closeDzial(true); });
     var amtEl = document.getElementById("dd-amt");
@@ -1474,7 +1451,7 @@
   }
   function flowTip(title, v, total, sub) {
     return '<div class="tt-k">' + sub + '</div><div class="tt-t">' + escapeHtml(title) + '</div><div class="tt-v">' + money(v) + '</div><div class="tt-s">' + pct(v / total * 100, 1) + " wydatków budżetu" + (perCap(v) ? " · " + zl(perCap(v)) + " na osobę" : "") + "</div>" +
-      (mode === "expert" ? '<div class="tt-x">' + exactTys(v) + "</div>" : "");
+      '<div class="tt-x">' + exactTys(v) + "</div>";
   }
 
   function drawSankey() {
@@ -1662,7 +1639,7 @@
         '<div class="type-v">' + a.n + "<small>" + a.u + "</small></div>" +
         '<div class="type-meta"><span>' + pct(t.plan / total * 100, 1) + "</span>" + (pc ? "<span>" + zl(pc) + " na osobę</span>" : "") + (P ? deltaHtml(rr(t.plan, prevBy[t.name])) : "") + "</div>" +
         '<p class="type-d">' + info[1] + "</p>" +
-        '<p class="type-official">' + (mode === "expert" ? exactTys(t.plan) + " · " : "") + "w ustawie: „" + t.name + "”</p></div>";
+        '<p class="type-official">' + exactTys(t.plan) + " · " + "w ustawie: „" + t.name + "”</p></div>";
     }).join("");
 
     var top = types[0];
