@@ -343,16 +343,15 @@
     var host = document.getElementById("rynek-body");
     if (!host || !d) return;
     var live = document.getElementById("rynek-live");
-    if (live) live.textContent = (d._bondsLive || d._yieldLive) ? "Odświeżone przy otwarciu strony" : "Zapis z " + rynDate(d.meta.aktualizacja);
+    if (live) live.textContent = (d._bondsLive || d._yieldLive) ? "odświeżone" : "zapis z " + rynDate(d.meta.aktualizacja);
     var agencies = d.agencje.map(function (a) {
       var neg = a.perspektywa === "negatywna";
       var href = rynHref(a.url);
       return '<a class="ag" href="' + rynEsc(href) + '" target="_blank" rel="noopener">' +
         '<span class="ag-name">' + rynEsc(a.nazwa) + "</span>" +
-        '<span class="ag-rate">' + rynEsc(a.ocena) + "</span>" +
-        '<span class="ag-out ' + (neg ? "is-neg" : "is-stable") + '"><i aria-hidden="true"></i>' + rynEsc(a.perspektywa) + "</span>" +
-        '<span class="ag-move">' + rynEsc(a.ruch) + "</span>" +
-        '<span class="ag-date">' + rynEsc(rynDate(a.data)) + " · krótki " + rynEsc(a.krotka) + "</span></a>";
+        '<b class="ag-rate">' + rynEsc(a.ocena) + "</b>" +
+        '<span class="ag-sub"><span class="delta' + (neg ? " warn" : " up") + '">' + rynEsc(a.perspektywa) + '</span><span class="ag-when">' + rynEsc(rynDate(a.data)) + " · krótki " + rynEsc(a.krotka) + "</span></span>" +
+        '<span class="ag-move">' + rynEsc(a.ruch) + "</span></a>";
     }).join("");
     var marks = {};
     (d.zaznaczone || []).forEach(function (z) { marks[z] = true; });
@@ -364,30 +363,30 @@
     var max = Math.max(pl, de, 0.01);
     var spread = Math.round(d.rentownosc.spread_pb);
     var bonds = d.obligacje.map(function (o) {
-      return '<div class="ob"><div class="ob-k">' + rynEsc(o.kod) + (o.dla ? '<span class="ob-for">' + rynEsc(o.dla) + "</span>" : "") + "</div>" +
-        '<div class="ob-v">' + rynPct(o.start) + "</div>" +
-        '<div class="ob-s">' + rynEsc(o.okres) + "</div>" +
-        '<div class="ob-p">' + rynEsc(o.potem) + "</div></div>";
+      return '<div class="src-row"><span>' + rynEsc(o.kod) + (o.dla ? '<span class="ob-for">' + rynEsc(o.dla) + "</span>" : "") +
+        '<span class="ag-when">' + rynEsc(o.okres) + " · " + rynEsc(o.potem) + "</span></span><b>" + rynPct(o.start) + "</b></div>";
     }).join("");
     var offerUrl = rynHref(d.oferta.url);
     var euroUrl = rynHref(d.rentownosc.url);
     var srcUrl = rynHref(d.oferta.zrodlo_url);
     host.innerHTML =
-      '<div class="rynek-top">' +
-        '<div><div class="agencies">' + agencies + "</div>" +
+      '<div class="rynek-split">' +
+        '<div><div class="ags">' + agencies + "</div>" +
           '<div class="ladder" role="img" aria-label="Miejsce Polski na skali od BBB− do AAA"><div class="ladder-scale">' + ladder + "</div>" +
           '<p class="ladder-note">' + rynEsc(d.meta.nota) + "</p></div></div>" +
         '<div><p class="mono yield-k">Koszt pożyczki · 10 lat</p>' +
-          '<div class="yield-n">' + rynPct(pl).replace("%", "") + "<small>%</small></div>" +
-          '<p class="yield-sub">Rentowność w ' + rynEsc(rynMonth(d.rentownosc.okres)) + ". Tyle rynek chce za pożyczenie pieniędzy państwu na dekadę.</p>" +
-          '<div class="cmp">' +
-            '<div class="cmp-row"><span class="cmp-name">Polska</span><span class="cmp-track"><i class="cmp-fill" style="width:' + (pl / max * 100).toFixed(1) + '%"></i></span><span class="cmp-val">' + rynPct(pl) + "</span></div>" +
-            '<div class="cmp-row"><span class="cmp-name">Niemcy</span><span class="cmp-track"><i class="cmp-fill is-de" style="width:' + (de / max * 100).toFixed(1) + '%"></i></span><span class="cmp-val">' + rynPct(de) + "</span></div>" +
+          '<div class="rynek-yield">' + rynPct(pl).replace("%", "") + "<small>%</small></div>" +
+          '<p class="rynek-yield-sub">Rentowność w ' + rynEsc(rynMonth(d.rentownosc.okres)) + ". Tyle rynek chce za pożyczenie pieniędzy państwu na dekadę.</p>" +
+          '<div class="src">' +
+            '<div class="src-row"><span>Polska</span><b>' + rynPct(pl) + "</b></div>" +
+            '<div class="src-bar"><i class="is-pl" style="width:' + (pl / max * 100).toFixed(1) + '%"></i></div>' +
+            '<div class="src-row"><span>Niemcy</span><b>' + rynPct(de) + "</b></div>" +
+            '<div class="src-bar"><i class="is-de" style="width:' + (de / max * 100).toFixed(1) + '%"></i></div>' +
           "</div>" +
-          '<p class="mono yield-spread">' + (spread > 0 ? "+" : "") + spread.toLocaleString("pl-PL") + " pb wobec Niemiec</p></div>" +
+          '<p class="cov-t"><b>' + (spread > 0 ? "+" : "") + spread.toLocaleString("pl-PL") + " pb</b> wobec Niemiec.</p></div>" +
       "</div>" +
-      '<div class="bonds-h"><span class="mono">Dla Ciebie · ' + rynEsc(rynMonth(d.oferta.okres)) + '</span><span class="mono soft">cena ' + d.oferta.cena + " zł za sztukę</span></div>" +
-      '<div class="bonds">' + bonds + "</div>" +
+      '<div class="k bonds-h"><span class="mono">Obligacje oszczędnościowe · ' + rynEsc(rynMonth(d.oferta.okres)) + '</span><span class="mono soft">' + d.oferta.cena + " zł za sztukę</span></div>" +
+      '<div class="bonds src">' + bonds + "</div>" +
       '<p class="rynek-foot">Ratingi pochodzą z komunikatów agencji, zebrane ' + rynEsc(rynDate(d.meta.aktualizacja)) + ". " +
         "Oprocentowanie obligacji oszczędnościowych: <a href=\"" + rynEsc(srcUrl) + "\" target=\"_blank\" rel=\"noopener\">Ministerstwo Finansów</a>" +
         (offerUrl ? ', sprzedaż na <a href="' + rynEsc(offerUrl) + '" target="_blank" rel="noopener">obligacjeskarbowe.pl</a>' : "") + ". " +
