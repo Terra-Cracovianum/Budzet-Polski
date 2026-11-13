@@ -1,0 +1,78 @@
+{
+  "_instrukcja": "Ratingi zmieniają się rzadko: po decyzji agencji dopisz ocenę, perspektywę, datę i ruch. Obligacje i rentowność są zapasem na wypadek, gdy strona nie dobierze liczb z sieci. Kwoty oprocentowania w procentach, rentowność w procentach, spread w punktach bazowych.",
+  "meta": {
+    "aktualizacja": "2026-11-13",
+    "niezaleznie_od_roku": true,
+    "zdanie": "Ocena, czy państwo spłaci dług. Im wyższa, tym taniej pożycza.",
+    "nota": "S&P, Moody’s i Fitch stoją na A−. Scope o stopień wyżej, na A. To wciąż stopień inwestycyjny: trzy stopnie nad poziomem, od którego dług uznaje się za spekulacyjny."
+  },
+  "agencje": [
+    {
+      "id": "sp",
+      "nazwa": "S&P",
+      "ocena": "A−",
+      "krotka": "A−2",
+      "perspektywa": "negatywna",
+      "data": "2026-11-06",
+      "ruch": "Waluta krajowa obniżona z A. Perspektywa z stabilnej na negatywną.",
+      "url": "https://www.spglobal.com/ratings/en/regulatory/article/-/view/type/HTML/id/3656318"
+    },
+    {
+      "id": "moodys",
+      "nazwa": "Moody’s",
+      "ocena": "A3",
+      "krotka": "P−2",
+      "perspektywa": "stabilna",
+      "data": "2026-09-18",
+      "ruch": "Obniżony z A2. Perspektywa wróciła do stabilnej.",
+      "url": "https://ratings.moodys.com/ratings-news/473201"
+    },
+    {
+      "id": "fitch",
+      "nazwa": "Fitch",
+      "ocena": "A−",
+      "krotka": "F1",
+      "perspektywa": "negatywna",
+      "data": "2026-08-21",
+      "ruch": "Ocena bez zmian. Perspektywa wciąż negatywna.",
+      "url": "https://www.gov.pl/web/finance/fitch-rating-agency-affirmed-polands-credit-rating12"
+    },
+    {
+      "id": "scope",
+      "nazwa": "Scope",
+      "ocena": "A",
+      "krotka": "S−1",
+      "perspektywa": "negatywna",
+      "data": "2026-05-15",
+      "ruch": "Ocena bez zmian. Perspektywa z stabilnej na negatywną.",
+      "url": "https://scoperatings.com/announcements/rating-announcement/EN/180394"
+    }
+  ],
+  "drabinka": ["BBB−", "BBB", "BBB+", "A−", "A", "A+", "AA", "AAA"],
+  "zaznaczone": ["A−", "A"],
+  "rentownosc": {
+    "pl": 6.32,
+    "de": 3.42,
+    "ea": 4.08,
+    "spread_pb": 290,
+    "okres": "2026-10",
+    "zrodlo": "Eurostat",
+    "url": "https://ec.europa.eu/eurostat/databrowser/view/irt_lt_mcby_m/default/table"
+  },
+  "oferta": {
+    "okres": "2026-11",
+    "cena": 100,
+    "url": "https://www.obligacjeskarbowe.pl/oferta/",
+    "zrodlo_url": "https://www.gov.pl/web/finanse/oferta-oszczednosciowych-obligacji-skarbowych--listopad-2026-r"
+  },
+  "obligacje": [
+    { "kod": "OTS", "okres": "3 miesiące", "start": 2.0, "potem": "stałe" },
+    { "kod": "ROR", "okres": "1 rok", "start": 4.0, "potem": "stopa NBP" },
+    { "kod": "DOR", "okres": "2 lata", "start": 4.15, "potem": "NBP + 0,15" },
+    { "kod": "TOS", "okres": "3 lata", "start": 4.4, "potem": "stałe" },
+    { "kod": "COI", "okres": "4 lata", "start": 4.75, "potem": "inflacja + 1,50" },
+    { "kod": "EDO", "okres": "10 lat", "start": 5.35, "potem": "inflacja + 2,00" },
+    { "kod": "ROS", "okres": "6 lat", "start": 5.0, "potem": "inflacja + 2,00", "dla": "800+" },
+    { "kod": "ROD", "okres": "12 lat", "start": 5.6, "potem": "inflacja + 2,50", "dla": "800+" }
+  ]
+}
