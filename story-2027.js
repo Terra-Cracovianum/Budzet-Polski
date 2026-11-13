@@ -90,6 +90,7 @@
     buildTape(U, D, B26);
     buildMacro(D);
     buildSources(D);
+    buildMarket(D);
     $("foot-upd").textContent = "Ostatnia aktualizacja: " + fmtDate(D.meta.aktualizacja) + " · druk nr " + (U.druk || "—");
     setupReveal();
     setupStepper();
@@ -900,7 +901,7 @@
       var vh = window.innerHeight, list = [];
       topH = $("tb-chapters") ? document.querySelector(".topbar").offsetHeight : 58;
       list.push({ type: "stop", y: 0, hold: HOLD.prolog, el: $("prolog") });
-      document.querySelectorAll(".astep, .chead-block, .lex-wrap, .sstep, .sec, .outro").forEach(function (el) {
+      document.querySelectorAll(".astep, .chead-block, .lex-wrap, .sstep, .sec, .mkt-wrap, .outro").forEach(function (el) {
         var t = docTop(el), h = el.offsetHeight, kind;
         if (el.classList.contains("astep")) kind = el.classList.contains("astep-head") ? "ahead" : "astep";
         else if (el.classList.contains("chead-block")) kind = "chead";
@@ -1100,6 +1101,57 @@
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(rebuild);
     build();
     setTimeout(updateHint, 900);
+  }
+
+  /* ---------------- credit and the price of debt ---------------- */
+  function buildMarket(D) {
+    var host = $("mkt");
+    if (!host) return;
+    var cost = D && D.dlug && D.dlug.obsluga_2027;
+    function apply(base, yields) {
+      var d = JSON.parse(JSON.stringify(base));
+      d._live = false;
+      var ys = yields && yields.data && yields.data.entries;
+      if (!ys) return d;
+      var map = {};
+      ys.forEach(function (e) { if (e && e.geo) map[e.geo] = e; });
+      if (map.PL && typeof map.PL.value === "number" && map.DE && typeof map.DE.value === "number") {
+        d.rentownosc.pl = map.PL.value;
+        d.rentownosc.de = map.DE.value;
+        d.rentownosc.spread_pb = typeof yields.data.spreadPlDeBps === "number" ? yields.data.spreadPlDeBps : Math.round((map.PL.value - map.DE.value) * 100);
+        d.rentownosc.okres = yields.data.asOf || map.PL.period;
+        d._live = true;
+      }
+      return d;
+    }
+    function paint(d) {
+      var ags = d.agencje.map(function (a) {
+        var neg = a.perspektywa === "negatywna";
+        return '<a class="mkt-ag" href="' + esc(a.url) + '" target="_blank" rel="noopener"><b>' + esc(a.ocena) + "</b><span>" + esc(a.nazwa) + ' · <em class="' + (neg ? "is-neg" : "is-stable") + '">' + esc(a.perspektywa) + "</em></span></a>";
+      }).join("");
+      var pl = d.rentownosc.pl, spread = Math.round(d.rentownosc.spread_pb);
+      var pct = nb(fmt(pl, 2));
+      host.innerHTML =
+        '<p class="mkt-k">Wiarygodność · dziś' + (d._live ? " · odświeżone" : "") + "</p>" +
+        '<div class="mkt-row"><div class="mkt-ags">' + ags + "</div>" +
+          '<div class="mkt-y"><b>' + pct + "<small>%</small></b><span>10 lat · " + esc(fmtMonth(d.rentownosc.okres)) + "</span><span>" + (spread > 0 ? "+" : "") + nb(fmt(spread, 0)) + " pb wobec Niemiec</span></div></div>" +
+        "<p>W projekcie na 2027 r. odsetki od długu to <strong>" + nb(fmt(cost, 0)) + " mld zł</strong>. Dziś państwo pożycza na 10 lat za <strong>" + pct + "%</strong> rocznie" +
+          (spread > 0 ? ", o " + nb(fmt(spread, 0)) + " pb drożej niż Niemcy" : "") + ".</p>" +
+        '<a class="mkt-more" href="index.html#wiarygodnosc">Ratingi i obligacje dla oszczędzających <i class="ti ti-arrow-up-right" aria-hidden="true"></i></a>';
+    }
+    getJSON("rynek.json").then(function (base) {
+      paint(base);
+      return getJSON("https://public-api.finwire.pl/v1/series/bond-yields").then(function (yields) {
+        var next = apply(base, yields);
+        if (next._live) paint(next);
+      }, function () { return null; });
+    }).catch(function (e) { console.error(e); });
+  }
+
+  function fmtMonth(ym) {
+    var p = String(ym || "").split("-");
+    if (p.length < 2) return ym || "";
+    return MONTHS_NOM[+p[1] - 1] + " " + p[0];
   }
 
   /* ---------------- reveal ---------------- */

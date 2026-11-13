@@ -277,9 +277,144 @@
   function hideTip() { tooltip.style.opacity = "0"; }
   document.addEventListener("scroll", hideTip, { passive: true });
 
+  // ================= WIARYGODNOŚĆ =================
+  // Ratings change a few times a year (rynek.json). Bond rates and the 10-year
+  // yield refresh from the public finwire API when the browser can reach it.
+  var RYN_MONTHS = ["stycznia", "lutego", "marca", "kwietnia", "maja", "czerwca", "lipca", "sierpnia", "września", "października", "listopada", "grudnia"];
+  var RYN_NOM = ["styczeń", "luty", "marzec", "kwiecień", "maj", "czerwiec", "lipiec", "sierpień", "wrzesień", "październik", "listopad", "grudzień"];
+  function rynEsc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function rynDate(iso) {
+    var p = String(iso || "").split("-");
+    if (p.length < 3) return iso || "";
+    return (+p[2]) + " " + RYN_MONTHS[+p[1] - 1] + " " + p[0];
+  }
+  function rynMonth(ym) {
+    var p = String(ym || "").split("-");
+    if (p.length < 2 || !RYN_NOM[+p[1] - 1]) return ym || "";
+    return RYN_NOM[+p[1] - 1] + " " + p[0];
+  }
+  function rynPct(n) { return n.toLocaleString("pl-PL", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "%"; }
+  function rynPp(x) { return (x * 100).toLocaleString("pl-PL", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+  function rynHref(u) { return /^https:\/\//.test(u || "") ? u : ""; }
+  function rynPotem(e) {
+    if (!e) return null;
+    if (typeof e.margin_over_cpi === "number") return "inflacja + " + rynPp(e.margin_over_cpi);
+    if (typeof e.margin_over_ref === "number") return e.margin_over_ref === 0 ? "stopa NBP" : "NBP + " + rynPp(e.margin_over_ref);
+    return null;
+  }
+  function rynApplyLive(base, bonds, yields) {
+    var d = JSON.parse(JSON.stringify(base));
+    d._bondsLive = false;
+    d._yieldLive = false;
+    var entries = bonds && bonds.data && bonds.data.entries;
+    if (entries && entries.length) {
+      var by = {};
+      entries.forEach(function (e) { if (e && e.code) by[e.code] = e; });
+      var touched = 0;
+      d.obligacje.forEach(function (o) {
+        var e = by[o.kod];
+        if (!e || typeof e.first_year_rate !== "number") return;
+        o.start = Math.round(e.first_year_rate * 10000) / 100;
+        var potem = rynPotem(e);
+        if (potem) o.potem = potem;
+        touched++;
+      });
+      if (touched) {
+        d._bondsLive = true;
+        if (entries[0].month) d.oferta.okres = entries[0].month;
+      }
+    }
+    var ys = yields && yields.data && yields.data.entries;
+    if (ys && ys.length) {
+      var map = {};
+      ys.forEach(function (e) { if (e && e.geo) map[e.geo] = e; });
+      if (map.PL && typeof map.PL.value === "number" && map.DE && typeof map.DE.value === "number") {
+        d.rentownosc.pl = map.PL.value;
+        d.rentownosc.de = map.DE.value;
+        if (map.EA && typeof map.EA.value === "number") d.rentownosc.ea = map.EA.value;
+        d.rentownosc.spread_pb = typeof yields.data.spreadPlDeBps === "number" ? yields.data.spreadPlDeBps : Math.round((map.PL.value - map.DE.value) * 100);
+        d.rentownosc.okres = yields.data.asOf || map.PL.period;
+        d._yieldLive = true;
+      }
+    }
+    return d;
+  }
+  function renderRynekBody(d) {
+    var host = document.getElementById("rynek-body");
+    if (!host || !d) return;
+    var live = document.getElementById("rynek-live");
+    if (live) live.textContent = (d._bondsLive || d._yieldLive) ? "Odświeżone przy otwarciu strony" : "Zapis z " + rynDate(d.meta.aktualizacja);
+    var agencies = d.agencje.map(function (a) {
+      var neg = a.perspektywa === "negatywna";
+      var href = rynHref(a.url);
+      return '<a class="ag" href="' + rynEsc(href) + '" target="_blank" rel="noopener">' +
+        '<span class="ag-name">' + rynEsc(a.nazwa) + "</span>" +
+        '<span class="ag-rate">' + rynEsc(a.ocena) + "</span>" +
+        '<span class="ag-out ' + (neg ? "is-neg" : "is-stable") + '"><i aria-hidden="true"></i>' + rynEsc(a.perspektywa) + "</span>" +
+        '<span class="ag-move">' + rynEsc(a.ruch) + "</span>" +
+        '<span class="ag-date">' + rynEsc(rynDate(a.data)) + " · krótki " + rynEsc(a.krotka) + "</span></a>";
+    }).join("");
+    var marks = {};
+    (d.zaznaczone || []).forEach(function (z) { marks[z] = true; });
+    var ladder = d.drabinka.map(function (n) {
+      var on = !!marks[n];
+      return '<span class="ladder-n' + (on ? " is-on" : "") + '"' + (on ? ' title="Tu stoi Polska"' : "") + ">" + rynEsc(n) + "</span>";
+    }).join("");
+    var pl = d.rentownosc.pl, de = d.rentownosc.de;
+    var max = Math.max(pl, de, 0.01);
+    var spread = Math.round(d.rentownosc.spread_pb);
+    var bonds = d.obligacje.map(function (o) {
+      return '<div class="ob"><div class="ob-k">' + rynEsc(o.kod) + (o.dla ? '<span class="ob-for">' + rynEsc(o.dla) + "</span>" : "") + "</div>" +
+        '<div class="ob-v">' + rynPct(o.start) + "</div>" +
+        '<div class="ob-s">' + rynEsc(o.okres) + "</div>" +
+        '<div class="ob-p">' + rynEsc(o.potem) + "</div></div>";
+    }).join("");
+    var offerUrl = rynHref(d.oferta.url);
+    var euroUrl = rynHref(d.rentownosc.url);
+    var srcUrl = rynHref(d.oferta.zrodlo_url);
+    host.innerHTML =
+      '<div class="rynek-top">' +
+        '<div><div class="agencies">' + agencies + "</div>" +
+          '<div class="ladder" role="img" aria-label="Miejsce Polski na skali od BBB− do AAA"><div class="ladder-scale">' + ladder + "</div>" +
+          '<p class="ladder-note">' + rynEsc(d.meta.nota) + "</p></div></div>" +
+        '<div><p class="mono yield-k">Koszt pożyczki · 10 lat</p>' +
+          '<div class="yield-n">' + rynPct(pl).replace("%", "") + "<small>%</small></div>" +
+          '<p class="yield-sub">Rentowność w ' + rynEsc(rynMonth(d.rentownosc.okres)) + ". Tyle rynek chce za pożyczenie pieniędzy państwu na dekadę.</p>" +
+          '<div class="cmp">' +
+            '<div class="cmp-row"><span class="cmp-name">Polska</span><span class="cmp-track"><i class="cmp-fill" style="width:' + (pl / max * 100).toFixed(1) + '%"></i></span><span class="cmp-val">' + rynPct(pl) + "</span></div>" +
+            '<div class="cmp-row"><span class="cmp-name">Niemcy</span><span class="cmp-track"><i class="cmp-fill is-de" style="width:' + (de / max * 100).toFixed(1) + '%"></i></span><span class="cmp-val">' + rynPct(de) + "</span></div>" +
+          "</div>" +
+          '<p class="mono yield-spread">' + (spread > 0 ? "+" : "") + spread.toLocaleString("pl-PL") + " pb wobec Niemiec</p></div>" +
+      "</div>" +
+      '<div class="bonds-h"><span class="mono">Dla Ciebie · ' + rynEsc(rynMonth(d.oferta.okres)) + '</span><span class="mono soft">cena ' + d.oferta.cena + " zł za sztukę</span></div>" +
+      '<div class="bonds">' + bonds + "</div>" +
+      '<p class="rynek-foot">Ratingi pochodzą z komunikatów agencji, zebrane ' + rynEsc(rynDate(d.meta.aktualizacja)) + ". " +
+        "Oprocentowanie obligacji oszczędnościowych: <a href=\"" + rynEsc(srcUrl) + "\" target=\"_blank\" rel=\"noopener\">Ministerstwo Finansów</a>" +
+        (offerUrl ? ', sprzedaż na <a href="' + rynEsc(offerUrl) + '" target="_blank" rel="noopener">obligacjeskarbowe.pl</a>' : "") + ". " +
+        'Rentowność 10-latek: <a href="' + rynEsc(euroUrl) + '" target="_blank" rel="noopener">Eurostat</a>, szereg kryterium zbieżności. To miesięczny koszt pożyczki, nie notowanie jednej serii z sesji.</p>';
+  }
+  function renderRynek() {
+    var host = document.getElementById("rynek-body");
+    if (!host) return;
+    getJSON("rynek.json").then(function (base) {
+      renderRynekBody(base);
+      return Promise.all([
+        soft(getJSON("https://public-api.finwire.pl/v1/bonds")),
+        soft(getJSON("https://public-api.finwire.pl/v1/series/bond-yields"))
+      ]).then(function (live) {
+        var next = rynApplyLive(base, live[0], live[1]);
+        if (next._bondsLive || next._yieldLive) renderRynekBody(next);
+      });
+    }).catch(function (e) {
+      console.error(e);
+      host.innerHTML = '<p class="rynek-deck">Nie udało się wczytać ratingów. Odśwież stronę.</p>';
+    });
+  }
+
   // ================= BOOTSTRAP =================
   function soft(p) { return p.catch(function (e) { console.error(e); return null; }); }
 
+  renderRynek();
   Promise.all([
     getJSON("budget-data.json"),
     soft(getJSON("trends-data.json")),

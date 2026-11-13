@@ -20,7 +20,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.7.0/dist/tabler-icons.min.css">
-<link rel="stylesheet" href="style.css?v=41">
+<link rel="stylesheet" href="style.css?v=42">
 </head>
 <body>
 <a class="skip" href="#main">Przejdź do treści</a>
@@ -77,6 +77,16 @@
     <section class="card ticker rv" style="--d:2" id="ticker" aria-label="Kluczowe wskaźniki"></section>
 
     <div class="bento">
+      <article class="card s12 rv rynek" id="wiarygodnosc" style="--d:2">
+        <div class="k">
+          <span class="mono">Wiarygodność</span>
+          <span class="mono soft" id="rynek-live">Niezależnie od wybranego roku</span>
+        </div>
+        <h2 class="h rynek-lead" id="rynek-h">Ocena, czy państwo spłaci dług.</h2>
+        <p class="rynek-deck">Im wyższa, tym taniej pożycza.</p>
+        <div id="rynek-body"></div>
+      </article>
+
       <article class="card s8 rv" style="--d:3">
         <div class="k"><span class="mono" id="ov-map-k">Mapa wydatków</span><button type="button" class="open" data-go="tree">Otwórz <i class="ti ti-chevron-right" aria-hidden="true"></i></button></div>
         <h2 class="h" id="ov-map-h"></h2>
@@ -374,6 +384,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
-<script src="app.js?v=41"></script>
+<script src="app.js?v=42"></script>
 </body>
 </html>
