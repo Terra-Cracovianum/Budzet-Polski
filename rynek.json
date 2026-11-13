@@ -52,9 +52,8 @@
   "zaznaczone": ["A−", "A"],
   "rentownosc": {
     "pl": 6.32,
-    "de": 3.42,
-    "ea": 4.08,
-    "spread_pb": 290,
+    "eu": 4.33,
+    "spread_pb": 199,
     "okres": "2026-10",
     "zrodlo": "Eurostat",
     "url": "https://ec.europa.eu/eurostat/databrowser/view/irt_lt_mcby_m/default/table"

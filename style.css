@@ -582,7 +582,7 @@ a.ag:hover .ag-name { color: var(--accent); }
 .rynek-yield { font-size: 32px; font-weight: 600; letter-spacing: -0.04em; line-height: 1; }
 .rynek-yield small { font-size: 15px; font-weight: 500; color: var(--ink-2); letter-spacing: 0; margin-left: 3px; }
 .rynek-yield-sub { margin: 8px 0 14px; color: var(--ink-2); font-size: 13.5px; line-height: 1.45; }
-.rynek .src-bar i.is-de { background: var(--ink-3); }
+.rynek .src-bar i.is-eu { background: var(--ink-3); }
 .rynek .src-bar i.is-pl { background: var(--c-debt); }
 .bonds-h { margin: 22px 0 4px; }
 .bonds-h .mono.soft { text-transform: none; letter-spacing: 0; }
