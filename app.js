@@ -328,11 +328,11 @@
     if (ys && ys.length) {
       var map = {};
       ys.forEach(function (e) { if (e && e.geo) map[e.geo] = e; });
-      if (map.PL && typeof map.PL.value === "number" && map.DE && typeof map.DE.value === "number") {
+      var eu = map.EU27_2020;
+      if (map.PL && typeof map.PL.value === "number" && eu && typeof eu.value === "number") {
         d.rentownosc.pl = map.PL.value;
-        d.rentownosc.de = map.DE.value;
-        if (map.EA && typeof map.EA.value === "number") d.rentownosc.ea = map.EA.value;
-        d.rentownosc.spread_pb = typeof yields.data.spreadPlDeBps === "number" ? yields.data.spreadPlDeBps : Math.round((map.PL.value - map.DE.value) * 100);
+        d.rentownosc.eu = eu.value;
+        d.rentownosc.spread_pb = Math.round((map.PL.value - eu.value) * 100);
         d.rentownosc.okres = yields.data.asOf || map.PL.period;
         d._yieldLive = true;
       }
@@ -359,9 +359,9 @@
       var on = !!marks[n];
       return '<span class="ladder-n' + (on ? " is-on" : "") + '"' + (on ? ' title="Tu stoi Polska"' : "") + ">" + rynEsc(n) + "</span>";
     }).join("");
-    var pl = d.rentownosc.pl, de = d.rentownosc.de;
-    var max = Math.max(pl, de, 0.01);
-    var spread = Math.round(d.rentownosc.spread_pb);
+    var pl = d.rentownosc.pl, eu = d.rentownosc.eu;
+    var max = Math.max(pl, eu, 0.01);
+    var spread = Math.round((pl - eu) * 100);
     var bonds = d.obligacje.map(function (o) {
       return '<div class="src-row"><span>' + rynEsc(o.kod) + (o.dla ? '<span class="ob-for">' + rynEsc(o.dla) + "</span>" : "") +
         '<span class="ag-when">' + rynEsc(o.okres) + " · " + rynEsc(o.potem) + "</span></span><b>" + rynPct(o.start) + "</b></div>";
@@ -380,10 +380,10 @@
           '<div class="src">' +
             '<div class="src-row"><span>Polska</span><b>' + rynPct(pl) + "</b></div>" +
             '<div class="src-bar"><i class="is-pl" style="width:' + (pl / max * 100).toFixed(1) + '%"></i></div>' +
-            '<div class="src-row"><span>Niemcy</span><b>' + rynPct(de) + "</b></div>" +
-            '<div class="src-bar"><i class="is-de" style="width:' + (de / max * 100).toFixed(1) + '%"></i></div>' +
+            '<div class="src-row"><span>Średnia UE</span><b>' + rynPct(eu) + "</b></div>" +
+            '<div class="src-bar"><i class="is-eu" style="width:' + (eu / max * 100).toFixed(1) + '%"></i></div>' +
           "</div>" +
-          '<p class="cov-t"><b>' + (spread > 0 ? "+" : "") + spread.toLocaleString("pl-PL") + " pb</b> wobec Niemiec.</p></div>" +
+          '<p class="cov-t"><b>' + (spread > 0 ? "+" : "") + spread.toLocaleString("pl-PL") + " pb</b> wobec średniej UE.</p></div>" +
       "</div>" +
       '<div class="k bonds-h"><span class="mono">Obligacje oszczędnościowe · ' + rynEsc(rynMonth(d.oferta.okres)) + '</span><span class="mono soft">' + d.oferta.cena + " zł za sztukę</span></div>" +
       '<div class="bonds src">' + bonds + "</div>" +

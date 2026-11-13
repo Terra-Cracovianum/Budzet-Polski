@@ -1115,10 +1115,11 @@
       if (!ys) return d;
       var map = {};
       ys.forEach(function (e) { if (e && e.geo) map[e.geo] = e; });
-      if (map.PL && typeof map.PL.value === "number" && map.DE && typeof map.DE.value === "number") {
+      var eu = map.EU27_2020;
+      if (map.PL && typeof map.PL.value === "number" && eu && typeof eu.value === "number") {
         d.rentownosc.pl = map.PL.value;
-        d.rentownosc.de = map.DE.value;
-        d.rentownosc.spread_pb = typeof yields.data.spreadPlDeBps === "number" ? yields.data.spreadPlDeBps : Math.round((map.PL.value - map.DE.value) * 100);
+        d.rentownosc.eu = eu.value;
+        d.rentownosc.spread_pb = Math.round((map.PL.value - eu.value) * 100);
         d.rentownosc.okres = yields.data.asOf || map.PL.period;
         d._live = true;
       }
@@ -1129,14 +1130,14 @@
         var neg = a.perspektywa === "negatywna";
         return '<a class="mkt-ag" href="' + esc(a.url) + '" target="_blank" rel="noopener"><b>' + esc(a.ocena) + "</b><span>" + esc(a.nazwa) + ' · <em class="' + (neg ? "is-neg" : "is-stable") + '">' + esc(a.perspektywa) + "</em></span></a>";
       }).join("");
-      var pl = d.rentownosc.pl, spread = Math.round(d.rentownosc.spread_pb);
+      var pl = d.rentownosc.pl, spread = Math.round((pl - d.rentownosc.eu) * 100);
       var pct = nb(fmt(pl, 2));
+      var vs = spread > 0 ? ", o " + nb(fmt(spread, 0)) + " pb drożej niż średnia UE" : (spread < 0 ? ", o " + nb(fmt(Math.abs(spread), 0)) + " pb taniej niż średnia UE" : ", tyle co średnia UE");
       host.innerHTML =
         '<p class="mkt-k">Wiarygodność · dziś' + (d._live ? " · odświeżone" : "") + "</p>" +
         '<div class="mkt-row"><div class="mkt-ags">' + ags + "</div>" +
-          '<div class="mkt-y"><b>' + pct + "<small>%</small></b><span>10 lat · " + esc(fmtMonth(d.rentownosc.okres)) + "</span><span>" + (spread > 0 ? "+" : "") + nb(fmt(spread, 0)) + " pb wobec Niemiec</span></div></div>" +
-        "<p>W projekcie na 2027 r. odsetki od długu to <strong>" + nb(fmt(cost, 0)) + " mld zł</strong>. Dziś państwo pożycza na 10 lat za <strong>" + pct + "%</strong> rocznie" +
-          (spread > 0 ? ", o " + nb(fmt(spread, 0)) + " pb drożej niż Niemcy" : "") + ".</p>" +
+          '<div class="mkt-y"><b>' + pct + "<small>%</small></b><span>10 lat · " + esc(fmtMonth(d.rentownosc.okres)) + "</span><span>" + (spread > 0 ? "+" : "") + nb(fmt(spread, 0)) + " pb wobec średniej UE</span></div></div>" +
+        "<p>W projekcie na 2027 r. odsetki od długu to <strong>" + nb(fmt(cost, 0)) + " mld zł</strong>. Dziś państwo pożycza na 10 lat za <strong>" + pct + "%</strong> rocznie" + vs + ".</p>" +
         '<a class="mkt-more" href="index.html#wiarygodnosc">Ratingi i obligacje dla oszczędzających <i class="ti ti-arrow-up-right" aria-hidden="true"></i></a>';
     }
     getJSON("rynek.json").then(function (base) {
