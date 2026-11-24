@@ -2303,6 +2303,11 @@
     var n = W && W.meta && W.meta.miesiace;
     return (typeof n === "number" && n > 0 && n < 12) ? n : 0;
   }
+  // the dział breakdown can be older than the totals (MF estimates have no działy)
+  function execDzialyMonths(W) {
+    var n = W && W.dzialy_meta && W.dzialy_meta.miesiace;
+    return (typeof n === "number" && n > 0 && n < 12) ? n : execMonths(W);
+  }
   function applyExecChrome(W) {
     var n = execMonths(W);
     if (!n) {
@@ -2322,14 +2327,17 @@
     var okres = (W.meta && W.meta.okres) ? " (" + W.meta.okres + ")" : "";
     var koniec = EXEC_KONIEC[n] || po;
     setExecTabLabel(true);
-    setExecStatus("Stan na koniec " + koniec + " " + rok + ", " + n + " z 12 miesięcy. Kwoty to wykonanie narastająco, nie wynik za cały rok.");
+    var est = W.meta && W.meta.szacunek ? " Szacunek Ministerstwa Finansów." : "";
+    setExecStatus("Stan na koniec " + koniec + " " + rok + ", " + n + " z 12 miesięcy. Kwoty to wykonanie narastająco, nie wynik za cały rok." + est);
     setText("exec-lead", "Stan na koniec " + koniec + " " + rok + okres + ". Plan z ustawy na cały rok obok tego, co już wydano i zebrano.");
     setText("exec-hint-text", (W.meta && W.meta.uwaga) || "");
     setText("exec-h-bars", "Plan roczny obok wykonania " + po);
     setText("exec-h-doch", "Dochody wg źródła: stan " + po);
-    setText("exec-h-list", "Ile planu rocznego już wydano, wg działów");
-    setText("exec-list-note", "kreska = " + n + "/12 roku");
-    setText("exec-h-odch", "Tempo wobec " + n + "/12 roku");
+    var dn = execDzialyMonths(W);
+    var dzPo = dn !== n ? " · dane " + (EXEC_PO[dn] || "") : "";
+    setText("exec-h-list", "Ile planu rocznego już wydano, wg działów" + dzPo);
+    setText("exec-list-note", "kreska = " + dn + "/12 roku");
+    setText("exec-h-odch", "Tempo wobec " + dn + "/12 roku" + dzPo);
   }
   function drawExec() {
     var st = document.getElementById("exec-state"), body = document.getElementById("exec-body"), notice = document.getElementById("exec-notice");
@@ -2431,7 +2439,7 @@
   function pctCls(pctV, partial) { return (!partial && pctV != null) ? (pctV >= 99 ? "is-over" : (pctV < 85 ? "is-low" : "")) : ""; }
   function drawExecList(W) {
     var host = document.getElementById("exec-list"); if (!host) return;
-    var n = execMonths(W);
+    var n = execDzialyMonths(W);
     var dz = DATA.dzialy.filter(function (d) { return W.dzialy[d.code] != null; }).sort(function (a, b) { return b.plan - a.plan; });
     host.innerHTML = dz.map(function (d) {
       var wyk = W.dzialy[d.code], p = execPct(wyk, d.plan), nm = fixName(d.name);
@@ -2444,10 +2452,14 @@
     var inneName = "Inne dochody podatkowe i niepodatkowe";
     var known = W.dochody.VAT + W.dochody.Akcyza + W.dochody.CIT + W.dochody.PIT;
     var wykOf = function (name) { return name === inneName ? (W.wykonanie.dochody - known) : W.dochody[name]; };
+    // e.g. an MF estimate reports VAT only together with the gambling tax
+    var planOv = W.dochody_plan || {}, nameOv = W.dochody_nazwy || {};
     var n = execMonths(W);
-    var rows = DATA.dochody.slice().filter(function (d) { return wykOf(d.name) != null; }).sort(function (a, b) { return b.plan - a.plan; });
+    var rows = DATA.dochody.slice().filter(function (d) { return wykOf(d.name) != null; }).map(function (d) {
+      return { name: d.name, plan: planOv[d.name] != null ? planOv[d.name] : d.plan };
+    }).sort(function (a, b) { return b.plan - a.plan; });
     host.innerHTML = rows.map(function (d) {
-      var wyk = wykOf(d.name), p = execPct(wyk, d.plan), nm = DOCH_SHORT[d.name] || d.name;
+      var wyk = wykOf(d.name), p = execPct(wyk, d.plan), nm = nameOv[d.name] || DOCH_SHORT[d.name] || d.name;
       var col = SRC_COLOR[d.name] || "var(--c-other)";
       // negative execution (PIT mid-year: shares sent to local governments exceed collections) is an amount, not a % bar
       if (wyk < 0) return execBarRow(nm, d.name + ": plan " + money(d.plan) + " → wykonanie " + signMoney(wyk), 0, col, '<span class="exec-pct is-low">' + signMoney(wyk) + "</span>", n);
@@ -2456,7 +2468,7 @@
   }
   function drawExecOdchylenia(W) {
     var host = document.getElementById("exec-odchylenia"); if (!host) return;
-    var n = execMonths(W);
+    var n = execDzialyMonths(W);
     if (n) { drawExecPace(host, W, n); return; }
     var rows = DATA.dzialy.filter(function (d) { return W.dzialy[d.code] != null; }).map(function (d) {
       var wyk = W.dzialy[d.code];

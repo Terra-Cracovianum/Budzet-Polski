@@ -106,14 +106,18 @@ for year in range(FIRST, LAST_LAW + 1):
     w = load(f"wykonanie-{year}.json")
     m = b["meta"]
     partial = w and w["meta"].get("narastajaco")
-    w_label = (f"wykonanie po {w['meta']['miesiace']} mies. ({w['meta']['okres']} {year})"
+    est = " (szacunek MF)" if w and w["meta"].get("szacunek") else ""
+    w_label = (f"wykonanie po {w['meta']['miesiace']} mies. ({w['meta']['okres']} {year}){est}"
                if partial else "wykonanie za cały rok")
+    # the dział breakdown can be older than the totals
+    dm = (w or {}).get("dzialy_meta")
+    dz_label = f"wykonanie po {dm['miesiace']} mies. ({dm['okres']} {year})" if dm else w_label
 
     t = (f"Budżet państwa {year} ({m['ustawa']}): plan wydatków {mld(m['wydatki'])}, "
          f"plan dochodów {mld(m['dochody'])}, deficyt {mld(m['deficyt'])}.")
     if w:
         ww = w["wykonanie"]
-        t += (f" {w_label.capitalize()}: wydatki {mld(ww['wydatki'])} ({pct(ww['wydatki'], m['wydatki'])} planu), "
+        t += (f" {w_label[0].upper() + w_label[1:]}: wydatki {mld(ww['wydatki'])} ({pct(ww['wydatki'], m['wydatki'])} planu), "
               f"dochody {mld(ww['dochody'])}, deficyt {mld(ww['deficyt'])}.")
     if m.get("dlug_pkb_proc"):
         t += f" Dług publiczny ok. {str(m['dlug_pkb_proc']).replace('.', ',')}% PKB."
@@ -125,17 +129,23 @@ for year in range(FIRST, LAST_LAW + 1):
         add(year, "nowelizacja zmiana planu uwaga wyjaśnienie",
             f"Uwaga do budżetu {year}: " + re.sub(r"\s*\(budget-\d+\.json\)|budget-\d+\.json:\s*", "", w["meta"]["uwaga"]), always=True)
 
+    plan_ov = (w or {}).get("dochody_plan", {})
+    name_ov = (w or {}).get("dochody_nazwy", {})
     for d in b["dochody"]:
         t = f"Dochody {year}, {d['name']}: plan {mld(d['plan'])}"
         if w and d["name"] in w.get("dochody", {}):
-            t += f", {w_label} {mld(w['dochody'][d['name']])}"
+            if d["name"] in name_ov:
+                t += (f". MF podaje go tylko łącznie z podatkiem od gier ({name_ov[d['name']]}): plan {mld(plan_ov.get(d['name'], d['plan']))}, "
+                      f"{w_label} {mld(w['dochody'][d['name']])}")
+            else:
+                t += f", {w_label} {mld(w['dochody'][d['name']])}"
         add(year, f"dochody wpływy podatki {d['name']}", t + ".", DOCHODY_SLOWA.get(d["name"], ""))
 
     for d in b["dzialy"]:
         t = (f"Wydatki {year}, dział {d['code']} {d['name']}: plan {mld(d['plan'])} "
              f"({pct(d['plan'], m['wydatki'])} wszystkich zaplanowanych wydatków)")
         if w and d["code"] in w.get("dzialy", {}):
-            t += f"; {w_label}: {mld(w['dzialy'][d['code']])}"
+            t += f"; {dz_label}: {mld(w['dzialy'][d['code']])}"
         t += "."
         add(year, f"wydatki dział {d['code']} {d['name']}", t, DZIAL_SLOWA.get(d["code"], ""))
 
