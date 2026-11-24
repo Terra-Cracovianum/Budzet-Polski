@@ -577,7 +577,7 @@
   function writeUrl() {
     var path = buildPath(YEAR, view, dzialDetail);
     if (location.pathname !== path || location.search) history.replaceState(history.state, "", path + location.hash);
-    setCanonical(buildPath(YEAR, view, null));
+    setCanonical(view === "trends" ? "/trendy" : buildPath(YEAR, view, null)); // Trendy: all years on one page
   }
   function initFromUrl() {
     var u = readUrl();
