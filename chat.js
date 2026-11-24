@@ -1,0 +1,309 @@
+// Budget assistant. A big "ask" bar on the overview, then a full-screen chat.
+// Everything stays hidden unless /api/chat answers (Cloudflare Pages).
+(function () {
+  "use strict";
+
+  var API = "/api/chat";
+  var EXAMPLES = [
+    "Ile Polska wydaje na obronę?",
+    "Jaki jest deficyt w 2026 roku?",
+    "Skąd państwo ma najwięcej pieniędzy?",
+    "Ile kosztują odsetki od długu?",
+    "Co zmienia projekt budżetu na 2027?",
+    "Ile szło na zdrowie w 2015?"
+  ];
+  var history = [];
+  var busy = false;
+  var $ = function (id) { return document.getElementById(id); };
+
+  fetch(API, { method: "GET" })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (j) { if (j && j.ok) build(); })
+    .catch(function () { /* no assistant on this host */ });
+
+  // ---------- markup ----------
+
+  function build() {
+    // 1) Ask bar on the overview, right under the big number.
+    var hero = document.querySelector("#panel-overview .hero");
+    if (hero) {
+      var ask = document.createElement("section");
+      ask.className = "ask";
+      ask.setAttribute("aria-label", "Zapytaj asystenta o budżet");
+      ask.innerHTML =
+        '<form class="ask-bar" id="ask-form">' +
+          '<label class="chat-sr" for="ask-input">Zapytaj o budżet państwa</label>' +
+          '<i class="ti ti-sparkles ask-ico" aria-hidden="true"></i>' +
+          '<input id="ask-input" type="text" maxlength="500" autocomplete="off" enterkeyhint="send">' +
+          '<button type="submit" class="chat-send" aria-label="Zapytaj"><i class="ti ti-arrow-up" aria-hidden="true"></i></button>' +
+        "</form>" +
+        '<p class="ask-note">Asystent AI odpowiada na podstawie danych z tej strony.</p>';
+      hero.insertAdjacentElement("afterend", ask);
+      $("ask-form").addEventListener("submit", function (e) {
+        e.preventDefault();
+        var q = $("ask-input").value.trim();
+        $("ask-input").value = "";
+        open(q || $("ask-input").placeholder.replace(/^Spróbuj: „|”$/g, ""));
+      });
+      rotatePlaceholder($("ask-input"));
+    }
+
+    // 2) Small button for the other tabs.
+    var fab = document.createElement("button");
+    fab.type = "button";
+    fab.className = "chat-fab";
+    fab.id = "chat-fab";
+    fab.innerHTML = '<i class="ti ti-sparkles" aria-hidden="true"></i><span>Zapytaj o budżet</span>';
+    fab.addEventListener("click", function () { open(); });
+    document.body.appendChild(fab);
+    var bar = document.querySelector(".ask");
+    if (bar && "IntersectionObserver" in window) {
+      new IntersectionObserver(function (en) {
+        fab.classList.toggle("is-hidden", en[0].isIntersecting);
+      }).observe(bar);
+    }
+
+    // 3) Full-screen chat.
+    var full = document.createElement("div");
+    full.className = "chat-full";
+    full.id = "chat-full";
+    full.hidden = true;
+    full.setAttribute("role", "dialog");
+    full.setAttribute("aria-modal", "true");
+    full.setAttribute("aria-label", "Asystent budżetu");
+    full.innerHTML =
+      '<header class="chat-top">' +
+        '<img class="logo chat-logo" src="logo.svg?v=16" alt="Terra Cracovianum" width="1757" height="586">' +
+        '<button type="button" class="chat-back" id="chat-close"><i class="ti ti-arrow-left" aria-hidden="true"></i>Wróć do budżetu</button>' +
+      "</header>" +
+      '<div class="chat-scroll" id="chat-scroll">' +
+        '<div class="chat-col" id="chat-log" role="log" aria-live="polite"></div>' +
+      "</div>" +
+      '<footer class="chat-bottom">' +
+        '<div class="chat-col">' +
+          '<p class="chat-links">' +
+            '<button type="button" data-info="privacy"><i class="ti ti-lock" aria-hidden="true"></i>Twoja prywatność</button>' +
+            '<span aria-hidden="true">·</span>' +
+            '<button type="button" data-info="how"><i class="ti ti-info-circle" aria-hidden="true"></i>Jak działa asystent</button>' +
+          "</p>" +
+          '<form class="ask-bar ask-bar-sm" id="chat-form">' +
+            '<label class="chat-sr" for="chat-input">Twoje pytanie o budżet</label>' +
+            '<textarea id="chat-input" rows="1" maxlength="500" placeholder="Zapytaj o budżet…" enterkeyhint="send"></textarea>' +
+            '<button type="submit" class="chat-send" id="chat-send" aria-label="Wyślij pytanie"><i class="ti ti-arrow-up" aria-hidden="true"></i></button>' +
+          "</form>" +
+        "</div>" +
+      "</footer>";
+    document.body.appendChild(full);
+
+    $("chat-close").addEventListener("click", close);
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && !full.hidden) close();
+    });
+    $("chat-form").addEventListener("submit", function (e) { e.preventDefault(); send($("chat-input").value); });
+    $("chat-input").addEventListener("keydown", function (e) {
+      if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send($("chat-input").value); }
+    });
+    $("chat-input").addEventListener("input", grow);
+    $("chat-log").addEventListener("click", onLogClick);
+    full.querySelector(".chat-links").addEventListener("click", function (e) {
+      var b = e.target.closest("button[data-info]");
+      if (b) info(b.getAttribute("data-info"));
+    });
+  }
+
+  function rotatePlaceholder(input) {
+    var i = 0;
+    function set() { input.placeholder = "Spróbuj: „" + EXAMPLES[i % EXAMPLES.length] + "”"; i++; }
+    set();
+    setInterval(function () { if (document.activeElement !== input && !input.value) set(); }, 3500);
+  }
+
+  // ---------- open / close ----------
+
+  var lastFocus = null;
+
+  function open(question) {
+    lastFocus = document.activeElement;
+    $("chat-full").hidden = false;
+    document.documentElement.classList.add("chat-lock");
+    if (!$("chat-log").children.length) welcome();
+    if (question) send(question);
+    else $("chat-input").focus();
+  }
+
+  function close() {
+    $("chat-full").hidden = true;
+    document.documentElement.classList.remove("chat-lock");
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+
+  function welcome() {
+    var w = add("bot", "<p>Cześć! Pomogę Ci zrozumieć budżet państwa: ile, na co i skąd. Pytaj o dowolny rok od 2011 do 2027.</p>", false);
+    var s = document.createElement("div");
+    s.className = "chat-sugg";
+    EXAMPLES.slice(0, 4).forEach(function (q) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "chat-chip";
+      b.textContent = q;
+      b.addEventListener("click", function () { send(q); });
+      s.appendChild(b);
+    });
+    w.appendChild(s);
+  }
+
+  // ---------- messages ----------
+
+  function add(role, html, actions) {
+    var d = document.createElement("div");
+    d.className = "chat-msg " + role;
+    d.innerHTML = '<div class="chat-body">' + html + "</div>";
+    if (actions) {
+      d.insertAdjacentHTML("beforeend",
+        '<div class="chat-acts">' +
+          '<span class="chat-pair">' +
+            '<button type="button" data-act="up" aria-label="Dobra odpowiedź" aria-pressed="false"><i class="ti ti-thumb-up" aria-hidden="true"></i></button>' +
+            '<button type="button" data-act="down" aria-label="Zła odpowiedź" aria-pressed="false"><i class="ti ti-thumb-down" aria-hidden="true"></i></button>' +
+          "</span>" +
+          '<button type="button" data-act="copy" aria-label="Kopiuj odpowiedź"><i class="ti ti-copy" aria-hidden="true"></i></button>' +
+        "</div>");
+    }
+    $("chat-log").appendChild(d);
+    var sc = $("chat-scroll");
+    sc.scrollTop = sc.scrollHeight;
+    return d;
+  }
+
+  function send(text) {
+    text = (text || "").trim();
+    if (!text || busy) return;
+    busy = true;
+    var sugg = document.querySelector(".chat-sugg");
+    if (sugg) sugg.remove();
+    $("chat-input").value = "";
+    grow();
+    $("chat-send").disabled = true;
+    add("user", "<p>" + esc(text) + "</p>", false);
+    var wait = add("bot wait", '<p><span class="chat-dots" role="status" aria-label="Asystent pisze"><i></i><i></i><i></i></span></p>', false);
+
+    fetch(API, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ question: text, history: history })
+    })
+      .then(function (r) { return r.json().catch(function () { return {}; }); })
+      .then(function (j) {
+        wait.remove();
+        if (j.answer) {
+          var m = add("bot", render(j.answer), true);
+          m._q = text;
+          m._a = j.answer;
+          history.push({ role: "user", content: text }, { role: "assistant", content: j.answer });
+          history = history.slice(-6);
+        } else {
+          add("bot err", "<p>" + esc(j.error || "Coś poszło nie tak. Spróbuj ponownie.") + "</p>", false);
+        }
+      })
+      .catch(function () {
+        wait.remove();
+        add("bot err", "<p>Brak połączenia. Spróbuj ponownie.</p>", false);
+      })
+      .then(function () {
+        busy = false;
+        $("chat-send").disabled = false;
+        $("chat-input").focus();
+      });
+  }
+
+  function info(kind) {
+    var html = kind === "privacy"
+      ? "<p><strong>Twoja prywatność.</strong> Nie zakładamy konta i nie zapisujemy rozmów. Pytanie trafia do modelu AI tylko po to, by odpowiedzieć. Jeśli klikniesz łapkę w górę lub w dół, zapiszemy anonimowo to pytanie i odpowiedź, żeby poprawiać asystenta. Nie wpisuj danych osobowych.</p>"
+      : "<p><strong>Jak działa asystent.</strong> Do każdego pytania wyszukujemy pasujące liczby w danych tej strony: ustawach budżetowych 2011–2026, sprawozdaniach Ministerstwa Finansów i projekcie budżetu na 2027. Model AI tylko tłumaczy te liczby prostym językiem. Odpowiada wyłącznie o budżecie Polski. Może się pomylić, dlatego sprawdzaj liczby na wykresach.</p>";
+    add("bot note", html, false);
+  }
+
+  // ---------- actions: links, feedback, copy ----------
+
+  function onLogClick(e) {
+    var a = e.target.closest("a.chat-link");
+    if (a) {
+      e.preventDefault();
+      var m = a.getAttribute("href").match(/^#(widok|rok)=(\w+)$/);
+      if (!m) return;
+      close();
+      if (m[1] === "widok") {
+        var tab = $("tab-" + m[2]);
+        if (tab) tab.click();
+      } else {
+        var sel = $("year-select");
+        if (sel && sel.querySelector('option[value="' + m[2] + '"]')) {
+          sel.value = m[2];
+          sel.dispatchEvent(new Event("change"));
+        }
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+    var b = e.target.closest("button[data-act]");
+    if (!b) return;
+    var msg = b.closest(".chat-msg");
+    var act = b.getAttribute("data-act");
+    if (act === "copy") {
+      var txt = msg.querySelector(".chat-body").innerText;
+      (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(function () {
+        b.innerHTML = '<i class="ti ti-check" aria-hidden="true"></i>';
+        b.setAttribute("aria-label", "Skopiowano");
+        setTimeout(function () {
+          b.innerHTML = '<i class="ti ti-copy" aria-hidden="true"></i>';
+          b.setAttribute("aria-label", "Kopiuj odpowiedź");
+        }, 1500);
+      }).catch(function () {});
+      return;
+    }
+    // thumbs up / down: one vote per answer
+    msg.querySelectorAll("button[data-act=up],button[data-act=down]").forEach(function (x) {
+      x.setAttribute("aria-pressed", String(x === b));
+      x.disabled = true;
+    });
+    fetch("/api/feedback", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ vote: act, question: msg._q, answer: msg._a })
+    }).catch(function () {});
+  }
+
+  // ---------- helpers ----------
+
+  function grow() {
+    var t = $("chat-input");
+    t.style.height = "auto";
+    t.style.height = Math.min(t.scrollHeight, 140) + "px";
+  }
+
+  // Tiny, safe Markdown: paragraphs, lists, **bold**, links to this site only.
+  function render(md) {
+    return esc(md).split(/\n{2,}/).map(function (b) {
+      var lines = b.split("\n");
+      if (lines.every(function (l) { return /^\s*[-*•]\s+/.test(l); })) {
+        return "<ul>" + lines.map(function (l) { return "<li>" + inline(l.replace(/^\s*[-*•]\s+/, "")) + "</li>"; }).join("") + "</ul>";
+      }
+      return "<p>" + inline(lines.join("<br>")) + "</p>";
+    }).join("");
+  }
+
+  function inline(s) {
+    return s
+      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+      .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, function (m, label, href) {
+        if (/^#(widok|rok)=[a-z0-9]+$/.test(href)) return '<a href="' + href + '" class="chat-link">' + label + "</a>";
+        if (/^budzet-2027\.html(#[\w-]*)?$/.test(href)) return '<a href="' + href + '">' + label + "</a>";
+        return label;
+      });
+  }
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+})();

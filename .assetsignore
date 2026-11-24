@@ -1,0 +1,10 @@
+.git
+.wrangler
+node_modules
+functions
+tests
+worker.js
+wrangler.toml
+.assetsignore
+*.py
+.gitignore
