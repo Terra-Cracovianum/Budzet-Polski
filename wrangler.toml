@@ -1,8 +1,14 @@
 # Cloudflare Workers config. Static site from the repo root; worker.js handles
-# /api/chat (budget assistant) and /api/feedback.
+# /api/chat (budget assistant) and /api/feedback, redirects and pretty paths.
 name = "budzet-polski"
 main = "worker.js"
 compatibility_date = "2025-09-01"
+
+# Main address: budzetpolski.com (added under Domains in the dashboard).
+# workers.dev stays on so preview builds work; worker.js redirects the old
+# production workers.dev address and www to budzetpolski.com.
+workers_dev = true
+preview_urls = true
 
 [assets]
 directory = "."
@@ -12,9 +18,3 @@ run_worker_first = ["/api/*"]
 # Workers AI (free daily allowance). Change the model with the AI_MODEL variable.
 [ai]
 binding = "AI"
-
-# Main address: budzetpolski.com (added under Domains in the dashboard).
-# workers.dev stays on so preview builds work; worker.js redirects the old
-# production workers.dev address and www to budzetpolski.com.
-workers_dev = true
-preview_urls = true

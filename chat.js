@@ -73,7 +73,9 @@
     full.setAttribute("aria-label", "Asystent budżetu");
     full.innerHTML =
       '<header class="chat-top">' +
-        '<img class="logo chat-logo" src="/logo.svg?v=16" alt="Terra Cracovianum" width="1757" height="586">' +
+        '<a class="chat-home" id="chat-home" href="/" aria-label="Terra Cracovianum: Budżet Polski, strona główna">' +
+          '<img class="logo chat-logo" src="/logo.svg?v=16" alt="Terra Cracovianum" width="1757" height="586">' +
+        "</a>" +
         '<button type="button" class="chat-back" id="chat-close"><i class="ti ti-arrow-left" aria-hidden="true"></i>Wróć do budżetu</button>' +
       "</header>" +
       '<div class="chat-scroll" id="chat-scroll">' +
@@ -96,6 +98,15 @@
     document.body.appendChild(full);
 
     $("chat-close").addEventListener("click", close);
+    // Logo: close the chat and go to the overview (home) without reloading.
+    $("chat-home").addEventListener("click", function (e) {
+      var home = $("tab-overview");
+      if (!home || e.metaKey || e.ctrlKey || e.shiftKey) return; // new tab etc.: plain link
+      e.preventDefault();
+      close();
+      home.click();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
     document.addEventListener("keydown", function (e) {
       if (e.key === "Escape" && !full.hidden) close();
     });
