@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://budzetpolski.com/sitemap.xml

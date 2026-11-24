@@ -296,7 +296,7 @@
       .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
       .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, function (m, label, href) {
         if (/^#(widok|rok)=[a-z0-9]+$/.test(href)) return '<a href="' + href + '" class="chat-link">' + label + "</a>";
-        if (/^budzet-2027\.html(#[\w-]*)?$/.test(href)) return '<a href="' + href + '">' + label + "</a>";
+        if (/^budzet-2027(\.html)?(#[\w-]*)?$/.test(href)) return '<a href="' + href + '">' + label + "</a>";
         return label;
       });
   }
