@@ -271,3 +271,11 @@ html.chat-lock, html.chat-lock body { overflow: hidden; }
   .ask > .ask-bar:focus-within { transform: none; }
   .chat-shimmer { color: var(--ink-2); background: none; }
 }
+
+/* cooldown after too many questions: the send button shows the seconds left */
+.chat-send.is-cool { position: relative; }
+.chat-send.is-cool i { opacity: 0; }
+.chat-send.is-cool::after { content: attr(data-left); position: absolute; inset: 0; display: grid; place-items: center; font: 600 15px var(--sans); color: inherit; }
+.chat-send.is-nudge { animation: m-nudge .4s var(--m-ease); }
+@keyframes m-nudge { 20%, 60% { transform: translateX(-4px); } 40%, 80% { transform: translateX(4px); } }
+@media (prefers-reduced-motion: reduce) { .chat-send.is-nudge { animation: none; } }

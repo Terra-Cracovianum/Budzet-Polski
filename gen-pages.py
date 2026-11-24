@@ -228,7 +228,7 @@ def page(path, title, desc, body, h1, lead, crumb_items, image="og-home.jpg"):
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.7.0/dist/tabler-icons.min.css">
 <link rel="stylesheet" href="/style.css?v=46">
 <link rel="stylesheet" href="/page.css?v=2">
-<link rel="stylesheet" href="/chat.css?v=7">
+<link rel="stylesheet" href="/chat.css?v=8">
 </head>
 <body class="pbody">
 <a class="skip" href="#main">Przejdź do treści</a>
@@ -256,7 +256,7 @@ def page(path, title, desc, body, h1, lead, crumb_items, image="og-home.jpg"):
     </div>
   </div>
 </footer>
-<script src="/chat.js?v=9" defer></script>
+<script src="/chat.js?v=10" defer></script>
 </body>
 </html>
 """

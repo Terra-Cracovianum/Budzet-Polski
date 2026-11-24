@@ -23,7 +23,7 @@ const MAX_FACTS = 24;          // trend questions (many years)
 const MAX_FACTS_YEAR = 12;     // questions about one or a few years: shorter prompt, faster start
 const CACHE_TTL = 24 * 3600;   // seconds; cached answers for first questions (no history)
 const CACHE_GEN = 4;           // bump to drop all cached answers (4: clearer "no data" answers)
-const RATE = { limit: 40, windowMs: 10 * 60 * 1000 }; // per visitor, per isolate
+const RATE = { limit: 120, windowMs: 10 * 60 * 1000 }; // backstop, per visitor, per server copy
 
 const [FIRST_YEAR, LAST_YEAR] = data.years;
 
@@ -347,7 +347,34 @@ async function streamModel(env, messages) {
   throw lastErr;
 }
 
-// ---------- rate limit (simple; add a Cloudflare rate-limiting rule too) ----------
+// ---------- rate limit ----------
+// Three layers, per visitor (IP address):
+//  1. CHAT_BURST  (Cloudflare rate limiting): 6 questions per 10 seconds -> stops rapid-fire spam
+//  2. CHAT_MINUTE (Cloudflare rate limiting): 30 questions per minute     -> stops scripts
+//  3. in memory, per server copy: 120 per 10 minutes -> backstop if the bindings are missing
+// Cloudflare counts per data centre, which is plenty for one visitor (they hit one data centre).
+
+export async function rateLimit(env, ip) {
+  for (const [binding, seconds] of [[env.CHAT_BURST, 10], [env.CHAT_MINUTE, 60]]) {
+    if (!binding) continue;
+    try {
+      const { success } = await binding.limit({ key: ip });
+      if (!success) return seconds;
+    } catch (err) {
+      console.error("rate limit binding", err); // never block visitors because the limiter itself failed
+    }
+  }
+  return limited(ip) ? 600 : 0;
+}
+
+export function tooManyReply(seconds) {
+  const msg = seconds <= 10
+    ? "Zwolnij trochę: pytania przychodzą zbyt szybko. Spróbuj ponownie za kilka sekund."
+    : seconds <= 60
+      ? "Za dużo pytań w krótkim czasie. Spróbuj ponownie za minutę."
+      : "Wykorzystano limit pytań. Spróbuj ponownie za kilka minut.";
+  return json({ error: msg, retryAfter: seconds }, 429, { "retry-after": String(seconds) });
+}
 
 const hits = new Map();
 function limited(ip) {
@@ -361,10 +388,10 @@ function limited(ip) {
 
 // ---------- HTTP ----------
 
-const json = (body, status = 200) =>
+const json = (body, status = 200, extra = {}) =>
   new Response(JSON.stringify(body), {
     status,
-    headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" },
+    headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store", ...extra },
   });
 
 // GET /api/chat -> lets the page know the chat is available.
@@ -378,9 +405,8 @@ export async function onRequestPost({ request, env, ctx }) {
   if (origin && new URL(origin).host !== new URL(request.url).host) return json({ error: "forbidden" }, 403);
 
   const ip = request.headers.get("cf-connecting-ip") || "unknown";
-  if (limited(ip)) {
-    return json({ error: "Za dużo pytań naraz. Spróbuj ponownie za kilka minut." }, 429);
-  }
+  const wait = await rateLimit(env, ip);
+  if (wait) return tooManyReply(wait);
 
   let body;
   try {
