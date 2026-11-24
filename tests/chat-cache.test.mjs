@@ -23,4 +23,8 @@ assert.equal(calls, 1);
 r = await ask("A na zdrowie?", [{ role: "user", content: "Ile na obronę?" }, { role: "assistant", content: "..." }]);
 assert.equal(r.headers.get("x-chat-cache"), "miss"); // follow-ups never use the cache
 assert.equal(normQuestion("Ile Polska wydaje na OBRONĘ?!"), "ile polska wydaje na obrone");
-console.log("ok   cache: repeat question served from cache, follow-ups not cached");
+// a year with no data is answered by the server even if the cache holds an older answer
+for (const [url, res] of store) if (url.includes("ile%20polska")) store.set(url.replace(/ile%20polska[^/]*$/, "jaki%20byl%20budzet%20w%202005"), new Response("stara odpowiedz modelu"));
+r = await ask("Jaki był budżet w 2005?");
+assert.equal(r.headers.get("x-chat-model"), "server"); assert.match(await r.text(), /^Nie mam danych za 2005 rok/);
+console.log("ok   cache: repeat question served from cache, follow-ups not cached, server reply beats cache");
