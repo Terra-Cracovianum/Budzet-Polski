@@ -14,6 +14,7 @@
   ];
   var history = [];
   var busy = false;
+  var coolUntil = 0, coolTimer = null; // after "too many questions": wait before asking again
   var $ = function (id) { return document.getElementById(id); };
 
   fetch(API, { method: "GET" })
@@ -232,6 +233,7 @@
   function send(text) {
     text = (text || "").trim();
     if (!text || busy) return;
+    if (Date.now() < coolUntil) { pulseCooldown(); return; }
     hidePop();
     busy = true;
     var sugg = document.querySelector(".chat-sugg");
@@ -254,6 +256,7 @@
           return r.json().catch(function () { return {}; }).then(function (j) {
             wait.remove();
             add("bot err", "<p>" + esc(j.error || "Coś poszło nie tak. Spróbuj ponownie.") + "</p>", false);
+            if (r.status === 429) startCooldown(parseInt(r.headers.get("retry-after"), 10) || j.retryAfter || 10);
           });
         }
         // the place on the page this answer is about (button under the answer)
@@ -299,7 +302,7 @@
       })
       .then(function () {
         busy = false;
-        $("chat-send").disabled = false;
+        $("chat-send").disabled = Date.now() < coolUntil;
         $("chat-input").focus();
       });
   }
@@ -334,6 +337,36 @@
     pop.classList.remove("is-open");
     document.querySelectorAll(".chat-links button[data-info]").forEach(function (x) { x.setAttribute("aria-expanded", "false"); });
     popTimer = setTimeout(function () { pop.hidden = true; }, REDUCED() ? 0 : 220);
+  }
+
+  // Too many questions: lock the send button and count down on it.
+  function startCooldown(seconds) {
+    coolUntil = Date.now() + seconds * 1000;
+    var btn = $("chat-send"), input = $("chat-input");
+    btn.disabled = true;
+    clearInterval(coolTimer);
+    function tick() {
+      var left = Math.ceil((coolUntil - Date.now()) / 1000);
+      if (left <= 0) {
+        clearInterval(coolTimer);
+        btn.disabled = busy;
+        btn.classList.remove("is-cool");
+        btn.removeAttribute("data-left");
+        btn.setAttribute("aria-label", "Wyślij pytanie");
+        input.placeholder = "Zapytaj o budżet…";
+        return;
+      }
+      btn.classList.add("is-cool");
+      btn.setAttribute("data-left", left);
+      btn.setAttribute("aria-label", "Poczekaj " + left + " s");
+      input.placeholder = "Możesz zapytać ponownie za " + left + " s…";
+    }
+    tick();
+    coolTimer = setInterval(tick, 250);
+  }
+  function pulseCooldown() {
+    var btn = $("chat-send");
+    btn.classList.remove("is-nudge"); void btn.offsetWidth; btn.classList.add("is-nudge");
   }
 
   // ---------- actions: links, feedback, copy ----------

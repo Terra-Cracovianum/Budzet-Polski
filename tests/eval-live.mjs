@@ -111,7 +111,7 @@ for (const [i, c] of CASES.entries()) {
   if (r.model) models.add(r.model);
   console.log(`${pass ? "✅" : "❌"} ${String(i + 1).padStart(2)}. ${c.q.padEnd(58)} ${s(r.first)} / ${s(r.total)}${r.cache === "hit" ? " (cache)" : ""}  ${why}`);
   if (!pass && r.text) console.log("      → " + r.text.replace(/\s+/g, " ").slice(0, 220));
-  await new Promise((res) => setTimeout(res, 1200)); // stay under the per-visitor limit
+  await new Promise((res) => setTimeout(res, 2500)); // stay under the limits (6 per 10 s, 30 per minute)
 }
 const med = (a) => (a.length ? a.slice().sort((x, y) => x - y)[Math.floor(a.length / 2)] : null);
 console.log(`\nWynik: ${ok}/${CASES.length} poprawnych (${Math.round(ok / CASES.length * 100)}%)`);
