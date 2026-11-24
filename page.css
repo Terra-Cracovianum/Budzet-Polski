@@ -87,3 +87,9 @@
   .ptable { font-size: 13.5px; }
 }
 @media (prefers-reduced-motion: reduce) { .pcta, .faq-i summary::after { transition: none; } }
+
+.plist { margin: 0; padding-left: 20px; color: var(--ink-2); line-height: 1.6; max-width: 70ch; }
+.plist li { margin: 6px 0; }
+.plist b { color: var(--ink); }
+.psec a, .psrc a { color: var(--ink); text-underline-offset: 3px; text-decoration-color: var(--hair-2); }
+.psec a:hover, .psrc a:hover { color: var(--accent); }

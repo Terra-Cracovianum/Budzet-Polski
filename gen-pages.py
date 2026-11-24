@@ -185,6 +185,35 @@ def faq(items):
     return f'<section class="psec"><h2>Najczęstsze pytania</h2>{body}</section>' + ld_script(ld)
 
 
+# Who publishes the site. One @id per entity so every page points to the same one.
+ORG_URL = "https://terracracovianum.org"
+ORG = {"@type": "Organization", "@id": ORG_URL + "/#org", "name": "Stowarzyszenie Terra Cracovianum",
+       "alternateName": "Terra Cracovianum", "url": ORG_URL,
+       "logo": {"@type": "ImageObject", "url": SITE + "/logo.svg"},
+       # add the association's profiles here (LinkedIn, X, Facebook…) so Google links them together
+       "sameAs": [ORG_URL]}
+WEBSITE = {"@type": "WebSite", "@id": SITE + "/#website", "url": SITE + "/", "name": "Budżet Polski",
+           "alternateName": "budzetpolski.com", "inLanguage": "pl-PL",
+           "description": "Interaktywny budżet państwa polskiego od 2011 roku: wydatki, dochody, deficyt i wykonanie, z danych ustaw budżetowych i Ministerstwa Finansów.",
+           "publisher": {"@id": ORG["@id"]}}
+
+
+def dataset():
+    files = [("budget-data.json", f"Ustawa budżetowa {LAST}")] + [(f"budget-{y}.json", f"Ustawa budżetowa {y}") for y in range(LAST - 1, FIRST - 1, -1)]
+    files += [(f"wykonanie-{y}.json", f"Wykonanie budżetu {y}") for y in range(LAST, FIRST - 1, -1)]
+    files += [("budzet-2027.json", f"Projekt budżetu {PROJECT}")]
+    return {"@type": "Dataset", "@id": SITE + "/#dataset", "name": f"Budżet państwa polskiego {FIRST}–{PROJECT}: plan, wykonanie i projekt",
+            "description": (f"Wydatki budżetu państwa wg działów, części i rodzajów, dochody wg źródeł (VAT, akcyza, CIT, PIT) oraz deficyt, "
+                            f"z ustaw budżetowych {FIRST}–{LAST}, sprawozdań Ministerstwa Finansów z wykonania budżetu i projektu ustawy budżetowej na {PROJECT}. "
+                            "Kwoty w tys. zł, w formacie JSON."),
+            "url": SITE + "/o-projekcie", "keywords": ["budżet państwa", "budżet Polski", "wydatki publiczne", "deficyt budżetowy", "Ministerstwo Finansów", "ustawa budżetowa"],
+            "creator": {"@id": ORG["@id"]}, "publisher": {"@id": ORG["@id"]}, "isAccessibleForFree": True, "inLanguage": "pl-PL",
+            "temporalCoverage": f"{FIRST}/{PROJECT}", "spatialCoverage": {"@type": "Place", "name": "Polska"},
+            "isBasedOn": ["https://www.gov.pl/web/finanse/budzet-panstwa", "https://isap.sejm.gov.pl", "https://stat.gov.pl"],
+            "dateModified": TODAY,
+            "distribution": [{"@type": "DataDownload", "name": n, "encodingFormat": "application/json", "contentUrl": f"{SITE}/{f}"} for f, n in files]}
+
+
 def ld_script(obj):
     return '<script type="application/ld+json">' + json.dumps(obj, ensure_ascii=False) + "</script>"
 
@@ -199,7 +228,11 @@ def crumbs(items):
     return f'<nav class="crumbs" aria-label="Ścieżka">{html_}</nav>' + ld_script(ld)
 
 
-def page(path, title, desc, body, h1, lead, crumb_items, image="og-home.jpg"):
+def page(path, title, desc, body, h1, lead, crumb_items, image="og-home.jpg", extra_ld=None):
+    graph = [ORG, WEBSITE, {"@type": "WebPage", "@id": SITE + path, "url": SITE + path, "name": title, "description": desc,
+             "inLanguage": "pl-PL", "isPartOf": {"@id": WEBSITE["@id"]}, "publisher": {"@id": ORG["@id"]},
+             "dateModified": TODAY, "about": {"@id": SITE + "/#dataset"}}] + (extra_ld or [])
+    graph_ld = ld_script({"@context": "https://schema.org", "@graph": graph})
     logo = '<img class="logo" src="/logo.svg?v=16" alt="Terra Cracovianum" width="1757" height="586">'
     return f"""<!DOCTYPE html>
 <html lang="pl">
@@ -226,9 +259,10 @@ def page(path, title, desc, body, h1, lead, crumb_items, image="og-home.jpg"):
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.7.0/dist/tabler-icons.min.css">
-<link rel="stylesheet" href="/style.css?v=46">
-<link rel="stylesheet" href="/page.css?v=2">
+<link rel="stylesheet" href="/style.css?v=47">
+<link rel="stylesheet" href="/page.css?v=3">
 <link rel="stylesheet" href="/chat.css?v=8">
+{graph_ld}
 </head>
 <body class="pbody">
 <a class="skip" href="#main">Przejdź do treści</a>
@@ -245,13 +279,13 @@ def page(path, title, desc, body, h1, lead, crumb_items, image="og-home.jpg"):
   <h1 class="ph1">{h1}</h1>
   <p class="plead">{lead}</p>
   {body}
-  <p class="psrc">Źródła: ustawy budżetowe {FIRST}–{LAST} (Dziennik Ustaw), sprawozdania Ministerstwa Finansów z wykonania budżetu, projekt ustawy budżetowej na {PROJECT} (druk sejmowy nr {P27["meta"]["druk_sejmowy"]}). Ceny stałe: inflacja CPI wg GUS. Ludność wg GUS. Kwoty w mld zł. Aktualizacja: {TODAY}.</p>
+  <p class="psrc">Przygotowało Stowarzyszenie <a href="https://terracracovianum.org" rel="noopener">Terra Cracovianum</a> (<a href="/o-projekcie">o projekcie i metodologii</a>). Źródła: ustawy budżetowe {FIRST}–{LAST} (Dziennik Ustaw), sprawozdania Ministerstwa Finansów z wykonania budżetu, projekt ustawy budżetowej na {PROJECT} (druk sejmowy nr {P27["meta"]["druk_sejmowy"]}). Ceny stałe: inflacja CPI wg GUS. Ludność wg GUS. Kwoty w mld zł. Aktualizacja: {TODAY}.</p>
 </main>
 <footer class="foot">
   <div class="wrap foot-in">
     {logo}
     <div class="foot-t">
-      <span><a href="/tematy">Wszystkie tematy</a> · <a href="/deficyt">Deficyt</a> · <a href="/dochody">Dochody</a> · <a href="/budzet-2027">Budżet 2027</a></span>
+      <span><a href="/tematy">Wszystkie tematy</a> · <a href="/deficyt">Deficyt</a> · <a href="/dochody">Dochody</a> · <a href="/budzet-2027">Budżet 2027</a> · <a href="/o-projekcie">O projekcie</a></span>
       <span>© {date.today().year} Stowarzyszenie <a href="https://terracracovianum.org" rel="noopener">Terra Cracovianum</a></span>
     </div>
   </div>
@@ -440,6 +474,43 @@ def revenue_page():
     return path, page(path, title, desc, body, f"Dochody budżetu państwa<small>VAT, akcyza, CIT, PIT · {FIRST}–{LAST}</small>", lead, [("Budżet Polski", "/"), ("Dochody", path)])
 
 
+def about_page():
+    path = "/o-projekcie"
+    files = ", ".join(f'<a href="/{f}">{f}</a>' for f in ["budget-data.json", f"budget-{LAST - 1}.json", f"wykonanie-{LAST - 1}.json", "budzet-2027.json"])
+    body = f"""
+<section class="psec"><h2>Czym jest Budżet Polski</h2>
+<p>Budżet Polski to bezpłatny, niezależny serwis, który pokazuje budżet państwa polskiego tak, żeby każdy mógł go zrozumieć: ile państwo planuje wydać, na co, skąd ma pieniądze i ile faktycznie wydało. Obejmuje ustawy budżetowe z lat {FIRST}–{LAST}, wykonanie budżetu i projekt budżetu na {PROJECT}.</p>
+<p>Serwis prowadzi <a href="https://terracracovianum.org" rel="noopener">Stowarzyszenie Terra Cracovianum</a>. Nie jest związany z żadną partią polityczną ani instytucją rządową.</p></section>
+<section class="psec"><h2>Skąd są dane</h2>
+<p>Wyłącznie z oficjalnych źródeł:</p>
+<ul class="plist">
+<li><b>Ustawy budżetowe {FIRST}–{LAST}</b> opublikowane w Dzienniku Ustaw: plan wydatków wg działów, części i rodzajów, plan dochodów i deficytu.</li>
+<li><b>Sprawozdania Ministerstwa Finansów</b> z wykonania budżetu państwa: wykonanie za cały rok, a dla bieżącego roku dane miesięczne i szacunkowe.</li>
+<li><b>Projekt ustawy budżetowej na {PROJECT}</b> (druk sejmowy nr {P27["meta"]["druk_sejmowy"]}) z załącznikami.</li>
+<li><b>GUS</b>: inflacja (CPI) do przeliczeń w cenach stałych oraz liczba ludności do kwot na osobę.</li>
+</ul></section>
+<section class="psec"><h2>Jak liczymy</h2>
+<ul class="plist">
+<li><b>Plan</b> to kwota z pierwotnej ustawy budżetowej. Jeśli ustawę znowelizowano (np. w 2020 i 2021 r.), piszemy o tym przy danym roku.</li>
+<li><b>Wykonanie</b> to kwoty ze sprawozdań Ministerstwa Finansów. W trakcie roku to wykonanie narastająco, nie wynik za cały rok.</li>
+<li><b>Dział</b> mówi, na co idą pieniądze (np. obrona narodowa), a <b>część budżetowa</b>, kto je wydaje (np. Minister Obrony Narodowej).</li>
+<li><b>Ceny stałe</b>: kwoty z wcześniejszych lat przeliczamy na ceny z {LAST} r. średnioroczną inflacją CPI wg GUS.</li>
+<li><b>Na osobę</b>: kwota podzielona przez liczbę ludności Polski wg GUS w danym roku.</li>
+<li>Część działów zmieniała przez lata nazwę lub zakres, więc nagłe skoki mogą wynikać z przesunięć między działami.</li>
+</ul></section>
+<section class="psec"><h2>Asystent AI</h2>
+<p>Asystent odpowiada wyłącznie na pytania o budżet państwa. Do każdego pytania serwer wyszukuje pasujące liczby w danych tej strony i sam wykonuje obliczenia (kwoty na osobę, zmiany procentowe, ceny stałe), a model AI tylko je opisuje prostym językiem. Mimo to może się pomylić, dlatego pod odpowiedzią jest link do miejsca na stronie, gdzie można sprawdzić liczbę. Nie zakładamy kont i nie zapisujemy rozmów.</p></section>
+<section class="psec"><h2>Otwarte dane</h2>
+<p>Wszystkie dane, na których działa serwis, są dostępne w formacie JSON, np. {files}. Kwoty są w tysiącach złotych. Korzystając z nich, podaj źródło: <i>budzetpolski.com, Stowarzyszenie Terra Cracovianum</i>.</p></section>
+<section class="psec"><h2>Kontakt i błędy</h2>
+<p>Znalazłeś błąd albo masz pomysł? Napisz do nas przez stronę <a href="https://terracracovianum.org" rel="noopener">terracracovianum.org</a>. Złą odpowiedź asystenta możesz też oznaczyć łapką w dół, zbieramy je i poprawiamy.</p></section>"""
+    lead = "Kto prowadzi serwis, skąd pochodzą dane i jak je liczymy."
+    return path, page(path, "O projekcie: źródła danych i metodologia | Budżet Polski",
+                      f"Budżet Polski prowadzi Stowarzyszenie Terra Cracovianum. Dane z ustaw budżetowych {FIRST}–{LAST}, sprawozdań Ministerstwa Finansów i GUS. Metodologia, otwarte dane, asystent AI.",
+                      body, "O projekcie", lead, [("Budżet Polski", "/"), ("O projekcie", path)],
+                      extra_ld=[dataset(), {"@type": "AboutPage", "@id": SITE + path + "#about", "url": SITE + path, "isPartOf": {"@id": WEBSITE["@id"]}, "publisher": {"@id": ORG["@id"]}}])
+
+
 def hub_page(dz_pages):
     path = "/tematy"
     items = "".join(f'<li><a href="{p}"><span>{e(EVERYDAY.get(c, NAMES[c]))}</span><b>{fmt(v)} mld zł</b></a></li>'
@@ -477,9 +548,32 @@ for fn in (deficit_page, revenue_page):
     p, content = fn()
     write(p, content)
     pages.append((p, "0.8"))
+p, content = about_page()
+write(p, content)
+pages.append((p, "0.5"))
 p, content = hub_page(dz_pages)
 write(p, content)
 pages.append((p, "0.8"))
+
+# home page: schema.org graph in <head> and a block of plain links in the overview
+idx = (ROOT / "index.html").read_text(encoding="utf-8")
+home_ld = ld_script({"@context": "https://schema.org", "@graph": [ORG, WEBSITE, dataset(),
+    {"@type": "WebPage", "@id": SITE + "/", "url": SITE + "/", "name": "Budżet Polski: na co państwo wydaje pieniądze",
+     "isPartOf": {"@id": WEBSITE["@id"]}, "publisher": {"@id": ORG["@id"]}, "about": {"@id": SITE + "/#dataset"}, "dateModified": TODAY, "inLanguage": "pl-PL"}]})
+top = sorted(dz_pages, key=lambda x: -x[2])[:10]
+links = "".join(f'<li><a href="{p}">{e(EVERYDAY.get(c, NAMES[c]).split(":")[0])}</a></li>' for c, p, v in top)
+years = "".join(f'<li><a href="/budzet/{y}">{y}</a></li>' for y in range(LAST, FIRST - 1, -1))
+home_block = (f'<section class="seo-links" aria-labelledby="seo-links-h"><h2 id="seo-links-h">Przeglądaj budżet</h2>'
+              f'<div class="seo-cols"><div><h3>Na co idą pieniądze</h3><ul>{links}<li><a href="/tematy">Wszystkie tematy →</a></li></ul></div>'
+              f'<div><h3>Budżety rok po roku</h3><ul class="seo-yrs">{years}<li><a href="/budzet-2027">2027 (projekt)</a></li></ul></div>'
+              f'<div><h3>Wyjaśnienia</h3><ul><li><a href="/deficyt">Deficyt budżetu {FIRST}–{PROJECT}</a></li><li><a href="/dochody">Dochody: VAT, CIT, PIT, akcyza</a></li>'
+              f'<li><a href="/o-projekcie">O projekcie i źródłach danych</a></li><li><a href="https://terracracovianum.org" rel="noopener">Stowarzyszenie Terra Cracovianum</a></li></ul></div></div></section>')
+def between(text, start, end, inner):
+    a, b = text.index(start) + len(start), text.index(end)
+    return text[:a] + inner + text[b:]
+idx = between(idx, "<!-- LD:START -->", "<!-- LD:END -->", home_ld)
+idx = between(idx, "<!-- LINKS:START -->", "<!-- LINKS:END -->", home_block)
+(ROOT / "index.html").write_text(idx, encoding="utf-8")
 
 # sitemap: the app views + all generated pages
 APP = [("/", "1.0"), ("/mapa", "0.9"), ("/przeplyw", "0.8"), ("/rodzaje", "0.7"), ("/trendy", "0.8"),
