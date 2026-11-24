@@ -44,7 +44,7 @@ const CASES = [
   // maths done by the server
   { q: "Ile na obronę na osobę w 2026?", any: ["2926", "2 926"] },
   { q: "O ile wzrosły wydatki na zdrowie od 2015?", any: ["683,3", "47,3"], link: "/trendy" },
-  { q: "Ile wynosiły wydatki budżetu w 2011 w cenach z 2026?", any: ["524,2"] },
+  { q: "Ile wynosiły wydatki budżetu w 2011 w cenach z 2026?", any: ["524,2", "506,4"] }, // plan or execution
   { q: "O ile więcej na obronę w projekcie na 2027 niż w 2026?", any: ["6,5", "5,9"] },
   // follow-up questions
   { q: "A w 2019?", h: [["Ile na obronę w 2026?", "W 2026 r. na obronę zaplanowano 109,2 mld zł."]], any: ["36,5", "35,7"] },

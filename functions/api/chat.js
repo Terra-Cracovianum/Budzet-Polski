@@ -22,7 +22,7 @@ const MAX_HISTORY = 6;             // earlier messages sent back to the model
 const MAX_FACTS = 24;          // trend questions (many years)
 const MAX_FACTS_YEAR = 12;     // questions about one or a few years: shorter prompt, faster start
 const CACHE_TTL = 24 * 3600;   // seconds; cached answers for first questions (no history)
-const CACHE_GEN = 3;           // bump to drop all cached answers (3: answers now come with a page link)
+const CACHE_GEN = 4;           // bump to drop all cached answers (4: clearer "no data" answers)
 const RATE = { limit: 40, windowMs: 10 * 60 * 1000 }; // per visitor, per isolate
 
 const [FIRST_YEAR, LAST_YEAR] = data.years;
@@ -233,7 +233,7 @@ export function dataNotes(question, strong) {
   const t = norm(question);
   const miss = missingYears(question);
   if (miss.length) notes.push(`Strona ma dane tylko za lata ${FIRST_YEAR}–${data.current} (oraz projekt na ${data.project}); nie ma danych za: ${miss.join(", ")}.`);
-  if (NOT_IN_DATA.test(t)) notes.push("Pytanie może dotyczyć czegoś, czego strona nie obejmuje: budżetów samorządów (gmin, miast, województw), planu finansowego NFZ lub ZUS jako osobnych instytucji, zarobków konkretnych osób. Strona ma tylko budżet państwa. Jeśli DANE nie odpowiadają wprost na pytanie, powiedz to jasno i nie podstawiaj innych liczb.");
+  if (NOT_IN_DATA.test(t)) notes.push("Pytanie może dotyczyć czegoś, czego strona nie obejmuje: budżetów samorządów (gmin, miast, województw), planu finansowego NFZ lub ZUS jako osobnych instytucji, zarobków konkretnych osób. Strona ma tylko budżet państwa. To pytanie JEST w temacie (to nie jest odmowa). Zacznij od zdania „Nie mam danych o …” (np. „Nie mam danych o budżecie Krakowa.”), wyjaśnij, że strona obejmuje budżet państwa, i dopiero potem możesz zaproponować pokrewną liczbę dla całego państwa, wyraźnie ją tak opisując.");
   if (!strong) notes.push("W danych strony nie znaleziono nic pasującego do pytania. Jeśli to pytanie o finanse publiczne, powiedz wprost, że strona nie ma tych danych, i zaproponuj, co można na niej sprawdzić.");
   return notes;
 }
