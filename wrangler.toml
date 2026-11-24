@@ -1,0 +1,9 @@
+# Cloudflare Pages config. The site is plain static files at the repo root;
+# functions/api/chat.js runs the budget chatbot at /api/chat.
+name = "budzet-polski"
+pages_build_output_dir = "."
+compatibility_date = "2026-01-01"
+
+# Workers AI (free daily allowance). Model can be changed with the AI_MODEL variable.
+[ai]
+binding = "AI"
