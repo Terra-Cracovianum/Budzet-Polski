@@ -115,6 +115,26 @@ html.chat-lock, html.chat-lock body { overflow: hidden; }
 .chat-chip:hover { box-shadow: 0 0 0 1px var(--ink-3); }
 
 .chat-bottom { padding: 8px 0 max(18px, env(safe-area-inset-bottom)); }
+/* info bubble above the links (privacy / how it works) */
+.chat-bottom .chat-col { position: relative; }
+.chat-pop {
+  position: absolute; left: 0; right: 0; bottom: calc(100% + 10px); z-index: 2;
+  margin: 0 auto; max-width: 560px; padding: 14px 18px; border-radius: var(--r-md);
+  background: var(--surface); color: var(--ink); box-shadow: var(--shadow-pop);
+  font-size: 14.5px; line-height: 1.5;
+  opacity: 0; transform: translateY(8px) scale(.97); transform-origin: var(--tail, 50%) 100%;
+  transition: opacity .2s var(--m-ease), transform .45s var(--m-spring);
+}
+.chat-pop.is-open { opacity: 1; transform: none; }
+.chat-pop[hidden] { display: none; }
+.chat-pop p { margin: 0; }
+.chat-pop::after { /* the tail, pointing at the link */
+  content: ""; position: absolute; top: 100%; left: calc(var(--tail, 50%) - 7px); pointer-events: none;
+  border: 7px solid transparent; border-top-color: var(--surface);
+  filter: drop-shadow(0 1px 0 var(--hair-2));
+}
+@media (max-width: 640px) { .chat-pop { left: 0; right: 0; } }
+@media (prefers-reduced-motion: reduce) { .chat-pop { transition: none; transform: none; } }
 .chat-links { display: flex; justify-content: center; align-items: center; gap: 8px; margin: 0 0 12px; font-size: 13px; color: var(--ink-2); }
 .chat-links button {
   display: inline-flex; align-items: center; gap: 4px; border: 0; padding: 4px; background: none; cursor: pointer;

@@ -91,10 +91,11 @@
       '<footer class="chat-bottom">' +
         '<div class="chat-col">' +
           '<p class="chat-links">' +
-            '<button type="button" data-info="privacy"><i class="ti ti-lock" aria-hidden="true"></i>Twoja prywatność</button>' +
+            '<button type="button" data-info="privacy" aria-expanded="false" aria-controls="chat-pop"><i class="ti ti-lock" aria-hidden="true"></i>Twoja prywatność</button>' +
             '<span aria-hidden="true">·</span>' +
-            '<button type="button" data-info="how"><i class="ti ti-info-circle" aria-hidden="true"></i>Jak działa asystent</button>' +
+            '<button type="button" data-info="how" aria-expanded="false" aria-controls="chat-pop"><i class="ti ti-info-circle" aria-hidden="true"></i>Jak działa asystent</button>' +
           "</p>" +
+          '<div class="chat-pop" id="chat-pop" role="note" aria-live="polite" hidden></div>' +
           '<form class="ask-bar ask-bar-sm" id="chat-form">' +
             '<label class="chat-sr" for="chat-input">Twoje pytanie o budżet</label>' +
             '<textarea id="chat-input" rows="1" maxlength="500" placeholder="Zapytaj o budżet…" enterkeyhint="send"></textarea>' +
@@ -115,7 +116,9 @@
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
     document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape" && !full.hidden) close();
+      if (e.key !== "Escape" || full.hidden) return;
+      if (popKind) { hidePop(); return; } // Esc first closes the info bubble, then the chat
+      close();
     });
     $("chat-form").addEventListener("submit", function (e) { e.preventDefault(); send($("chat-input").value); });
     $("chat-input").addEventListener("keydown", function (e) {
@@ -125,8 +128,13 @@
     $("chat-log").addEventListener("click", onLogClick);
     full.querySelector(".chat-links").addEventListener("click", function (e) {
       var b = e.target.closest("button[data-info]");
-      if (b) info(b.getAttribute("data-info"));
+      if (b) info(b.getAttribute("data-info"), b);
     });
+    // the info bubble goes away as soon as you do something else
+    full.addEventListener("pointerdown", function (e) {
+      if (popKind && !e.target.closest(".chat-pop, .chat-links button")) hidePop();
+    });
+    $("chat-input").addEventListener("focus", function () { if (popKind) hidePop(); });
   }
 
   // The example question in the ask bar changes like a slot: old one slides up and
@@ -169,6 +177,7 @@
   var closeTimer = null;
   function close() {
     var full = $("chat-full");
+    hidePop();
     full.classList.remove("is-open");
     clearTimeout(closeTimer);
     closeTimer = setTimeout(function () { full.hidden = true; }, REDUCED() ? 0 : 320);
@@ -223,6 +232,7 @@
   function send(text) {
     text = (text || "").trim();
     if (!text || busy) return;
+    hidePop();
     busy = true;
     var sugg = document.querySelector(".chat-sugg");
     if (sugg) sugg.remove();
@@ -294,11 +304,36 @@
       });
   }
 
-  function info(kind) {
+  // Info as a bubble above its link: one at a time, gone when you do anything else.
+  var popKind = null, popTimer = null;
+  function info(kind, btn) {
+    if (popKind === kind) { hidePop(); return; } // second click on the same link closes it
     var html = kind === "privacy"
       ? "<p><strong>Twoja prywatność.</strong> Nie zakładamy konta i nie zapisujemy rozmów. Pytanie trafia do modelu AI tylko po to, by odpowiedzieć. Jeśli klikniesz łapkę w górę lub w dół, zapiszemy anonimowo to pytanie i odpowiedź, żeby poprawiać asystenta. Nie wpisuj danych osobowych.</p>"
       : "<p><strong>Jak działa asystent.</strong> Do każdego pytania wyszukujemy pasujące liczby w danych tej strony: ustawach budżetowych 2011–2026, sprawozdaniach Ministerstwa Finansów i projekcie budżetu na 2027. Model AI tylko tłumaczy te liczby prostym językiem. Odpowiada wyłącznie o budżecie Polski. Może się pomylić, dlatego sprawdzaj liczby na wykresach.</p>";
-    add("bot note", html, false);
+    var pop = $("chat-pop");
+    clearTimeout(popTimer);
+    pop.innerHTML = html;
+    pop.hidden = false;
+    // point the bubble's tail at the link that opened it
+    var box = pop.getBoundingClientRect(), b = btn.getBoundingClientRect();
+    var tail = Math.max(18, Math.min(box.width - 18, b.left + b.width / 2 - box.left));
+    pop.style.setProperty("--tail", Math.round(tail) + "px");
+    pop.classList.remove("is-open");
+    void pop.offsetWidth; // restart the entrance when switching from one bubble to the other
+    pop.classList.add("is-open");
+    popKind = kind;
+    document.querySelectorAll(".chat-links button[data-info]").forEach(function (x) {
+      x.setAttribute("aria-expanded", String(x === btn));
+    });
+  }
+  function hidePop() {
+    var pop = $("chat-pop");
+    if (!pop || !popKind) return;
+    popKind = null;
+    pop.classList.remove("is-open");
+    document.querySelectorAll(".chat-links button[data-info]").forEach(function (x) { x.setAttribute("aria-expanded", "false"); });
+    popTimer = setTimeout(function () { pop.hidden = true; }, REDUCED() ? 0 : 220);
   }
 
   // ---------- actions: links, feedback, copy ----------
