@@ -18,8 +18,10 @@ const FALLBACK_AI_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
 const MAX_TOKENS = 400;
 const MAX_QUESTION = 500;          // characters
 const MAX_HISTORY = 6;             // earlier messages sent back to the model
-const MAX_FACTS = 24;
-const RATE = { limit: 20, windowMs: 10 * 60 * 1000 }; // per visitor, per isolate
+const MAX_FACTS = 24;          // trend questions (many years)
+const MAX_FACTS_YEAR = 12;     // questions about one or a few years: shorter prompt, faster start
+const CACHE_TTL = 24 * 3600;   // seconds; cached answers for first questions (no history)
+const RATE = { limit: 40, windowMs: 10 * 60 * 1000 }; // per visitor, per isolate
 
 const [FIRST_YEAR, LAST_YEAR] = data.years;
 
@@ -97,7 +99,7 @@ export function retrieve(question, history = []) {
   const best = scored.length ? scored[0][0] : 0;
   const picked = scored
     .filter(([s]) => s >= Math.min(best, 1))
-    .slice(0, MAX_FACTS)
+    .slice(0, years.length ? MAX_FACTS_YEAR : MAX_FACTS)
     .map(([, f]) => f);
   // Always add the year totals (spending, revenue, deficit) as context.
   if (years.length <= 3) {
@@ -228,7 +230,7 @@ export async function onRequestGet({ env }) {
   return json({ ok: Boolean(env.AI || env.LLM_URL) });
 }
 
-export async function onRequestPost({ request, env }) {
+export async function onRequestPost({ request, env, ctx }) {
   // Only accept calls from this site.
   const origin = request.headers.get("origin");
   if (origin && new URL(origin).host !== new URL(request.url).host) return json({ error: "forbidden" }, 403);
@@ -252,16 +254,41 @@ export async function onRequestPost({ request, env }) {
     .slice(-MAX_HISTORY)
     .map((m) => ({ role: m.role, content: m.content.slice(0, 1000) }));
 
+  // Same first question -> same answer: serve it from the cache instantly.
+  // Only questions without history (a follow-up depends on the conversation).
+  const cache = !history.length && typeof caches !== "undefined" ? caches.default : null;
+  const cacheKey = cache ? new Request(`https://chat-cache.invalid/${data.version}/${env.AI_MODEL || env.LLM_MODEL || "default"}/${encodeURIComponent(normQuestion(question))}`) : null;
+  if (cache) {
+    const hit = await cache.match(cacheKey);
+    if (hit) return new Response(hit.body, { headers: { ...TEXT_HEADERS, "x-chat-model": hit.headers.get("x-chat-model") || "", "x-chat-cache": "hit" } });
+  }
+
   const { facts } = retrieve(question, history);
   const messages = [{ role: "system", content: systemPrompt(facts) }, ...history, { role: "user", content: question }];
 
   try {
     const { stream, model } = await streamModel(env, messages);
-    return new Response(stream, {
-      headers: { "content-type": "text/plain; charset=utf-8", "cache-control": "no-store", "x-chat-model": model },
-    });
+    let out = stream;
+    if (cache) {
+      // one copy goes to the visitor, the other is saved once the answer is complete
+      const [toClient, toCache] = stream.tee();
+      out = toClient;
+      const save = new Response(toCache).text().then((text) => {
+        if (text.trim().length < 20) return; // do not keep empty or broken answers
+        return cache.put(cacheKey, new Response(text, { headers: { ...TEXT_HEADERS, "cache-control": `public, max-age=${CACHE_TTL}`, "x-chat-model": model } }));
+      }).catch((e) => console.error("cache save", e));
+      if (ctx?.waitUntil) ctx.waitUntil(save);
+    }
+    return new Response(out, { headers: { ...TEXT_HEADERS, "x-chat-model": model, "x-chat-cache": "miss" } });
   } catch (err) {
     console.error("chat error", err);
     return json({ error: "Asystent jest chwilowo niedostępny. Spróbuj za chwilę." }, 502);
   }
+}
+
+const TEXT_HEADERS = { "content-type": "text/plain; charset=utf-8", "cache-control": "no-store" };
+
+// "Ile Polska wydaje na obronę?" and "ile polska wydaje na obronę" share one cache entry
+export function normQuestion(q) {
+  return norm(q).replace(/[^a-z0-9+ ]+/g, " ").replace(/\s+/g, " ").trim();
 }
