@@ -121,6 +121,9 @@ for year in range(FIRST, LAST_LAW + 1):
         t += f" Wydatki na obronę ok. {str(m['obrona_pkb_proc']).replace('.', ',')}% PKB."
     add(year, "budżet ogółem razem wydatki dochody deficyt suma całość ile wynosi", t,
         "dziura budżetowa wykonanie plan", always=True)
+    if w and w["meta"].get("uwaga"):
+        add(year, "nowelizacja zmiana planu uwaga wyjaśnienie",
+            f"Uwaga do budżetu {year}: " + re.sub(r"\s*\(budget-\d+\.json\)|budget-\d+\.json:\s*", "", w["meta"]["uwaga"]), always=True)
 
     for d in b["dochody"]:
         t = f"Dochody {year}, {d['name']}: plan {mld(d['plan'])}"
