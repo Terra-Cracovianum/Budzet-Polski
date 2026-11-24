@@ -34,7 +34,10 @@
         '<form class="ask-bar" id="ask-form">' +
           '<label class="chat-sr" for="ask-input">Zapytaj o budżet państwa</label>' +
           '<i class="ti ti-sparkles ask-ico" aria-hidden="true"></i>' +
-          '<input id="ask-input" type="text" maxlength="500" autocomplete="off" enterkeyhint="send">' +
+          '<span class="ask-field" id="ask-field">' +
+            '<input id="ask-input" type="text" maxlength="500" autocomplete="off" enterkeyhint="send">' +
+            '<span class="ask-ph" aria-hidden="true"><span class="ask-ph-t" id="ask-ph"></span></span>' +
+          "</span>" +
           '<button type="submit" class="chat-send" aria-label="Zapytaj"><i class="ti ti-arrow-up" aria-hidden="true"></i></button>' +
         "</form>" +
         '<p class="ask-note">Asystent AI odpowiada na podstawie danych z tej strony.</p>';
@@ -43,7 +46,11 @@
         e.preventDefault();
         var q = $("ask-input").value.trim();
         $("ask-input").value = "";
-        open(q || $("ask-input").placeholder.replace(/^Spróbuj: „|”$/g, ""));
+        $("ask-field").classList.remove("has-value");
+        open(q || curExample);
+      });
+      $("ask-input").addEventListener("input", function () {
+        $("ask-field").classList.toggle("has-value", !!$("ask-input").value);
       });
       rotatePlaceholder($("ask-input"));
     }
@@ -122,12 +129,25 @@
     });
   }
 
+  // The example question in the ask bar changes like a slot: old one slides up and
+  // fades, the new one rises in. (A real placeholder cannot be animated.)
+  var curExample = EXAMPLES[0];
   function rotatePlaceholder(input) {
-    var i = 0;
-    function set() { input.placeholder = "Spróbuj: „" + EXAMPLES[i % EXAMPLES.length] + "”"; i++; }
-    set();
-    setInterval(function () { if (document.activeElement !== input && !input.value) set(); }, 3500);
+    var ph = $("ask-ph"), i = 0;
+    input.setAttribute("aria-label", "Zapytaj o budżet państwa, np. " + EXAMPLES[0]);
+    function text() { curExample = EXAMPLES[i % EXAMPLES.length]; ph.innerHTML = 'Spróbuj: <q>' + esc(curExample) + "</q>"; }
+    text();
+    setInterval(function () {
+      if (document.activeElement === input || input.value || document.hidden) return;
+      i++;
+      if (REDUCED()) { text(); return; }
+      ph.classList.add("is-out");
+      setTimeout(function () { text(); ph.classList.remove("is-out"); ph.classList.add("is-in");
+        requestAnimationFrame(function () { requestAnimationFrame(function () { ph.classList.remove("is-in"); }); });
+      }, 320);
+    }, 3800);
   }
+  function REDUCED() { return window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches; }
 
   // ---------- open / close ----------
 
@@ -135,15 +155,23 @@
 
   function open(question) {
     lastFocus = document.activeElement;
-    $("chat-full").hidden = false;
+    var full = $("chat-full");
+    clearTimeout(closeTimer);
+    full.hidden = false;
     document.documentElement.classList.add("chat-lock");
+    // two frames so the browser paints the start state before the transition
+    requestAnimationFrame(function () { requestAnimationFrame(function () { full.classList.add("is-open"); }); });
     if (!$("chat-log").children.length) welcome();
     if (question) send(question);
     else $("chat-input").focus();
   }
 
+  var closeTimer = null;
   function close() {
-    $("chat-full").hidden = true;
+    var full = $("chat-full");
+    full.classList.remove("is-open");
+    clearTimeout(closeTimer);
+    closeTimer = setTimeout(function () { full.hidden = true; }, REDUCED() ? 0 : 320);
     document.documentElement.classList.remove("chat-lock");
     if (lastFocus && lastFocus.focus) lastFocus.focus();
   }
@@ -156,6 +184,7 @@
       var b = document.createElement("button");
       b.type = "button";
       b.className = "chat-chip";
+      b.style.setProperty("--i", s.children.length);
       b.textContent = q;
       b.addEventListener("click", function () { send(q); });
       s.appendChild(b);
@@ -201,7 +230,7 @@
     grow();
     $("chat-send").disabled = true;
     add("user", "<p>" + esc(text) + "</p>", false);
-    var wait = add("bot wait", '<p><span class="chat-dots" role="status" aria-label="Asystent pisze"><i></i><i></i><i></i></span></p>', false);
+    var wait = add("bot wait", '<p class="chat-think" role="status"><span class="chat-orb" aria-hidden="true"></span><span class="chat-shimmer">Szukam w danych budżetu…</span></p>', false);
 
     fetch(API, {
       method: "POST",
@@ -226,7 +255,7 @@
           return reader.read().then(function (x) {
             if (x.done) return;
             answer += dec.decode(x.value, { stream: true });
-            if (!msg && answer.trim()) { wait.remove(); msg = add("bot", "", false); }
+            if (!msg && answer.trim()) { wait.remove(); msg = add("bot is-streaming", "", false); }
             if (msg) { msg.querySelector(".chat-body").innerHTML = render(answer.trim()); scrollDown(); }
             return pump();
           });
@@ -238,6 +267,7 @@
             add("bot err", "<p>Nie udało mi się odpowiedzieć. Spróbuj zadać pytanie inaczej.</p>", false);
             return;
           }
+          msg.classList.remove("is-streaming");
           if (link && typeof link.href === "string" && /^\/[\w\/-]*$/.test(link.href)) {
             msg.insertAdjacentHTML("beforeend",
               '<a class="chat-goto" href="' + esc(link.href) + '">' +

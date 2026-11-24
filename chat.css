@@ -10,11 +10,17 @@ html.chat-lock, html.chat-lock body { overflow: hidden; }
   background: var(--surface); box-shadow: var(--shadow-pop);
 }
 /* warm gradient frame */
-.ask > .ask-bar::before {
+/* a slow ring of light travels around the ask bar (conic gradient, rotating angle) */
+@property --ask-a { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+.ask > .ask-bar::before, .ask > .ask-bar::after {
   content: ""; position: absolute; inset: -6px; z-index: -1; border-radius: inherit;
-  background: linear-gradient(110deg, #C99A6B, var(--accent) 35%, #5F7146 70%, #4A6382);
-  opacity: .55; filter: blur(.5px);
+  background: conic-gradient(from var(--ask-a), #C99A6B, var(--accent), #5F7146, #4A6382, #A1606A, #C99A6B);
+  animation: ask-spin 9s linear infinite;
 }
+.ask > .ask-bar::before { opacity: .55; }
+.ask > .ask-bar::after { inset: -2px; z-index: -2; filter: blur(22px); opacity: .28; transition: opacity .6s var(--m-ease), filter .6s var(--m-ease); }
+.ask > .ask-bar:focus-within::after, .ask > .ask-bar:hover::after { opacity: .5; filter: blur(28px); }
+@keyframes ask-spin { to { --ask-a: 360deg; } }
 .ask-ico { font-size: 22px; color: var(--accent); flex: none; }
 .ask-bar input, .ask-bar textarea {
   flex: 1; min-width: 0; border: 0; background: transparent; color: var(--ink);
@@ -130,6 +136,7 @@ html.chat-lock, html.chat-lock body { overflow: hidden; }
 @media (prefers-color-scheme: dark) {
   .chat-logo { filter: invert(1); }
   .ask > .ask-bar::before { opacity: .45; }
+  .ask > .ask-bar::after { opacity: .22; }
 }
 @media (max-width: 640px) {
   .ask-bar { padding-left: 16px; }
@@ -147,4 +154,100 @@ html.chat-lock, html.chat-lock body { overflow: hidden; }
 @media (prefers-color-scheme: dark) {
   .chat-send, .chat-fab, .chat-back, .chat-msg.user { color: var(--bg); }
   .chat-msg.user { background: var(--surface-3); color: var(--ink); }
+}
+
+/* =====================================================================
+   Motion. Apple-style: springy ease-out, short distances, nothing that
+   moves without a reason, and everything off with reduced motion.
+   ===================================================================== */
+:root {
+  --m-ease: cubic-bezier(0.16, 1, 0.3, 1);      /* expo out: fast start, soft landing */
+  --m-spring: cubic-bezier(0.32, 0.72, 0, 1);   /* the iOS sheet curve */
+  --m-pop: cubic-bezier(0.34, 1.4, 0.64, 1);    /* a hint of overshoot */
+}
+
+/* ask bar: the example question rolls like a slot */
+.ask-field { position: relative; flex: 1; min-width: 0; display: flex; }
+.ask-ph {
+  position: absolute; inset: 0; display: flex; align-items: center; pointer-events: none; overflow: hidden;
+  color: var(--ink-3); font: 400 19px/1.4 var(--sans); letter-spacing: -0.01em; white-space: nowrap;
+}
+.ask-ph q { quotes: "„" "”"; }
+.ask-ph-t { display: block; overflow: hidden; text-overflow: ellipsis; transition: transform .45s var(--m-ease), opacity .35s var(--m-ease), filter .35s var(--m-ease); }
+.ask-ph-t.is-out { transform: translateY(-70%); opacity: 0; filter: blur(3px); }
+.ask-ph-t.is-in { transform: translateY(70%); opacity: 0; filter: blur(3px); transition: none; }
+.ask-field.has-value .ask-ph { opacity: 0; }
+.ask-field .ask-ph { transition: opacity .2s; }
+.ask-bar { transition: transform .5s var(--m-spring), box-shadow .3s; }
+.ask > .ask-bar:focus-within { transform: scale(1.01); }
+
+/* send button: lifts on hover, presses in */
+.chat-send i { transition: transform .35s var(--m-pop); }
+.chat-send:hover:not(:disabled) i { transform: translateY(-2px); }
+.chat-send:active:not(:disabled) { transform: scale(0.9); transition-duration: .1s; }
+
+/* floating button: springs in */
+.chat-fab { animation: m-pop-in .6s var(--m-pop) both; }
+.chat-fab:active { transform: scale(0.95); }
+@keyframes m-pop-in { from { opacity: 0; transform: translateY(14px) scale(.9); } }
+
+/* full-screen chat: fades in while the parts settle from below, in sequence */
+.chat-full { opacity: 0; transition: opacity .32s var(--m-ease); }
+.chat-full.is-open { opacity: 1; }
+.chat-full .chat-top { transform: translateY(-8px); opacity: 0; transition: transform .6s var(--m-spring), opacity .4s var(--m-ease); }
+.chat-full .chat-scroll { transform: translateY(18px) scale(.99); transition: transform .7s var(--m-spring); }
+.chat-full .chat-bottom { transform: translateY(32px); opacity: 0; transition: transform .7s var(--m-spring) .05s, opacity .45s var(--m-ease) .05s; }
+.chat-full.is-open .chat-top, .chat-full.is-open .chat-scroll, .chat-full.is-open .chat-bottom { transform: none; opacity: 1; }
+
+/* messages arrive: the question springs up from the field, the answer rises softly */
+.chat-msg.user { transform-origin: 100% 100%; animation: m-user-in .55s var(--m-pop) both; }
+.chat-msg.bot { animation: m-bot-in .6s var(--m-ease) both; }
+@keyframes m-user-in { from { opacity: 0; transform: translateY(18px) scale(.94); } }
+@keyframes m-bot-in { from { opacity: 0; transform: translateY(10px); filter: blur(4px); } }
+
+/* suggestions cascade in */
+.chat-chip { animation: m-rise .55s var(--m-ease) both; animation-delay: calc(.18s + var(--i, 0) * 60ms); transition: transform .25s var(--m-pop), box-shadow .2s; }
+.chat-chip:hover { transform: translateY(-2px); }
+.chat-chip:active { transform: scale(.97); }
+@keyframes m-rise { from { opacity: 0; transform: translateY(10px); } }
+
+/* thinking: a breathing orb and a light sweeping across the words */
+.chat-think { display: inline-flex; align-items: center; gap: 10px; }
+.chat-orb {
+  width: 14px; height: 14px; border-radius: 50%; flex: none;
+  background: conic-gradient(from var(--ask-a), #C99A6B, var(--accent), #5F7146, #4A6382, #C99A6B);
+  animation: ask-spin 2.4s linear infinite, m-breathe 1.6s ease-in-out infinite;
+}
+@keyframes m-breathe { 50% { transform: scale(.72); opacity: .7; } }
+.chat-shimmer {
+  color: transparent; -webkit-background-clip: text; background-clip: text;
+  background-image: linear-gradient(100deg, var(--ink-3) 30%, var(--ink) 50%, var(--ink-3) 70%);
+  background-size: 250% 100%; animation: m-shimmer 1.8s linear infinite;
+}
+@keyframes m-shimmer { from { background-position: 100% 0; } to { background-position: -150% 0; } }
+
+/* writing: a soft cursor follows the text until the answer is complete */
+.chat-msg.is-streaming .chat-body > :last-child::after {
+  content: ""; display: inline-block; width: .55em; height: .55em; margin-left: .3em; border-radius: 50%;
+  background: var(--accent); vertical-align: .05em; animation: m-caret 1s ease-in-out infinite;
+}
+@keyframes m-caret { 50% { transform: scale(.55); opacity: .45; } }
+
+/* when the answer is done, the page link and the actions follow one after another */
+.chat-goto { animation: m-rise .6s var(--m-ease) both; animation-delay: .08s; }
+.chat-goto i { transition: transform .35s var(--m-pop); }
+.chat-goto:hover i { transform: translateX(4px); }
+.chat-acts { animation: m-rise .5s var(--m-ease) both; animation-delay: .2s; }
+.chat-acts button { transition: transform .3s var(--m-pop), color .2s; }
+.chat-acts button:active:not(:disabled) { transform: scale(.86); }
+.chat-acts button[aria-pressed="true"] i { animation: m-thump .5s var(--m-pop); }
+@keyframes m-thump { 40% { transform: scale(1.35) rotate(-8deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .ask > .ask-bar::before, .ask > .ask-bar::after, .chat-orb, .chat-shimmer, .chat-fab, .chat-msg, .chat-chip,
+  .chat-goto, .chat-acts, .chat-acts button i, .chat-msg.is-streaming .chat-body > :last-child::after { animation: none !important; }
+  .chat-full, .chat-full .chat-top, .chat-full .chat-scroll, .chat-full .chat-bottom, .ask-ph-t, .ask-bar { transition: none !important; }
+  .chat-full .chat-top, .chat-full .chat-scroll, .chat-full .chat-bottom { transform: none; opacity: 1; }
+  .ask > .ask-bar:focus-within { transform: none; }
+  .chat-shimmer { color: var(--ink-2); background: none; }
 }
