@@ -113,7 +113,7 @@ const SITE_GUIDE = `Widoki strony (linki podawaj dokładnie w tej formie Markdow
 - [Trendy](#widok=trends): jak wydatki zmieniały się w latach ${FIRST_YEAR}–${data.current}, także w cenach stałych.
 - [Twoje podatki](#widok=taxes): kalkulator, na co idą podatki konkretnej osoby.
 - [Wykonanie](#widok=exec): ile z planu faktycznie wydano.
-- [Budżet 2027](budzet-2027.html): projekt budżetu na ${data.project} krok po kroku.
+- [Budżet 2027](budzet-2027): projekt budżetu na ${data.project} krok po kroku.
 Rok zmienisz linkiem w formie [rok 2024](#rok=2024) (lata ${FIRST_YEAR}–${data.current}).`;
 
 export function systemPrompt(facts) {

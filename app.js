@@ -779,7 +779,7 @@
         })
         .on("mousemove", positionTip)
         .on("mouseleave", hideTip)
-        .on("click", function () { hideTip(); if (yr === 2027) location.href = "budzet-2027.html"; else setYear(yr); });
+        .on("click", function () { hideTip(); if (yr === 2027) location.href = "budzet-2027"; else setYear(yr); });
     });
   }
   function p27Current() {
