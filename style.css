@@ -536,22 +536,6 @@ body.sheet-open { overflow: hidden; }
 .foot .logo { height: 28px; }
 .foot-t { display: flex; flex-direction: column; gap: 4px; text-align: right; color: var(--ink-2); font-size: 12.5px; }
 
-/* ============ tutorial dialog ============ */
-.tut-dialog { border: 0; padding: 0; background: transparent; max-width: min(760px, calc(100vw - 32px)); width: 100%; color: var(--ink); }
-.tut-dialog::backdrop { background: rgba(10, 10, 12, 0.45); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
-.tut-dialog[open] { animation: viewIn .35s var(--ease) both; }
-.tut-panel { background: var(--surface); border-radius: 28px; padding: 24px; box-shadow: var(--shadow-pop); }
-.tut-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 8px; }
-.tut-title { font-size: 22px; font-weight: 600; letter-spacing: -0.025em; }
-.tut-lead { color: var(--ink-2); font-size: 14.5px; margin-bottom: 16px; }
-.tut-video { position: relative; aspect-ratio: 16 / 9; border-radius: 16px; overflow: hidden; background: #000; }
-.tut-play { position: absolute; inset: 0; border: 0; padding: 0; background: #000; }
-.tut-poster { width: 100%; height: 100%; object-fit: cover; opacity: .9; }
-.tut-play-icon { position: absolute; left: 50%; top: 50%; width: 68px; height: 68px; margin: -34px 0 0 -34px; border-radius: 50%; display: grid; place-items: center; background: rgba(255,255,255,.92); color: #111; font-size: 28px; transition: transform .2s var(--ease); }
-.tut-play:hover .tut-play-icon { transform: scale(1.06); }
-.tut-iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
-.tut-foot { margin-top: 12px; color: var(--ink-2); font-size: 13px; }
-.tut-yt-link { font-weight: 500; }
 
 /* ============ wiarygodność ============ */
 .rynek .h { margin-bottom: 8px; }
@@ -690,8 +674,6 @@ body.is-loaded .rv { animation: viewIn .7s var(--ease) both; animation-delay: ca
   .dd-fact b { font-size: 15px; }
   .foot-in { flex-direction: column; align-items: flex-start; padding: 28px 16px 40px; }
   .foot-t { text-align: left; }
-  .tut-panel { padding: 18px; border-radius: 22px; }
-  .tut-title { font-size: 19px; }
 }
 @media (max-width: 380px) {
   .hero-n { font-size: 54px; }

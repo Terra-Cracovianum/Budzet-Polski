@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.7.0/dist/tabler-icons.min.css">
-<link rel="stylesheet" href="style.css?v=44">
+<link rel="stylesheet" href="style.css?v=45">
 <link rel="stylesheet" href="chat.css?v=3">
 </head>
 <body>
@@ -55,9 +55,6 @@
         </select>
         <i class="ti ti-chevron-down" aria-hidden="true"></i>
       </label>
-      <button type="button" class="icon-btn" id="tut-open" aria-label="Otwórz samouczek wideo" aria-haspopup="dialog" aria-controls="tutorial-dialog" title="Samouczek">
-        <i class="ti ti-player-play" aria-hidden="true"></i>
-      </button>
     </div>
   </div>
 </header>
@@ -370,25 +367,12 @@
   </div>
 </footer>
 
-<dialog class="tut-dialog" id="tutorial-dialog" aria-labelledby="tut-title">
-  <div class="tut-panel">
-    <header class="tut-head">
-      <h2 class="tut-title" id="tut-title">Nowy tutaj? Zobacz krótki samouczek</h2>
-      <button type="button" class="tut-close icon-btn" id="tut-close" aria-label="Zamknij samouczek">
-        <i class="ti ti-x" aria-hidden="true"></i>
-      </button>
-    </header>
-    <p class="tut-lead">Film pokazuje, jak czytać mapę wydatków, przełączać lata i wchodzić w szczegóły budżetu państwa. Do samouczka wrócisz zawsze przyciskiem ▶ w nagłówku.</p>
-    <div class="tut-video" id="tut-video"></div>
-    <p class="tut-foot">Film nie działa? <a class="tut-yt-link" href="https://www.youtube.com/watch?v=kYXm-8s79P0" target="_blank" rel="noopener">Otwórz w YouTube <i class="ti ti-external-link" aria-hidden="true"></i></a></p>
-  </div>
-</dialog>
 
 <div class="tt" id="tooltip" role="status" aria-live="polite"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
-<script src="app.js?v=45"></script>
+<script src="app.js?v=46"></script>
 <script src="chat.js?v=3" defer></script>
 </body>
 </html>

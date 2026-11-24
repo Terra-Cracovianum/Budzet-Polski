@@ -429,7 +429,6 @@
     wireNav();
     wireAxis();
     wireYear();
-    wireTutorial();
     wireOverview();
     wireSheet();
     wireTaxes();
@@ -444,7 +443,6 @@
       requestAnimationFrame(function () {
         requestAnimationFrame(function () {
           document.body.classList.add("is-loaded");
-          maybeShowFirstVisitTutorial();
         });
       });
     });
@@ -452,7 +450,6 @@
     var s = document.getElementById("boot-state");
     if (s) s.innerHTML = '<i class="ti ti-alert-triangle"></i> Nie udało się wczytać danych budżetu. Odśwież stronę lub spróbuj ponownie później.';
     document.body.classList.add("is-loaded");
-    wireTutorial();
     console.error(err);
   });
 
@@ -2477,91 +2474,6 @@
         }).join("") : '<p class="mv-empty">Brak</p>') + "</div>";
     }
     host.innerHTML = list("Szybciej niż równe tempo", ahead, true) + list("Wolniej niż równe tempo", behind, false);
-  }
-
-  // =====================================================================
-  // ============================ SAMOUCZEK ===============================
-  // =====================================================================
-  var TUT = { id: "kYXm-8s79P0", seenKey: "budzet-tutorial-seen" };
-  var tutLastTrigger = null;
-  var tutWired = false;
-
-  function readTutorialSeen() {
-    try { return localStorage.getItem(TUT.seenKey) === "1"; }
-    catch (e) { return true; }               // storage blocked → treat as seen, never nag
-  }
-  function markTutorialSeen() { try { localStorage.setItem(TUT.seenKey, "1"); } catch (e) {} }
-
-  function buildTutorialPoster() {
-    var btn = document.createElement("button");
-    btn.type = "button"; btn.className = "tut-play"; btn.id = "tut-play";
-    btn.setAttribute("aria-label", "Odtwórz samouczek");
-    var img = document.createElement("img");
-    img.className = "tut-poster"; img.alt = ""; img.setAttribute("aria-hidden", "true");
-    img.width = 1280; img.height = 720;
-    img.src = "https://i.ytimg.com/vi/" + TUT.id + "/maxresdefault.jpg";
-    img.onerror = function () { this.onerror = null; this.src = "https://i.ytimg.com/vi/" + TUT.id + "/hqdefault.jpg"; };
-    var ic = document.createElement("span");
-    ic.className = "tut-play-icon"; ic.setAttribute("aria-hidden", "true");
-    ic.innerHTML = '<i class="ti ti-player-play-filled"></i>';
-    btn.appendChild(img); btn.appendChild(ic);
-    return btn;
-  }
-  function buildTutorialIframe() {
-    var f = document.createElement("iframe");
-    f.className = "tut-iframe";
-    f.setAttribute("src", "https://www.youtube-nocookie.com/embed/" + TUT.id + "?autoplay=1&rel=0&modestbranding=1");
-    f.setAttribute("title", "Samouczek: Budżet Państwa Polskiego");
-    f.setAttribute("allow", "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share");
-    f.setAttribute("allowfullscreen", "");
-    f.setAttribute("referrerpolicy", "strict-origin-when-cross-origin");
-    return f;
-  }
-  function playTutorial() {
-    var host = document.getElementById("tut-video");
-    if (!host) return;
-    host.innerHTML = "";
-    host.appendChild(buildTutorialIframe());
-    var f = host.querySelector("iframe"); if (f) f.focus();
-  }
-  function openTutorial(trigger) {
-    var dlg = document.getElementById("tutorial-dialog");
-    if (!dlg) return;
-    tutLastTrigger = trigger || document.activeElement || null;
-    if (typeof dlg.showModal !== "function") { window.open("https://www.youtube.com/watch?v=" + TUT.id, "_blank", "noopener"); return; }
-    if (dlg.open) return;
-    var host = document.getElementById("tut-video");
-    if (host) { host.innerHTML = ""; host.appendChild(buildTutorialPoster()); }
-    dlg.showModal();
-    var close = document.getElementById("tut-close"); if (close) close.focus();
-  }
-  function closeTutorial() {
-    var dlg = document.getElementById("tutorial-dialog");
-    if (!dlg) return;
-    var host = document.getElementById("tut-video"); if (host) host.innerHTML = "";
-    if (dlg.open) dlg.close();
-    if (tutLastTrigger && tutLastTrigger.focus) tutLastTrigger.focus();
-    tutLastTrigger = null;
-  }
-  function wireTutorial() {
-    if (tutWired) return;
-    var dlg = document.getElementById("tutorial-dialog");
-    var openBtn = document.getElementById("tut-open");
-    if (!dlg || !openBtn) return;
-    tutWired = true;
-    openBtn.addEventListener("click", function () { openTutorial(openBtn); });
-    var closeBtn = document.getElementById("tut-close");
-    if (closeBtn) closeBtn.addEventListener("click", closeTutorial);
-    var host = document.getElementById("tut-video");
-    if (host) host.addEventListener("click", function (ev) { if (ev.target.closest && ev.target.closest("#tut-play")) playTutorial(); });
-    dlg.addEventListener("cancel", function (ev) { ev.preventDefault(); closeTutorial(); });
-    dlg.addEventListener("click", function (ev) { if (ev.target === dlg) closeTutorial(); });
-    dlg.addEventListener("close", function () { var h = document.getElementById("tut-video"); if (h) h.innerHTML = ""; });
-  }
-  function maybeShowFirstVisitTutorial() {
-    if (readTutorialSeen()) return;
-    markTutorialSeen();
-    setTimeout(function () { openTutorial(document.getElementById("tut-open")); }, prefersReduced() ? 0 : 1400);
   }
 
   // =====================================================================
