@@ -22,7 +22,7 @@ const MAX_HISTORY = 6;             // earlier messages sent back to the model
 const MAX_FACTS = 24;          // trend questions (many years)
 const MAX_FACTS_YEAR = 12;     // questions about one or a few years: shorter prompt, faster start
 const CACHE_TTL = 24 * 3600;   // seconds; cached answers for first questions (no history)
-const CACHE_GEN = 4;           // bump to drop all cached answers (4: clearer "no data" answers)
+const CACHE_GEN = 5;           // bump to drop all cached answers (5: old "2005" answers from before the server reply)
 const RATE = { limit: 120, windowMs: 10 * 60 * 1000 }; // backstop, per visitor, per server copy
 
 const [FIRST_YEAR, LAST_YEAR] = data.years;
@@ -422,6 +422,12 @@ export async function onRequestPost({ request, env, ctx }) {
     .slice(-MAX_HISTORY)
     .map((m) => ({ role: m.role, content: m.content.slice(0, 1000) }));
 
+  // A year the site has no data for (and no year it has): answer without the model,
+  // instantly and always the same way. Checked before the cache,
+  // so an older cached model answer can never win.
+  const noYearReply = outOfRangeReply(question);
+  if (noYearReply) return new Response(noYearReply, { headers: { ...TEXT_HEADERS, "x-chat-model": "server", "x-chat-cache": "none" } });
+
   // Same first question -> same answer: serve it from the cache instantly.
   // Only questions without history (a follow-up depends on the conversation).
   const cache = !history.length && typeof caches !== "undefined" ? caches.default : null;
@@ -430,11 +436,6 @@ export async function onRequestPost({ request, env, ctx }) {
     const hit = await cache.match(cacheKey);
     if (hit) return new Response(hit.body, { headers: { ...TEXT_HEADERS, "x-chat-model": hit.headers.get("x-chat-model") || "", "x-chat-link": hit.headers.get("x-chat-link") || "", "x-chat-cache": "hit" } });
   }
-
-  // A year the site has no data for (and no year it has): answer without the model,
-  // instantly and always the same way.
-  const noYearReply = outOfRangeReply(question);
-  if (noYearReply) return new Response(noYearReply, { headers: { ...TEXT_HEADERS, "x-chat-model": "server", "x-chat-cache": "none" } });
 
   const r = retrieve(question, history);
   const calcs = calculations(question, r.picked, r.top, r.years);
