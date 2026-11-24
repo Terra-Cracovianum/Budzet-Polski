@@ -232,10 +232,22 @@ export function dataNotes(question, strong) {
   const notes = [];
   const t = norm(question);
   const miss = missingYears(question);
-  if (miss.length) notes.push(`Strona ma dane tylko za lata ${FIRST_YEAR}–${data.current} (oraz projekt na ${data.project}); nie ma danych za: ${miss.join(", ")}.`);
+  if (miss.length) notes.push(`Strona ma dane tylko za lata ${FIRST_YEAR}–${data.current} (oraz projekt na ${data.project}); nie ma danych za: ${miss.join(", ")}. To pytanie JEST w temacie (to nie jest odmowa): zacznij od zdania „Nie mam danych za ${miss[0]} rok.”`);
   if (NOT_IN_DATA.test(t)) notes.push("Pytanie może dotyczyć czegoś, czego strona nie obejmuje: budżetów samorządów (gmin, miast, województw), planu finansowego NFZ lub ZUS jako osobnych instytucji, zarobków konkretnych osób. Strona ma tylko budżet państwa. To pytanie JEST w temacie (to nie jest odmowa). Zacznij od zdania „Nie mam danych o …” (np. „Nie mam danych o budżecie Krakowa.”), wyjaśnij, że strona obejmuje budżet państwa, i dopiero potem możesz zaproponować pokrewną liczbę dla całego państwa, wyraźnie ją tak opisując.");
   if (!strong) notes.push("W danych strony nie znaleziono nic pasującego do pytania. Jeśli to pytanie o finanse publiczne, powiedz wprost, że strona nie ma tych danych, i zaproponuj, co można na niej sprawdzić.");
   return notes;
+}
+
+export function outOfRangeReply(question) {
+  const miss = missingYears(question);
+  if (!miss.length || yearsIn(question).length) return null;
+  const t = norm(question);
+  if (/wybor|wygra|partii|partia|polityk|glosowa/.test(t)) return null; // politics: the model declines
+  if (!GENERAL.test(t) && !retrieve(question).strong) return null;
+  const ys = [...new Set(miss)].sort((a, b) => a - b);
+  const which = ys.length === 1 ? `${ys[0]} rok` : `lata ${ys.join(", ")}`;
+  return `Nie mam danych za ${which}. Strona obejmuje budżety państwa z lat ${FIRST_YEAR}–${data.current} oraz projekt budżetu na ${data.project}. ` +
+    `Możesz zapytać na przykład: „Jaki był budżet w ${FIRST_YEAR}?” albo „Jak zmieniał się deficyt od ${FIRST_YEAR}?”`;
 }
 
 // ---------- prompt ----------
@@ -392,6 +404,11 @@ export async function onRequestPost({ request, env, ctx }) {
     const hit = await cache.match(cacheKey);
     if (hit) return new Response(hit.body, { headers: { ...TEXT_HEADERS, "x-chat-model": hit.headers.get("x-chat-model") || "", "x-chat-link": hit.headers.get("x-chat-link") || "", "x-chat-cache": "hit" } });
   }
+
+  // A year the site has no data for (and no year it has): answer without the model,
+  // instantly and always the same way.
+  const noYearReply = outOfRangeReply(question);
+  if (noYearReply) return new Response(noYearReply, { headers: { ...TEXT_HEADERS, "x-chat-model": "server", "x-chat-cache": "none" } });
 
   const r = retrieve(question, history);
   const calcs = calculations(question, r.picked, r.top, r.years);
