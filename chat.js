@@ -73,7 +73,7 @@
     full.setAttribute("aria-label", "Asystent budżetu");
     full.innerHTML =
       '<header class="chat-top">' +
-        '<img class="logo chat-logo" src="logo.svg?v=16" alt="Terra Cracovianum" width="1757" height="586">' +
+        '<img class="logo chat-logo" src="/logo.svg?v=16" alt="Terra Cracovianum" width="1757" height="586">' +
         '<button type="button" class="chat-back" id="chat-close"><i class="ti ti-arrow-left" aria-hidden="true"></i>Wróć do budżetu</button>' +
       "</header>" +
       '<div class="chat-scroll" id="chat-scroll">' +
