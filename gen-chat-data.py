@@ -84,13 +84,33 @@ def keys(*parts):
 facts = []
 
 
-def add(year, topic, text, extra="", always=False):
+def add(year, topic, text, extra="", always=False, link=None, nums=None):
+    """link: (path on the site, label) for the "see it on the page" button.
+    nums: [{k: series key, p: plan, w: execution}] in mld zł, for server-side maths."""
     facts.append({
         "y": year,
         "t": text,
         "k": keys(topic, extra, text if len(text) < 200 else topic),
         **({"a": 1} if always else {}),
+        **({"l": list(link)} if link else {}),
+        **({"n": nums} if nums else {}),
     })
+
+
+def page(year, view=""):
+    """Site address of a view for a year, the same way the app writes it."""
+    if year == LAST_LAW:
+        return "/" + view
+    return f"/{year}" + (f"/{view}" if view else "")
+
+
+def num(key, plan_tys, wyk_tys=None, full=True):
+    d = {"k": key, "p": round(plan_tys / 1e6, 4)}
+    if wyk_tys is not None:
+        d["w"] = round(wyk_tys / 1e6, 4)
+        if not full:
+            d["wp"] = 1  # partial year: execution so far, not comparable with full years
+    return d
 
 
 def load(name):
@@ -123,8 +143,11 @@ for year in range(FIRST, LAST_LAW + 1):
         t += f" Dług publiczny ok. {str(m['dlug_pkb_proc']).replace('.', ',')}% PKB."
     if m.get("obrona_pkb_proc"):
         t += f" Wydatki na obronę ok. {str(m['obrona_pkb_proc']).replace('.', ',')}% PKB."
+    ww = w["wykonanie"] if w else {}
     add(year, "budżet ogółem razem wydatki dochody deficyt suma całość ile wynosi", t,
-        "dziura budżetowa wykonanie plan", always=True)
+        "dziura budżetowa wykonanie plan", always=True,
+        link=(page(year), f"Przegląd budżetu {year}"),
+        nums=[num(k, m[k], ww.get(k), not partial) for k in ("wydatki", "dochody", "deficyt")])
     if w and w["meta"].get("uwaga"):
         add(year, "nowelizacja zmiana planu uwaga wyjaśnienie",
             f"Uwaga do budżetu {year}: " + re.sub(r"\s*\(budget-\d+\.json\)|budget-\d+\.json:\s*", "", w["meta"]["uwaga"]), always=True)
@@ -139,7 +162,10 @@ for year in range(FIRST, LAST_LAW + 1):
                       f"{w_label} {mld(w['dochody'][d['name']])}")
             else:
                 t += f", {w_label} {mld(w['dochody'][d['name']])}"
-        add(year, f"dochody wpływy podatki {d['name']}", t + ".", DOCHODY_SLOWA.get(d["name"], ""))
+        wd = w["dochody"].get(d["name"]) if w and d["name"] not in name_ov else None
+        add(year, f"dochody wpływy podatki {d['name']}", t + ".", DOCHODY_SLOWA.get(d["name"], ""),
+            link=(page(year, "przeplyw"), f"Skąd pieniądze · {year}"),
+            nums=[num("doch:" + d["name"], d["plan"], wd, not partial)])
 
     for d in b["dzialy"]:
         t = (f"Wydatki {year}, dział {d['code']} {d['name']}: plan {mld(d['plan'])} "
@@ -147,47 +173,58 @@ for year in range(FIRST, LAST_LAW + 1):
         if w and d["code"] in w.get("dzialy", {}):
             t += f"; {dz_label}: {mld(w['dzialy'][d['code']])}"
         t += "."
-        add(year, f"wydatki dział {d['code']} {d['name']}", t, DZIAL_SLOWA.get(d["code"], ""))
+        wz = w["dzialy"].get(d["code"]) if w else None
+        add(year, f"wydatki dział {d['code']} {d['name']}", t, DZIAL_SLOWA.get(d["code"], ""),
+            link=(f"/{year}/mapa/{d['code']}", f"{d['name']} · {year}"),
+            nums=[num("dz:" + d["code"], d["plan"], wz, not (dm or partial))])
 
     for c in b["czesci"]:
         add(year, f"część {c['code']} {c['name']} dysponent",
-            f"Wydatki {year}, część budżetowa {c['code']} ({c['name']}): plan {mld(c['plan'])}.")
+            f"Wydatki {year}, część budżetowa {c['code']} ({c['name']}): plan {mld(c['plan'])}.",
+            link=(page(year, "mapa"), f"Mapa wydatków · {year}"), nums=[num("cz:" + c["code"], c["plan"])])
 
     for ty in b["typy"]:
         add(year, f"rodzaj typ wydatków {ty['name']}",
-            f"Wydatki {year} według rodzaju, {ty['name']}: plan {mld(ty['plan'])}.")
+            f"Wydatki {year} według rodzaju, {ty['name']}: plan {mld(ty['plan'])}.",
+            link=(page(year, "rodzaje"), f"Rodzaje wydatków · {year}"), nums=[num("ty:" + ty["name"], ty["plan"])])
 
 # ---------- 2027: draft law ----------
+def add27(topic, text, extra="", always=False, nums=None):
+    add(PROJECT_YEAR, topic, text, extra, always, link=("/budzet-2027", f"Budżet {PROJECT_YEAR} krok po kroku"), nums=nums)
+
+
 p = load("budzet-2027.json")
 if p:
     pm, art = p["meta"], p["ustawa"]["art"]
-    add(PROJECT_YEAR, "budżet 2027 projekt ogółem wydatki dochody deficyt etap sejm",
+    add27("budżet 2027 projekt ogółem wydatki dochody deficyt etap sejm",
         f"Projekt budżetu na {PROJECT_YEAR} (druk sejmowy nr {pm['druk_sejmowy']}; etap: {pm['etap_krotko']}): "
         f"wydatki {fmt(art['wydatki'])}, dochody {fmt(art['dochody'])}, deficyt {fmt(art['deficyt'])}. "
         f"{pm['etap_opis']} To projekt, nie przyjęta ustawa.",
-        "przyszły rok następny rok projekt ustawy", always=True)
-    add(PROJECT_YEAR, "pożyczki przychody rozchody potrzeby pożyczkowe limit zadłużenia",
+        "przyszły rok następny rok projekt ustawy", always=True,
+        nums=[{"k": k, "p": art[k]} for k in ("wydatki", "dochody", "deficyt")])
+    add27("pożyczki przychody rozchody potrzeby pożyczkowe limit zadłużenia",
         f"Projekt {PROJECT_YEAR}: przychody (głównie nowe pożyczki) {fmt(art['przychody'])}, "
         f"rozchody (spłata starych długów) {fmt(art['rozchody'])}, limit przyrostu zadłużenia {fmt(art['limit_zadluzenia'], 0)}.")
     for d in p["ustawa"]["dochody_pelne"]:
-        add(PROJECT_YEAR, f"dochody {d['name']}", f"Projekt {PROJECT_YEAR}, dochody, {d['name']}: {fmt(d['v'])}.",
+        add27(f"dochody {d['name']}", f"Projekt {PROJECT_YEAR}, dochody, {d['name']}: {fmt(d['v'])}.",
             next((v for k, v in DOCHODY_SLOWA.items() if k in d["name"]), ""))
     for d in p["ustawa"]["dzialy"]:
         t = f"Projekt {PROJECT_YEAR}, wydatki, dział {d['code']} {d['name']}: {fmt(d['v'])}"
         if d.get("v2026") is not None:
             t += f" (w ustawie na 2026: {fmt(d['v2026'])})"
-        add(PROJECT_YEAR, f"wydatki dział {d['code']} {d['name']}", t + ".", DZIAL_SLOWA.get(d["code"], ""))
+        add27(f"wydatki dział {d['code']} {d['name']}", t + ".", DZIAL_SLOWA.get(d["code"], ""),
+              nums=[{"k": "dz:" + d["code"], "p": d["v"]}])
     for r in p["ustawa"]["rodzaje"]:
-        add(PROJECT_YEAR, f"rodzaj wydatków {r['name']}", f"Projekt {PROJECT_YEAR}, {r['name']}: {fmt(r['v'])}. {r['opis']}")
+        add27(f"rodzaj wydatków {r['name']}", f"Projekt {PROJECT_YEAR}, {r['name']}: {fmt(r['v'])}. {r['opis']}")
     for f in p["filary"]["pozycje"]:
-        add(PROJECT_YEAR, f"{f['name']} filar priorytet", f"Projekt {PROJECT_YEAR}, {f['name']} (łączne wydatki publiczne na ten cel, nie tylko budżet państwa): {fmt(f['v'])}; {f['kicker']}.")
+        add27(f"{f['name']} filar priorytet", f"Projekt {PROJECT_YEAR}, {f['name']} (łączne wydatki publiczne na ten cel, nie tylko budżet państwa): {fmt(f['v'])}; {f['kicker']}.")
     for x in p["portfel"]:
-        add(PROJECT_YEAR, f"{x['name']} {x['name'].replace('+', ' plus')} świadczenie program", f"Projekt {PROJECT_YEAR}, {x['name']}: {fmt(x['v'])}. {x['opis']}")
+        add27(f"{x['name']} {x['name'].replace('+', ' plus')} świadczenie program", f"Projekt {PROJECT_YEAR}, {x['name']}: {fmt(x['v'])}. {x['opis']}")
     for x in p["makro"]:
-        add(PROJECT_YEAR, f"{x['name']} makro założenia prognoza gospodarka",
+        add27(f"{x['name']} makro założenia prognoza gospodarka",
             f"Założenia do budżetu {PROJECT_YEAR}, {x['name']}: {str(x['v']).replace('.', ',')}{x['unit']} ({x['opis']}).")
     dl = p["dlug"]
-    add(PROJECT_YEAR, "dług publiczny pkb próg ostrożnościowy konstytucyjny obsługa długu odsetki",
+    add27("dług publiczny pkb próg ostrożnościowy konstytucyjny obsługa długu odsetki",
         "Państwowy dług publiczny (% PKB): " + ", ".join(f"{x['rok']}: {str(x['v']).replace('.', ',')}%" for x in dl["pkb"])
         + f". Próg ostrożnościowy {dl['prog_ostroznosciowy']}%, limit konstytucyjny {dl['prog_konstytucyjny']}% PKB. "
         f"Obsługa długu w {PROJECT_YEAR}: {fmt(dl['obsluga_2027'])}.")
@@ -196,17 +233,17 @@ if p:
     def skala(rows):
         return ", ".join(f"od {x['od']:,} zł".replace(",", " ") + (f" do {x['do']:,} zł".replace(",", " ") if x.get("do") else " wzwyż")
                          + f": {x['stawka']}%" for x in rows)
-    add(PROJECT_YEAR, "pit skala podatkowa próg podatkowy 12% 32% zmiana",
+    add27("pit skala podatkowa próg podatkowy 12% 32% zmiana",
         f"Skala PIT dziś: {skala(pit['teraz'])}. Proponowana skala: {skala(pit['projekt'])}. "
         f"{pit['uwaga']} Obejmie ok. {str(pit['podatnicy_mln']).replace('.', ',')} mln podatników, "
         f"maksymalnie {pit['max_zysk']} zł zysku rocznie.")
-    add(PROJECT_YEAR, "termin sejm senat konstytucja kiedy uchwalenie harmonogram", p["termin"]["opis"])
+    add27("termin sejm senat konstytucja kiedy uchwalenie harmonogram", p["termin"]["opis"])
 
 # ---------- credit rating ----------
 r = load("rynek.json")
 if r:
     ag = "; ".join(f"{a['nazwa']}: {a['ocena']}, perspektywa {a['perspektywa']} ({a['data']})" for a in r["agencje"])
-    add(None, "rating ocena wiarygodność kredytowa agencje s&p moody's fitch obligacje",
+    add(None, "rating ocena wiarygodność kredytowa agencje s&p moody's fitch obligacje", link=("/", "Rating Polski · Przegląd"), text=
         f"Rating Polski (stan na {r['meta']['aktualizacja']}): {ag}. {r['meta']['nota']}")
 
 import hashlib
