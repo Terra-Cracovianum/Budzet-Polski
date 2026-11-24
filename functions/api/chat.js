@@ -20,7 +20,8 @@ const MAX_QUESTION = 500;          // characters
 const MAX_HISTORY = 6;             // earlier messages sent back to the model
 const MAX_FACTS = 24;          // trend questions (many years)
 const MAX_FACTS_YEAR = 12;     // questions about one or a few years: shorter prompt, faster start
-const CACHE_TTL = 24 * 3600;   // seconds; cached answers for first questions (no history)
+const CACHE_TTL = 24 * 3600;
+const CACHE_GEN = 2;           // bump to drop all cached answers (2: answers that lost their zeros)   // seconds; cached answers for first questions (no history)
 const RATE = { limit: 40, windowMs: 10 * 60 * 1000 }; // per visitor, per isolate
 
 const [FIRST_YEAR, LAST_YEAR] = data.years;
@@ -161,8 +162,9 @@ export function sseToText(stream) {
           if (!data || data === "[DONE]") continue;
           try {
             const j = JSON.parse(data);
-            const piece = j.response ?? j.choices?.[0]?.delta?.content ?? "";
-            if (piece) ctrl.enqueue(enc.encode(piece));
+            const piece = j.response ?? j.choices?.[0]?.delta?.content;
+            // a piece can be the NUMBER 0 (e.g. the "0" in 2026): never test it with if (piece)
+            if (piece !== undefined && piece !== null && piece !== "") ctrl.enqueue(enc.encode(String(piece)));
           } catch {
             /* partial or non-JSON line */
           }
@@ -257,7 +259,7 @@ export async function onRequestPost({ request, env, ctx }) {
   // Same first question -> same answer: serve it from the cache instantly.
   // Only questions without history (a follow-up depends on the conversation).
   const cache = !history.length && typeof caches !== "undefined" ? caches.default : null;
-  const cacheKey = cache ? new Request(`https://chat-cache.invalid/${data.version}/${env.AI_MODEL || env.LLM_MODEL || "default"}/${encodeURIComponent(normQuestion(question))}`) : null;
+  const cacheKey = cache ? new Request(`https://chat-cache.invalid/g${CACHE_GEN}/${data.version}/${env.AI_MODEL || env.LLM_MODEL || "default"}/${encodeURIComponent(normQuestion(question))}`) : null;
   if (cache) {
     const hit = await cache.match(cacheKey);
     if (hit) return new Response(hit.body, { headers: { ...TEXT_HEADERS, "x-chat-model": hit.headers.get("x-chat-model") || "", "x-chat-cache": "hit" } });

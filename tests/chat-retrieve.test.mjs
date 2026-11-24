@@ -39,6 +39,14 @@ assert.equal(r.status, 200); assert.equal(await r.text(), "Odpowiedź testowa.")
 assert.equal(r.headers.get("x-chat-model"), "@cf/mistralai/mistral-small-3.1-24b-instruct");
 assert.equal(seen.input.stream, true);
 assert.match(seen.input.messages[0].content, /dział 752 Obrona narodowa: plan 109,2 mld zł/);
+// pieces sent as numbers (0, 2, 6) must not be dropped: "W 2026 roku: 109,2 mld zł"
+const numSse = new ReadableStream({ start(c) {
+  const e = new TextEncoder();
+  for (const p of ["W ", 2, 0, 2, 6, " roku: ", 1, 0, 9, ",", 2, " mld zł"]) c.enqueue(e.encode("data: " + JSON.stringify({ response: p }) + "\n\n"));
+  c.close();
+} });
+r = await onRequestPost({ request: req({ question: "Obrona 2026?" }), env: { AI: { run: async () => numSse } } });
+assert.equal(await r.text(), "W 2026 roku: 109,2 mld zł");
 // primary model fails -> fallback answers
 tried = [];
 const envFail = { AI: { run: async (model) => { tried.push(model); if (model.includes("mistral")) throw new Error("no such model"); return sse(["ok"]); } } };
