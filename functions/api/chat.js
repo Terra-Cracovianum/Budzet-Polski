@@ -11,7 +11,11 @@
 
 import data from "../../chat-data.json" with { type: "json" };
 
-const DEFAULT_AI_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
+// Mistral Small 3.1: good at Polish and other European languages, ~3x smaller
+// (faster) than Llama 3.3 70B. If it fails to start, the Llama model answers.
+const DEFAULT_AI_MODEL = "@cf/mistralai/mistral-small-3.1-24b-instruct";
+const FALLBACK_AI_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
+const MAX_TOKENS = 400;
 const MAX_QUESTION = 500;          // characters
 const MAX_HISTORY = 6;             // earlier messages sent back to the model
 const MAX_FACTS = 24;
@@ -135,9 +139,39 @@ DANE (kwoty w mld zł; źródło: ustawy budżetowe, sprawozdania Ministerstwa F
 ${facts.length ? facts.map((t) => "- " + t).join("\n") : "- (brak danych pasujących do pytania)"}`;
 }
 
-// ---------- model call ----------
+// ---------- model call (streamed) ----------
 
-async function askModel(env, messages) {
+// Turns a server-sent-events stream (Workers AI or OpenAI-style) into plain text.
+export function sseToText(stream) {
+  const dec = new TextDecoder();
+  const enc = new TextEncoder();
+  let buf = "";
+  return stream.pipeThrough(
+    new TransformStream({
+      transform(chunk, ctrl) {
+        buf += typeof chunk === "string" ? chunk : dec.decode(chunk, { stream: true });
+        const lines = buf.split("\n");
+        buf = lines.pop();
+        for (const line of lines) {
+          const t = line.trim();
+          if (!t.startsWith("data:")) continue;
+          const data = t.slice(5).trim();
+          if (!data || data === "[DONE]") continue;
+          try {
+            const j = JSON.parse(data);
+            const piece = j.response ?? j.choices?.[0]?.delta?.content ?? "";
+            if (piece) ctrl.enqueue(enc.encode(piece));
+          } catch {
+            /* partial or non-JSON line */
+          }
+        }
+      },
+    })
+  );
+}
+
+// Returns { stream, model }. Tries the chosen model, then the fallback.
+async function streamModel(env, messages) {
   if (env.LLM_URL) {
     const res = await fetch(env.LLM_URL.replace(/\/$/, "") + "/v1/chat/completions", {
       method: "POST",
@@ -145,15 +179,28 @@ async function askModel(env, messages) {
         "content-type": "application/json",
         ...(env.LLM_KEY ? { authorization: `Bearer ${env.LLM_KEY}` } : {}),
       },
-      body: JSON.stringify({ model: env.LLM_MODEL || "bielik", messages, max_tokens: 500, temperature: 0.2 }),
+      body: JSON.stringify({ model: env.LLM_MODEL || "bielik", messages, max_tokens: MAX_TOKENS, temperature: 0.2, stream: true }),
     });
-    if (!res.ok) throw new Error(`LLM ${res.status}`);
-    const json = await res.json();
-    return json.choices?.[0]?.message?.content ?? "";
+    if (!res.ok || !res.body) throw new Error(`LLM ${res.status}`);
+    return { stream: sseToText(res.body), model: env.LLM_MODEL || "bielik" };
   }
   if (!env.AI) throw new Error("No AI binding");
-  const out = await env.AI.run(env.AI_MODEL || DEFAULT_AI_MODEL, { messages, max_tokens: 500, temperature: 0.2 });
-  return out?.response ?? out?.choices?.[0]?.message?.content ?? "";
+  const models = [...new Set([env.AI_MODEL || DEFAULT_AI_MODEL, FALLBACK_AI_MODEL])];
+  let lastErr;
+  for (const model of models) {
+    try {
+      const out = await env.AI.run(model, { messages, max_tokens: MAX_TOKENS, temperature: 0.2, stream: true });
+      if (out instanceof ReadableStream) return { stream: sseToText(out), model };
+      // a model that ignores "stream" returns the whole answer at once
+      const text = out?.response ?? out?.choices?.[0]?.message?.content ?? "";
+      if (text) return { stream: new Response(text).body, model };
+      throw new Error("empty answer");
+    } catch (err) {
+      console.error("model failed", model, err);
+      lastErr = err;
+    }
+  }
+  throw lastErr;
 }
 
 // ---------- rate limit (simple; add a Cloudflare rate-limiting rule too) ----------
@@ -209,8 +256,10 @@ export async function onRequestPost({ request, env }) {
   const messages = [{ role: "system", content: systemPrompt(facts) }, ...history, { role: "user", content: question }];
 
   try {
-    const answer = (await askModel(env, messages)).trim();
-    return json({ answer: answer || "Nie udało mi się odpowiedzieć. Spróbuj zadać pytanie inaczej." });
+    const { stream, model } = await streamModel(env, messages);
+    return new Response(stream, {
+      headers: { "content-type": "text/plain; charset=utf-8", "cache-control": "no-store", "x-chat-model": model },
+    });
   } catch (err) {
     console.error("chat error", err);
     return json({ error: "Asystent jest chwilowo niedostępny. Spróbuj za chwilę." }, 502);
