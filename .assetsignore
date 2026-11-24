@@ -8,3 +8,4 @@ wrangler.toml
 .assetsignore
 *.py
 .gitignore
+og/render.mjs
