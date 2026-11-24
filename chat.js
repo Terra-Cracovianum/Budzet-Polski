@@ -169,7 +169,18 @@
     var d = document.createElement("div");
     d.className = "chat-msg " + role;
     d.innerHTML = '<div class="chat-body">' + html + "</div>";
-    if (actions) {
+    if (actions) addActions(d);
+    $("chat-log").appendChild(d);
+    scrollDown();
+    return d;
+  }
+
+  function scrollDown() {
+    var sc = $("chat-scroll");
+    sc.scrollTop = sc.scrollHeight;
+  }
+
+  function addActions(d) {
       d.insertAdjacentHTML("beforeend",
         '<div class="chat-acts">' +
           '<span class="chat-pair">' +
@@ -178,11 +189,6 @@
           "</span>" +
           '<button type="button" data-act="copy" aria-label="Kopiuj odpowiedź"><i class="ti ti-copy" aria-hidden="true"></i></button>' +
         "</div>");
-    }
-    $("chat-log").appendChild(d);
-    var sc = $("chat-scroll");
-    sc.scrollTop = sc.scrollHeight;
-    return d;
   }
 
   function send(text) {
@@ -202,18 +208,39 @@
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ question: text, history: history })
     })
-      .then(function (r) { return r.json().catch(function () { return {}; }); })
-      .then(function (j) {
-        wait.remove();
-        if (j.answer) {
-          var m = add("bot", render(j.answer), true);
-          m._q = text;
-          m._a = j.answer;
-          history.push({ role: "user", content: text }, { role: "assistant", content: j.answer });
-          history = history.slice(-6);
-        } else {
-          add("bot err", "<p>" + esc(j.error || "Coś poszło nie tak. Spróbuj ponownie.") + "</p>", false);
+      .then(function (r) {
+        var ct = r.headers.get("content-type") || "";
+        // errors (rate limit, model down) come back as JSON
+        if (!r.ok || ct.indexOf("application/json") !== -1 || !r.body) {
+          return r.json().catch(function () { return {}; }).then(function (j) {
+            wait.remove();
+            add("bot err", "<p>" + esc(j.error || "Coś poszło nie tak. Spróbuj ponownie.") + "</p>", false);
+          });
         }
+        // the answer arrives in pieces: show it as it is written
+        var reader = r.body.getReader(), dec = new TextDecoder(), answer = "", msg = null;
+        function pump() {
+          return reader.read().then(function (x) {
+            if (x.done) return;
+            answer += dec.decode(x.value, { stream: true });
+            if (!msg && answer.trim()) { wait.remove(); msg = add("bot", "", false); }
+            if (msg) { msg.querySelector(".chat-body").innerHTML = render(answer.trim()); scrollDown(); }
+            return pump();
+          });
+        }
+        return pump().then(function () {
+          answer = answer.trim();
+          if (!msg) {
+            wait.remove();
+            add("bot err", "<p>Nie udało mi się odpowiedzieć. Spróbuj zadać pytanie inaczej.</p>", false);
+            return;
+          }
+          addActions(msg);
+          msg._q = text;
+          msg._a = answer;
+          history.push({ role: "user", content: text }, { role: "assistant", content: answer });
+          history = history.slice(-6);
+        });
       })
       .catch(function () {
         wait.remove();
