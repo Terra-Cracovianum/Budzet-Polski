@@ -684,3 +684,6 @@ body.is-loaded .rv { animation: viewIn .7s var(--ease) both; animation-delay: ca
   *, *::before, *::after { animation-duration: 0.001ms !important; animation-delay: 0ms !important; transition-duration: 0.001ms !important; }
   .rv { opacity: 1; transform: none; }
 }
+
+.foot-t a { color: inherit; text-underline-offset: 2px; }
+.foot-t a:hover { color: var(--ink); }
