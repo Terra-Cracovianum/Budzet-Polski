@@ -47,6 +47,16 @@ const numSse = new ReadableStream({ start(c) {
 } });
 r = await onRequestPost({ request: req({ question: "Obrona 2026?" }), env: { AI: { run: async () => numSse } } });
 assert.equal(await r.text(), "W 2026 roku: 109,2 mld zł");
+// a year with no data: the server answers by itself, the model is not called
+{
+  let called = false;
+  const r0 = await onRequestPost({ request: req({ question: "Jaki był budżet w 2005?" }), env: { AI: { run: async () => { called = true; return sse(["x"]); } } } });
+  const t0 = await r0.text();
+  assert.equal(called, false); assert.match(t0, /^Nie mam danych za 2005 rok\./); assert.equal(r0.headers.get("x-chat-model"), "server");
+  // a valid year next to an old one still goes to the model
+  const r1 = await onRequestPost({ request: req({ question: "Porównaj deficyt 2005 i 2015" }), env });
+  assert.notEqual(r1.headers.get("x-chat-model"), "server"); await r1.text();
+}
 // primary model fails -> fallback answers
 tried = [];
 const envFail = { AI: { run: async (model) => { tried.push(model); if (model.includes("mistral")) throw new Error("no such model"); return sse(["ok"]); } } };
