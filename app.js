@@ -184,7 +184,7 @@
   }
 
   // ================= DATA ACCESS =================
-  function getJSON(u) { return fetch(u).then(function (r) { if (!r.ok) throw new Error(u + " HTTP " + r.status); return r.json(); }); }
+  function getJSON(u) { if (!/^https?:|^\//.test(u)) u = "/" + u; return fetch(u).then(function (r) { if (!r.ok) throw new Error(u + " HTTP " + r.status); return r.json(); }); }
   function loadYear(yr) {
     if (YEAR_CACHE[yr]) return Promise.resolve(YEAR_CACHE[yr]);
     if (!YEAR_FILES[yr]) return Promise.resolve(null);
@@ -546,32 +546,56 @@
   function setHtml(id, h) { var el = document.getElementById(id); if (el) el.innerHTML = h; }
 
   // ================= URL =================
+  // Pretty paths: /  /mapa  /2024  /2024/mapa  /2024/mapa/752
+  // (year is left out for the newest year unless a dział is open)
+  var SITE = "https://budzetpolski.com";
+  function buildPath(yr, v, dz) {
+    var parts = [];
+    if (yr !== LATEST || dz != null) parts.push(yr);
+    if (VIEWS[v].slug) parts.push(VIEWS[v].slug);
+    if (dz != null) parts.push(dz);
+    return "/" + parts.join("/");
+  }
+  function readUrl() {
+    var out = { rok: NaN, slug: "", dz: null };
+    location.pathname.split("/").forEach(function (seg) {
+      if (/^20\d\d$/.test(seg)) out.rok = parseInt(seg, 10);
+      else if (/^\d{3}$/.test(seg)) out.dz = seg;
+      else if (seg && viewFromSlug(seg) !== "overview") out.slug = seg;
+    });
+    // old links: ?rok=2025&widok=mapa&dzial=752
+    var p = new URLSearchParams(location.search);
+    if (p.get("rok")) out.rok = parseInt(p.get("rok"), 10);
+    if (p.get("widok")) out.slug = p.get("widok");
+    if (p.get("dzial")) out.dz = p.get("dzial");
+    return out;
+  }
+  function setCanonical(path) {
+    var c = document.querySelector('link[rel="canonical"]'); if (c) c.href = SITE + path;
+    var o = document.querySelector('meta[property="og:url"]'); if (o) o.content = SITE + path;
+  }
   function writeUrl() {
-    var p = new URLSearchParams();
-    if (YEAR !== LATEST || dzialDetail != null) p.set("rok", YEAR);
-    if (VIEWS[view].slug) p.set("widok", VIEWS[view].slug);
-    if (dzialDetail != null) p.set("dzial", dzialDetail);
-    var q = p.toString();
-    history.replaceState(history.state, "", q ? "?" + q : location.pathname);
+    var path = buildPath(YEAR, view, dzialDetail);
+    if (location.pathname !== path || location.search) history.replaceState(history.state, "", path + location.hash);
+    setCanonical(buildPath(YEAR, view, null));
   }
   function initFromUrl() {
-    var p = new URLSearchParams(location.search);
-    var v = viewFromSlug(p.get("widok") || "");
-    var dz = p.get("dzial"), rok = parseInt(p.get("rok"), 10);
+    var u = readUrl();
+    var v = viewFromSlug(u.slug);
     // old deep links (?rok=2025&dzial=752) opened the map — keep that behaviour
-    if (dz && !p.get("widok")) v = "tree";
+    if (u.dz && !u.slug) v = "tree";
     function finish() {
       switchView(v);
-      if (dz && dzialMeta(dz)) openDzial(dz, false);
+      if (u.dz && dzialMeta(u.dz)) openDzial(u.dz, false);
+      writeUrl();
     }
-    if (rok && YEAR_FILES[rok] && rok !== YEAR) setYear(rok, finish, true);
+    if (u.rok && YEAR_FILES[u.rok] && u.rok !== YEAR) setYear(u.rok, finish, true);
     else finish();
   }
   function syncFromUrl() {
-    var p = new URLSearchParams(location.search);
-    var dz = p.get("dzial"), rok = parseInt(p.get("rok"), 10);
-    if (dz && (rok || LATEST) === YEAR && dzialMeta(dz)) {
-      if (dzialDetail !== dz) openDzial(dz, false);
+    var u = readUrl();
+    if (u.dz && (u.rok || LATEST) === YEAR && dzialMeta(u.dz)) {
+      if (dzialDetail !== u.dz) openDzial(u.dz, false);
     } else if (dzialDetail != null) {
       closeDzial(false);
     }
@@ -602,7 +626,7 @@
       if (dzialDetail != null) {
         if (dzialMeta(dzialDetail)) {
           drawDzialDetail(dzialDetail, true);
-          history.replaceState({ dzial: dzialDetail }, "", "?rok=" + yr + (VIEWS[view].slug ? "&widok=" + VIEWS[view].slug : "") + "&dzial=" + dzialDetail);
+          history.replaceState({ dzial: dzialDetail }, "", buildPath(yr, view, dzialDetail));
         } else closeDzial(true);
       }
       if (!silent) {
@@ -776,7 +800,7 @@
         })
         .on("mousemove", positionTip)
         .on("mouseleave", hideTip)
-        .on("click", function () { hideTip(); if (yr === 2027) location.href = "budzet-2027"; else setYear(yr); });
+        .on("click", function () { hideTip(); if (yr === 2027) location.href = "/budzet-2027"; else setYear(yr); });
     });
   }
   function p27Current() {
@@ -1414,10 +1438,7 @@
     requestAnimationFrame(function () { requestAnimationFrame(function () { sheet.classList.add("is-open"); bd.classList.add("is-open"); }); });
     setTimeout(function () { sheet.focus({ preventScroll: true }); }, 60);
     if (push) {
-      var p = new URLSearchParams(location.search);
-      p.set("rok", YEAR); p.set("dzial", code);
-      if (VIEWS[view].slug) p.set("widok", VIEWS[view].slug);
-      history.pushState({ dzial: code }, "", "?" + p.toString());
+      history.pushState({ dzial: code }, "", buildPath(YEAR, view, code));
     }
   }
   function closeDzial(push) {
@@ -1428,11 +1449,7 @@
     document.body.classList.remove("sheet-open");
     setTimeout(function () { if (dzialDetail == null) { sheet.hidden = true; bd.hidden = true; } }, prefersReduced() ? 0 : 460);
     if (push) {
-      var p = new URLSearchParams(location.search);
-      p.delete("dzial");
-      if (YEAR === LATEST) p.delete("rok");
-      var q = p.toString();
-      history.pushState({}, "", q ? "?" + q : location.pathname);
+      history.pushState({}, "", buildPath(YEAR, view, null));
     }
     if (sheetTrigger && sheetTrigger.focus && document.contains(sheetTrigger)) sheetTrigger.focus({ preventScroll: true });
     sheetTrigger = null;

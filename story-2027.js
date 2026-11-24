@@ -1138,7 +1138,7 @@
         '<div class="mkt-row"><div class="mkt-ags">' + ags + "</div>" +
           '<div class="mkt-y"><b>' + pct + "<small>%</small></b><span>10 lat · " + esc(fmtMonth(d.rentownosc.okres)) + "</span><span>" + (spread > 0 ? "+" : "") + nb(fmt(spread, 0)) + " pb wobec średniej UE</span></div></div>" +
         "<p>W projekcie na 2027 r. odsetki od długu to <strong>" + nb(fmt(cost, 0)) + " mld zł</strong>. Dziś państwo pożycza na 10 lat za <strong>" + pct + "%</strong> rocznie" + vs + ".</p>" +
-        '<a class="mkt-more" href="index.html#wiarygodnosc">Ratingi i obligacje dla oszczędzających <i class="ti ti-arrow-up-right" aria-hidden="true"></i></a>';
+        '<a class="mkt-more" href="/#wiarygodnosc">Ratingi i obligacje dla oszczędzających <i class="ti ti-arrow-up-right" aria-hidden="true"></i></a>';
     }
     getJSON("rynek.json").then(function (base) {
       paint(base);
