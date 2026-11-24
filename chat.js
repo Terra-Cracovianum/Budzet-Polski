@@ -217,6 +217,9 @@
             add("bot err", "<p>" + esc(j.error || "Coś poszło nie tak. Spróbuj ponownie.") + "</p>", false);
           });
         }
+        // the place on the page this answer is about (button under the answer)
+        var link = null;
+        try { var lh = r.headers.get("x-chat-link"); if (lh) link = JSON.parse(decodeURIComponent(lh)); } catch (e) { link = null; }
         // the answer arrives in pieces: show it as it is written
         var reader = r.body.getReader(), dec = new TextDecoder(), answer = "", msg = null;
         function pump() {
@@ -234,6 +237,14 @@
             wait.remove();
             add("bot err", "<p>Nie udało mi się odpowiedzieć. Spróbuj zadać pytanie inaczej.</p>", false);
             return;
+          }
+          if (link && typeof link.href === "string" && /^\/[\w\/-]*$/.test(link.href)) {
+            msg.insertAdjacentHTML("beforeend",
+              '<a class="chat-goto" href="' + esc(link.href) + '">' +
+                '<span class="chat-goto-k">Zobacz na stronie</span>' +
+                '<span class="chat-goto-l">' + esc(link.label || "") + "</span>" +
+                '<i class="ti ti-arrow-right" aria-hidden="true"></i>' +
+              "</a>");
           }
           addActions(msg);
           msg._q = text;
@@ -263,6 +274,18 @@
   // ---------- actions: links, feedback, copy ----------
 
   function onLogClick(e) {
+    // "Zobacz na stronie": close the chat and open that place (Cmd/Ctrl+click: new tab)
+    var go = e.target.closest && e.target.closest("a.chat-goto");
+    if (go) {
+      if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+      var href = go.getAttribute("href");
+      if (!window.BudzetApp || href.indexOf("/budzet-2027") === 0) return; // plain navigation
+      e.preventDefault();
+      close();
+      window.BudzetApp.go(href);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
     var a = e.target.closest("a.chat-link");
     if (a) {
       e.preventDefault();

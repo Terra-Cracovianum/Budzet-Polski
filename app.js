@@ -592,14 +592,28 @@
     if (u.rok && YEAR_FILES[u.rok] && u.rok !== YEAR) setYear(u.rok, finish, true);
     else finish();
   }
+  // back/forward buttons and links from the chat: bring year, view and dział in line with the address
   function syncFromUrl() {
     var u = readUrl();
-    if (u.dz && (u.rok || LATEST) === YEAR && dzialMeta(u.dz)) {
-      if (dzialDetail !== u.dz) openDzial(u.dz, false);
-    } else if (dzialDetail != null) {
-      closeDzial(false);
+    var v = viewFromSlug(u.slug);
+    if (u.dz && !u.slug) v = "tree";
+    function finish() {
+      if (view !== v) switchView(v);
+      if (u.dz && dzialMeta(u.dz)) { if (dzialDetail !== u.dz) openDzial(u.dz, false); }
+      else if (dzialDetail != null) closeDzial(false);
+      writeUrl(); // the year change rewrote the address before the dział opened
     }
+    var rok = u.rok || LATEST;
+    if (YEAR_FILES[rok] && rok !== YEAR) setYear(rok, finish);
+    else finish();
   }
+  // the chat assistant opens a place on the page: BudzetApp.go("/2018/mapa/752")
+  window.BudzetApp = {
+    go: function (path) {
+      if (location.pathname !== path) history.pushState({}, "", path);
+      syncFromUrl();
+    }
+  };
 
   // ================= YEAR =================
   function wireYear() {
