@@ -33,13 +33,12 @@ function colorKey(name) {
   if (/transport|łączn|infrastr|drog|kolej|gospodar|budownict|mieszkani|środowisk/.test(n)) return "infra";
   return "other";
 }
+// The app's own short names (app.js SHORT), so the image says exactly what the site says.
 const SHORT = {
-  "Obowiązkowe ubezpieczenia społeczne": "Emerytury i ubezpieczenia",
-  "Różne rozliczenia": "Samorządy i rozliczenia",
-  "Obsługa długu publicznego": "Odsetki od długu",
-  "Szkolnictwo wyższe i nauka": "Uczelnie i nauka",
-  "Bezpieczeństwo publiczne i ochrona przeciwpożarowa": "Policja i straż",
-  "Bezpieczeństwo publiczne i ochrona ppoż.": "Policja i straż",
+  "753": "Ubezpieczenia społeczne", "758": "Różne rozliczenia", "752": "Obrona narodowa", "757": "Obsługa długu",
+  "855": "Rodzina", "851": "Ochrona zdrowia", "730": "Szkolnictwo wyższe i nauka", "754": "Bezpieczeństwo publiczne",
+  "750": "Administracja publiczna", "751": "Urzędy naczelne i sądy", "755": "Wymiar sprawiedliwości", "600": "Transport i łączność",
+  "010": "Rolnictwo", "700": "Gospodarka mieszkaniowa", "852": "Pomoc społeczna", "801": "Oświata i wychowanie", "921": "Kultura",
 };
 const pl = (v, d = 1) => v.toLocaleString("pl-PL", { minimumFractionDigits: d, maximumFractionDigits: d }).replace(/ /g, " ");
 
@@ -83,7 +82,7 @@ function tiles(dzialy, W, H) {
   const GAP = 6;
   return squarify(items, 0, 0, W, H).map((t) => {
     const big = t.w > 170 && t.h > 110, mid = t.w > 110 && t.h > 64;
-    const label = SHORT[t.name] || t.name.replace(/ i łowiectwo$/, "");
+    const label = SHORT[t.code] || t.name;
     return `<div class="tile ${big ? "big" : mid ? "mid" : ""}" style="left:${t.x + GAP / 2}px;top:${t.y + GAP / 2}px;width:${t.w - GAP}px;height:${t.h - GAP}px;background:${t.other ? COLORS.other : COLORS[colorKey(t.name)]}">
       ${mid ? `<span class="t-name">${label}</span><span class="t-val">${pl(t.v)}${big ? "<small> mld zł</small>" : ""}</span>` : ""}
     </div>`;
@@ -162,7 +161,7 @@ const variants = [
     sub: "Każdy złoty budżetu państwa, od 2011 roku do projektu na 2027. Prosto z ustaw i sprawozdań Ministerstwa Finansów.",
     chips: ["2011–2027", "Mapa wydatków", "Wykonanie na żywo"],
     mapLabel: `Wydatki ${b26.meta.rok} wg działów · mld zł`,
-    tileHtml: tiles(b26.dzialy.map((d) => ({ name: d.name, v: d.plan / 1e6 })), MAP_W, MAP_H),
+    tileHtml: tiles(b26.dzialy.map((d) => ({ code: d.code, name: d.name, v: d.plan / 1e6 })), MAP_W, MAP_H),
   },
   {
     file: "og-2027.jpg",
@@ -172,7 +171,7 @@ const variants = [
     sub: `Deficyt ${pl(p27.ustawa.art.deficyt)} mld zł. Skąd pieniądze, dokąd płyną i jak projekt idzie przez Sejm, krok po kroku.`,
     chips: [`Druk nr ${p27.meta.druk_sejmowy}`, "Sejm · Senat", "Krok po kroku"],
     mapLabel: `Wydatki ${p27.meta.rok} wg działów · mld zł`,
-    tileHtml: tiles(p27.ustawa.dzialy.map((d) => ({ name: d.name, v: d.v })), MAP_W, MAP_H),
+    tileHtml: tiles(p27.ustawa.dzialy.map((d) => ({ code: d.code, name: d.name, v: d.v })), MAP_W, MAP_H),
   },
 ];
 
