@@ -259,7 +259,7 @@ def page(path, title, desc, body, h1, lead, crumb_items, image="og-home.jpg", ex
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.7.0/dist/tabler-icons.min.css">
-<link rel="stylesheet" href="/style.css?v=47">
+<link rel="stylesheet" href="/style.css?v=48">
 <link rel="stylesheet" href="/page.css?v=3">
 <link rel="stylesheet" href="/chat.css?v=8">
 {graph_ld}

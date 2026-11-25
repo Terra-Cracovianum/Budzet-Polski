@@ -713,7 +713,7 @@
   function renderHero(resizeOnly) {
     var m = DATA.meta, yr = m.rok || YEAR;
     var dz = (m.ustawa || "").match(/Dz\.U\.[^)]*/);
-    setText("hero-eyebrow", "Budżet państwa " + yr + " · plan z ustawy" + (dz ? " · " + dz[0] : ""));
+    setText("hero-eyebrow", "Budżet Polski " + yr + " · plan z ustawy" + (dz ? " · " + dz[0] : ""));
     var amt = document.getElementById("hero-amt"), unit = document.getElementById("hero-unit");
     var f = statMoneyFmt(m.wydatki);
     if (!resizeOnly) {
