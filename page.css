@@ -1,95 +1,125 @@
-/* Static topic pages (wydatki/*, budzet/*, deficyt, dochody, tematy). Tokens from style.css. */
-.pbody { background: var(--bg); color: var(--ink); }
-.pnav { display: flex; gap: 4px; margin-left: auto; overflow-x: auto; scrollbar-width: none; }
-.pnav::-webkit-scrollbar { display: none; }
-.pnav a { padding: 8px 12px; border-radius: 999px; color: var(--ink-2); text-decoration: none; font-size: 15px; font-weight: 500; white-space: nowrap; }
-.pnav a:hover { color: var(--ink); background: var(--surface); }
+/* Static pages (wydatki/*, budzet/*, deficyt, dochody, tematy, o-projekcie).
+   They are built from the app's own components (.vhead, .vh, .kpis/.stat, .bento/.card,
+   .tbl, .legend, .taxbar, .hint); this file only adds what the app does not have. */
 
-.pmain { padding-top: 28px; padding-bottom: 24px; max-width: 920px; }
-.crumbs { font-size: 13px; color: var(--ink-3); display: flex; flex-wrap: wrap; gap: 6px; }
-.crumbs a { color: var(--ink-2); text-decoration: none; }
-.crumbs a:hover { color: var(--ink); text-decoration: underline; }
-.ph1 { margin: 22px 0 0; font-size: clamp(34px, 6vw, 56px); font-weight: 600; letter-spacing: -0.04em; line-height: 1.02; }
-.ph1 small { display: block; margin-top: 12px; font: 500 14px/1.3 var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--accent); }
-.plead { margin: 22px 0 0; font-size: clamp(18px, 2.4vw, 22px); line-height: 1.45; color: var(--ink-2); letter-spacing: -0.015em; max-width: 46ch; }
-.plead b { color: var(--ink); font-weight: 600; }
-
-.pkpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1px; margin: 32px 0 8px; border-radius: var(--r); overflow: hidden; background: var(--hair); box-shadow: var(--shadow); }
-.pkpi { background: var(--surface); padding: 18px 20px; display: flex; flex-direction: column; gap: 6px; }
-.pk-l { font: 500 11.5px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
-.pkpi b { font-size: 30px; font-weight: 600; letter-spacing: -0.035em; }
-.pkpi b small { font-size: 14px; font-weight: 500; color: var(--ink-2); letter-spacing: 0; }
-.pk-s { font-size: 13px; color: var(--ink-2); }
-
-.psec { margin-top: 44px; }
-.psec h2 { font-size: 24px; font-weight: 600; letter-spacing: -0.025em; margin: 0 0 16px; }
-.psec p { color: var(--ink-2); line-height: 1.6; max-width: 70ch; }
-.pnote { margin-top: 18px; padding: 14px 18px; border-radius: var(--r-md); background: var(--surface); box-shadow: 0 0 0 1px var(--hair-2); color: var(--ink-2); font-size: 14.5px; line-height: 1.55; }
-
-.pchart { margin: 0 0 16px; padding: 18px 18px 12px; border-radius: var(--r); background: var(--surface); box-shadow: var(--shadow); }
-.pchart svg { display: block; width: 100%; height: auto; overflow: visible; }
-.pchart .b { fill: var(--c-social); opacity: .55; }
-.pchart .b-last { fill: var(--accent); }
-.pchart .b-draft { fill: var(--accent); opacity: .35; }
-.pchart .d { fill: var(--surface); stroke: var(--ink); stroke-width: 2; }
-.pchart text { font: 500 11px var(--mono); fill: var(--ink-3); }
-.pchart text.v { font: 600 13px var(--sans); fill: var(--ink); }
-.pchart figcaption { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin-top: 8px; font-size: 12.5px; color: var(--ink-2); }
-.lg { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: -8px; vertical-align: -1px; }
-.lg-b { background: var(--c-social); opacity: .55; }
-.lg-n { background: var(--accent); }
-.lg-d { border-radius: 50%; background: var(--surface); box-shadow: inset 0 0 0 2px var(--ink); }
-.lg-p { background: var(--accent); opacity: .35; }
-
-.ptable-wrap { overflow-x: auto; border-radius: var(--r-md); box-shadow: 0 0 0 1px var(--hair-2); background: var(--surface); }
-.ptable { width: 100%; border-collapse: collapse; font-size: 14.5px; font-variant-numeric: tabular-nums; }
-.ptable th { text-align: right; padding: 12px 14px; font: 500 11.5px/1.2 var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--ink-3); border-bottom: 1px solid var(--hair-2); white-space: nowrap; }
-.ptable td { text-align: right; padding: 10px 14px; border-bottom: 1px solid var(--hair); white-space: nowrap; }
-.ptable th:first-child, .ptable td:first-child { text-align: left; }
-.ptable tr:last-child td { border-bottom: 0; }
-.ptable a { color: var(--ink); text-decoration-color: var(--hair-2); text-underline-offset: 3px; }
-.ptable a:hover { color: var(--accent); }
-
-.pctas { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
-.pcta { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 18px; border-radius: var(--r-md); background: var(--surface); box-shadow: 0 0 0 1px var(--hair-2); color: var(--ink); text-decoration: none; transition: box-shadow .2s, transform .2s; }
-.pcta:hover { box-shadow: 0 0 0 1px var(--accent); transform: translateY(-1px); }
-.pcta b { display: block; font-weight: 600; font-size: 15.5px; letter-spacing: -0.01em; }
-.pcta small { display: block; margin-top: 3px; font-size: 13px; color: var(--ink-2); }
-.pcta i { color: var(--accent); font-size: 18px; flex: none; }
-
-.faq-i { border-bottom: 1px solid var(--hair-2); }
-.faq-i summary { cursor: pointer; list-style: none; padding: 16px 28px 16px 0; font-weight: 600; font-size: 16.5px; letter-spacing: -0.01em; position: relative; }
-.faq-i summary::-webkit-details-marker { display: none; }
-.faq-i summary::after { content: "+"; position: absolute; right: 4px; top: 13px; font-size: 22px; font-weight: 400; color: var(--ink-3); transition: transform .3s var(--ease); }
-.faq-i[open] summary::after { transform: rotate(45deg); }
-.faq-i p { margin: 0 0 16px; }
-
-.pyears { display: flex; justify-content: space-between; margin-top: 28px; }
-.pyears a { color: var(--ink-2); text-decoration: none; font-weight: 500; }
-.pyears a:hover { color: var(--ink); }
-.phub { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; }
-.phub a { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 14px 16px; border-radius: var(--r-sm); background: var(--surface); box-shadow: 0 0 0 1px var(--hair); color: var(--ink); text-decoration: none; transition: box-shadow .2s; }
-.phub a:hover { box-shadow: 0 0 0 1px var(--accent); }
-.phub span { font-weight: 500; font-size: 15px; }
-.phub b { font: 500 13px var(--mono); color: var(--ink-2); white-space: nowrap; }
-.pyrs { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 8px; }
-.pyrs a { display: inline-block; padding: 9px 14px; border-radius: 999px; background: var(--surface); box-shadow: 0 0 0 1px var(--hair-2); color: var(--ink); text-decoration: none; font: 500 14px var(--mono); }
-.pyrs a:hover { box-shadow: 0 0 0 1px var(--accent); }
-.psrc { margin-top: 48px; font-size: 12.5px; color: var(--ink-3); line-height: 1.6; max-width: 80ch; }
-.foot-t a { color: inherit; }
-
-@media (max-width: 640px) {
-  .pmain { padding-top: 18px; }
-  .pnav a { padding: 8px 9px; font-size: 14px; }
-  .pkpis { grid-template-columns: repeat(2, 1fr); }
-  .pkpi { padding: 14px 16px; }
-  .pkpi b { font-size: 22px; }
-  .ptable { font-size: 13.5px; }
+/* header: links behave like the app's tabs */
+.pbody a.nav-i { text-decoration: none; display: inline-flex; align-items: center; }
+.ptopics {
+  display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 14px; border-radius: 999px;
+  background: var(--surface); box-shadow: 0 0 0 1px var(--hair-2); color: var(--ink); text-decoration: none;
+  font-size: 14px; font-weight: 500; transition: box-shadow .2s var(--ease);
 }
-@media (prefers-reduced-motion: reduce) { .pcta, .faq-i summary::after { transition: none; } }
+.ptopics:hover, .ptopics.is-on { box-shadow: 0 0 0 1px var(--ink-3); }
+.ptopics i { font-size: 16px; color: var(--ink-2); }
 
-.plist { margin: 0; padding-left: 20px; color: var(--ink-2); line-height: 1.6; max-width: 70ch; }
-.plist li { margin: 6px 0; }
-.plist b { color: var(--ink); }
-.psec a, .psrc a { color: var(--ink); text-underline-offset: 3px; text-decoration-color: var(--hair-2); }
-.psec a:hover, .psrc a:hover { color: var(--accent); }
+/* view title */
+.pcrumb { display: flex; align-items: center; flex-wrap: wrap; gap: 0 6px; }
+.pcrumb a { color: inherit; text-decoration: none; }
+.pcrumb a:hover { color: var(--ink); }
+.pdot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 4px; }
+.vsub b { color: var(--ink); font-weight: 600; }
+.ppill {
+  display: inline-flex; align-items: center; gap: 6px; height: 38px; padding: 0 16px; border-radius: 999px;
+  background: var(--ink); color: var(--bg); text-decoration: none; font-size: 14px; font-weight: 600; white-space: nowrap;
+  transition: transform .2s var(--ease), opacity .2s;
+}
+.ppill:hover { transform: translateY(-1px); }
+.ppill i { font-size: 16px; }
+
+/* cards appear like the app's views */
+.pbody .kpis, .pbody .bento > .card { animation: viewIn .6s var(--ease) both; }
+.pbody .bento > .card:nth-child(2) { animation-delay: .06s; }
+.pbody .bento > .card:nth-child(3) { animation-delay: .12s; }
+.pbody .bento > .card:nth-child(n+4) { animation-delay: .16s; }
+
+/* charts: same marks as the app's d3 charts */
+.pchart svg { display: block; width: 100%; height: auto; }
+.pchart .ac-stop { stop-color: var(--accent); }
+.pchart .c-plan { fill: none; stroke: var(--accent); stroke-width: 2.4; stroke-linecap: round; }
+.pchart .c-dot { fill: var(--accent); opacity: .45; }
+.pchart .c-wyk { fill: none; stroke: var(--ink); stroke-opacity: .55; stroke-width: 1.6; stroke-dasharray: 1 0; }
+.pchart .c-wyk-dot { fill: var(--surface); stroke: var(--ink); stroke-opacity: .6; stroke-width: 1.4; }
+.pchart .c-draft { fill: none; stroke: var(--accent); stroke-width: 2.4; stroke-dasharray: 4 5; }
+.pchart .c-draft-dot { fill: var(--surface); stroke: var(--accent); stroke-width: 2.4; }
+.pchart .c-halo { fill: var(--accent); opacity: .16; }
+.pchart .c-sel { fill: var(--accent); stroke: var(--surface); stroke-width: 2.5; }
+.pchart .c-lab { fill: var(--ink); font: 600 14px var(--sans); }
+.pchart .axis-label { font-size: 12px; }
+.lg-plan { background: var(--accent); }
+.lg-wyk { background: transparent; box-shadow: inset 0 0 0 1.5px var(--ink); opacity: .7; }
+.lg-draft { background: transparent; box-shadow: inset 0 0 0 2px var(--accent); }
+.legend .soft { color: var(--ink-3); }
+.tbl .soft { color: var(--ink-3); font: 500 10.5px var(--mono); letter-spacing: .04em; text-transform: uppercase; margin-left: 6px; }
+.tbl a { color: inherit; text-decoration: none; }
+.tbl a:hover { color: var(--accent); }
+
+/* text inside cards */
+.ptext { color: var(--ink-2); font-size: 15px; line-height: 1.6; max-width: 72ch; }
+.ptext + .ptext, .plist + .ptext, .ptext + .plist { margin-top: 12px; }
+.plist { margin: 0; padding-left: 18px; color: var(--ink-2); font-size: 15px; line-height: 1.6; }
+.plist li { margin: 5px 0; }
+.plist b { color: var(--ink); font-weight: 600; }
+.card a:not(.plink):not(.ppill) { color: var(--ink); text-underline-offset: 3px; text-decoration-color: var(--hair-2); }
+.card a:not(.plink):not(.ppill):hover { color: var(--accent); }
+
+/* "Zobacz na stronie": rows like the app's lists */
+.plinks { display: flex; flex-direction: column; }
+.plink { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-top: 1px solid var(--hair); color: var(--ink); text-decoration: none; }
+.plink:first-child { border-top: 0; padding-top: 2px; }
+.plink b { display: block; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+.plink small { display: block; margin-top: 2px; font-size: 13px; color: var(--ink-2); }
+.plink i { color: var(--ink-3); font-size: 17px; transition: transform .25s var(--ease), color .2s; }
+.plink:hover i { color: var(--accent); transform: translate(2px, -2px); }
+.bento > .card.s12 .plinks { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 28px; }
+.bento > .card.s12 .plink { border-top: 0; padding-top: 2px; }
+
+/* FAQ */
+.faq-i { border-top: 1px solid var(--hair); }
+.faq-i:first-of-type { border-top: 0; }
+.faq-i summary { cursor: pointer; list-style: none; position: relative; padding: 14px 32px 14px 0; font-size: 16px; font-weight: 600; letter-spacing: -0.015em; }
+.faq-i summary::-webkit-details-marker { display: none; }
+.faq-i summary::after { content: "+"; position: absolute; right: 4px; top: 10px; font-size: 22px; font-weight: 400; color: var(--ink-3); transition: transform .3s var(--ease); }
+.faq-i[open] summary::after { transform: rotate(45deg); }
+.faq-i p { color: var(--ink-2); font-size: 15px; line-height: 1.6; padding: 0 0 16px; max-width: 72ch; }
+
+/* year pills (like the app's segmented control) */
+.pyears { display: flex; flex-wrap: wrap; gap: 6px; }
+.pyears .ppill { height: 34px; padding: 0 13px; background: var(--surface-2); color: var(--ink); box-shadow: 0 0 0 1px var(--hair-2); font: 500 13.5px var(--mono); }
+.pyears .ppill.is-on { background: var(--ink); color: var(--bg); box-shadow: none; }
+
+/* topics hub: one tile per dział */
+.ptile { display: flex; flex-direction: column; color: var(--ink); text-decoration: none; transition: transform .25s var(--ease), box-shadow .25s var(--ease); }
+.ptile:hover { transform: translateY(-2px); box-shadow: 0 0 0 1px var(--hair-2), var(--shadow-pop); }
+.ptile .k i { color: var(--ink-3); font-size: 17px; transition: transform .25s var(--ease), color .2s; }
+.ptile:hover .k i { color: var(--accent); transform: translate(2px, -2px); }
+.ptile h3 { font-size: 19px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 6px; }
+.ptile .stat-value { margin: 4px 0 8px; }
+.ptile-f { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: auto; }
+
+.hint a { color: inherit; text-underline-offset: 2px; }
+.hint a:hover { color: var(--ink); }
+
+@media (max-width: 1040px) { .bento > .card.s12 .plinks { grid-template-columns: 1fr; } .bento > .card.s12 .plink { border-top: 1px solid var(--hair); padding-top: 12px; } .bento > .card.s12 .plink:first-child { border-top: 0; } }
+@media (max-width: 760px) {
+  .vtools .ppill { height: 36px; }
+  .pyears .ppill { height: 32px; padding: 0 11px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pbody .kpis, .pbody .bento > .card { animation: none; }
+  .ppill, .ptile, .plink i, .faq-i summary::after { transition: none; }
+}
+
+/* side cards keep their own height next to a long table */
+.pbody .bento > .card.s4 { align-self: start; }
+/* lines and dots keep their weight when the chart scales down */
+.pchart .c-plan, .pchart .c-wyk, .pchart .c-draft, .pchart .grid, .pchart .c-draft-dot, .pchart .c-wyk-dot, .pchart .c-sel { vector-effect: non-scaling-stroke; }
+@media (max-width: 760px) {
+  .pchart .axis-label { font-size: 30px; }
+  .pchart .c-lab { font-size: 36px; }
+  .pchart .c-dot { r: 6; }
+  .pchart .c-wyk-dot { r: 6; }
+  .pchart .c-draft-dot { r: 10; }
+  .pchart .c-sel { r: 12; }
+  .pchart .c-halo { r: 26; }
+  .pchart .c-plan, .pchart .c-draft { stroke-width: 2.2; }
+}
