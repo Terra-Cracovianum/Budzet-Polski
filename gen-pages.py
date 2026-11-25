@@ -208,6 +208,11 @@ def dataset():
                             "Kwoty w tys. zł, w formacie JSON."),
             "url": SITE + "/o-projekcie", "keywords": ["budżet państwa", "budżet Polski", "wydatki publiczne", "deficyt budżetowy", "Ministerstwo Finansów", "ustawa budżetowa"],
             "creator": {"@id": ORG["@id"]}, "publisher": {"@id": ORG["@id"]}, "isAccessibleForFree": True, "inLanguage": "pl-PL",
+            # our compilation and calculations: CC BY 4.0; the source documents themselves are not copyrighted (art. 4 pr. aut.)
+            "license": "https://creativecommons.org/licenses/by/4.0/",
+            "usageInfo": SITE + "/o-projekcie#licencja",
+            "creditText": "budzetpolski.com, Stowarzyszenie Terra Cracovianum",
+            "copyrightNotice": "Dane źródłowe (ustawy budżetowe, sprawozdania Ministerstwa Finansów) nie są przedmiotem prawa autorskiego (art. 4 ustawy o prawie autorskim i prawach pokrewnych). Opracowanie: CC BY 4.0.",
             "temporalCoverage": f"{FIRST}/{PROJECT}", "spatialCoverage": {"@type": "Place", "name": "Polska"},
             "isBasedOn": ["https://www.gov.pl/web/finanse/budzet-panstwa", "https://isap.sejm.gov.pl", "https://stat.gov.pl"],
             "dateModified": TODAY,
@@ -285,7 +290,7 @@ def page(path, title, desc, body, h1, lead, crumb_items, image="og-home.jpg", ex
   <div class="wrap foot-in">
     {logo}
     <div class="foot-t">
-      <span><a href="/tematy">Wszystkie tematy</a> · <a href="/deficyt">Deficyt</a> · <a href="/dochody">Dochody</a> · <a href="/budzet-2027">Budżet 2027</a> · <a href="/o-projekcie">O projekcie</a></span>
+      <span><a href="/tematy">Wszystkie tematy</a> · <a href="/deficyt">Deficyt</a> · <a href="/dochody">Dochody</a> · <a href="/budzet-2027">Budżet 2027</a> · <a href="/o-projekcie">O projekcie</a> · <a href="/o-projekcie#licencja">Licencja CC BY 4.0</a></span>
       <span>© {date.today().year} Stowarzyszenie <a href="https://terracracovianum.org" rel="noopener">Terra Cracovianum</a></span>
     </div>
   </div>
@@ -500,8 +505,14 @@ def about_page():
 </ul></section>
 <section class="psec"><h2>Asystent AI</h2>
 <p>Asystent odpowiada wyłącznie na pytania o budżet państwa. Do każdego pytania serwer wyszukuje pasujące liczby w danych tej strony i sam wykonuje obliczenia (kwoty na osobę, zmiany procentowe, ceny stałe), a model AI tylko je opisuje prostym językiem. Mimo to może się pomylić, dlatego pod odpowiedzią jest link do miejsca na stronie, gdzie można sprawdzić liczbę. Nie zakładamy kont i nie zapisujemy rozmów.</p></section>
-<section class="psec"><h2>Otwarte dane</h2>
-<p>Wszystkie dane, na których działa serwis, są dostępne w formacie JSON, np. {files}. Kwoty są w tysiącach złotych. Korzystając z nich, podaj źródło: <i>budzetpolski.com, Stowarzyszenie Terra Cracovianum</i>.</p></section>
+<section class="psec" id="licencja"><h2>Otwarte dane i licencja</h2>
+<p>Informacja o tym, jak państwo wydaje publiczne pieniądze, należy do obywateli. Konstytucja RP gwarantuje prawo do informacji o działalności organów władzy publicznej (art. 61), a gospodarka środkami publicznymi jest jawna (art. 33 ustawy o finansach publicznych).</p>
+<ul class="plist">
+<li><b>Dane źródłowe są wolne od praw autorskich.</b> Ustawy budżetowe, sprawozdania i inne urzędowe dokumenty nie są przedmiotem prawa autorskiego (art. 4 ustawy o prawie autorskim i prawach pokrewnych). Każdy może z nich korzystać bez ograniczeń.</li>
+<li><b>Nasze opracowanie jest na licencji <a href="https://creativecommons.org/licenses/by/4.0/deed.pl" rel="license noopener">CC BY 4.0</a>.</b> Zestawienia danych, obliczenia (np. kwoty na osobę, ceny stałe), teksty i wykresy z tej strony możesz kopiować, udostępniać i przerabiać, także komercyjnie, pod warunkiem podania źródła: <i>budzetpolski.com, Stowarzyszenie Terra Cracovianum</i>.</li>
+<li><b>Dane GUS</b> (inflacja, liczba ludności) pochodzą z Głównego Urzędu Statystycznego i wykorzystujemy je z podaniem źródła.</li>
+</ul>
+<p>Wszystkie dane, na których działa serwis, są dostępne w formacie JSON, np. {files}. Kwoty są w tysiącach złotych.</p></section>
 <section class="psec"><h2>Kontakt i błędy</h2>
 <p>Znalazłeś błąd albo masz pomysł? Napisz do nas przez stronę <a href="https://terracracovianum.org" rel="noopener">terracracovianum.org</a>. Złą odpowiedź asystenta możesz też oznaczyć łapką w dół, zbieramy je i poprawiamy.</p></section>"""
     lead = "Kto prowadzi serwis, skąd pochodzą dane i jak je liczymy."
