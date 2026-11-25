@@ -216,6 +216,9 @@ em.s, .vh em { font-family: var(--serif); font-style: italic; font-weight: 400; 
 .hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 56px; align-items: end; padding: 64px 0 36px; }
 .eyebrow { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
 .eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex: none; }
+.hero-h { font: inherit; }
+.hero-h > .eyebrow { display: flex; }
+.hero-h > .hero-n { display: block; }
 .hero-n { font-size: 104px; font-weight: 600; letter-spacing: -0.055em; line-height: 0.92; white-space: nowrap; }
 .hero-n small { font-size: 40px; letter-spacing: -0.03em; font-weight: 500; color: var(--ink-2); margin-left: 10px; }
 .hero-t { font-size: 23px; line-height: 1.35; color: var(--ink-2); margin-top: 22px; max-width: 31ch; letter-spacing: -0.02em; }
